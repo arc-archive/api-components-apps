@@ -1,0 +1,42 @@
+{
+  "name": "api-components-autotest",
+  "version": "1.0.0",
+  "description": "A CI server to run API components tests using latest version of AMF and report results",
+  "main": "app.js",
+  "scripts": {
+    "start": "xvfb-run node ${SCRIPT:-app.js}",
+    "start-worker": "xvfb-run node --inspect=9228 worker.js",
+    "test": "mocha test/*.test.js",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci",
+    "deploy-frontend": "kubectl create -f app-frontend-datastore.yaml",
+    "deploy-backend": "kubectl create -f app-worker-datastore.yaml",
+    "deploy-service": "kubectl create -f apic-tests-service.yaml"
+  },
+  "author": "Pawel Psztyc",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "dependencies": {
+    "@google-cloud/datastore": "^2.0.0",
+    "@google-cloud/debug-agent": "^3.0.1",
+    "@google-cloud/logging-winston": "^0.10.2",
+    "@google-cloud/pubsub": "^0.22.2",
+    "@google-cloud/storage": "^2.3.4",
+    "@google-cloud/trace-agent": "^3.5.0",
+    "body-parser": "^1.18.3",
+    "bower": "^1.8.4",
+    "connect-memcached": "^1.0.0",
+    "decamelize": "^2.0.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "express-winston": "^3.0.1",
+    "fs-extra": "^7.0.1",
+    "nconf": "^0.10.0",
+    "passport": "^0.4.0",
+    "passport-google-oauth20": "^1.0.0",
+    "slug": "^0.9.3",
+    "tmp": "0.0.33",
+    "uuid": "^3.3.2",
+    "web-component-tester": "^6.9.2",
+    "winston": "^3.1.0"
+  }
+}

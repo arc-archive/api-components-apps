@@ -1,0 +1,118 @@
+#%RAML 1.0
+title: API Components tests REST API
+version: v1
+baseUri: http://localhost:8080/api
+mediaType: [application/json]
+description: |
+  An API for API components automated tests.
+  It allows to schedule tests of API comonents and observer the results.
+
+traits:
+  Paginated: !include traits/paginated.raml
+
+types:
+  Test: !include types/test.raml
+  TestCreate: !include types/create-test.raml
+  Component: !include types/component.raml
+  Log: !include types/log.raml
+  ErrorResource:
+    description: A response that is errored
+    type: object
+    properties:
+      error:
+        type: boolean
+        required: true
+        example: true
+        default: true
+        description: Indicate that the response is errored.
+      message:
+        type: string
+        description: The error message associated with the error.
+        required: true
+/tests:
+  displayName: Tests
+  get:
+    is: [Paginated: {resourceType: Test}]
+    displayName: List tests
+    description: |
+      Lists all available tests. By default it returns first 25 tests.
+      Use `limit` and `nextPageToken` parameters to enable pagination.
+  post:
+    displayName: Schedule a test
+    description: |
+      This method creates a test and schedules worker noed to execute the test.
+    body:
+      type: TestCreate
+    responses:
+      200:
+         body:
+           type: object
+           properties:
+             error:
+               required: false
+               type: boolean
+               description: Error message if any.
+             id:
+               required: false
+               type: string
+               description: An ID of scheduled test. Not set when error.
+  /{testId}:
+    uriParameters:
+      testId:
+        displayName: Test id
+    get:
+      displayName: Get a test
+      description: Returns a test.
+      responses:
+        200:
+          body:
+            type: Test
+        404:
+          body:
+            displayName: Test not found
+            type: ErrorResource
+    /components:
+      get:
+        is: [Paginated: {resourceType: Component}]
+        displayName: List tested components
+        description: |
+          Lists componets processed in a test.
+      /{componentName}:
+        uriParameters:
+          componentName:
+            type: string
+            description: Component name
+            example: api-annotation-document
+        get:
+          displayName: Get a component
+          description: Returns component information.
+          responses:
+            200:
+              body:
+                type: Component
+            404:
+              body:
+                displayName: Component not found
+                type: ErrorResource
+        /logs:
+          get:
+            displayName: List logs
+            is: [Paginated: {resourceType: Log}]
+            description: |
+              Returns browsers execution logs for the test
+          /{logId}:
+            uriParameters:
+              logId:
+                type: string
+                displayName: Log id
+                description: ID of the log
+            get:
+              displayName: Get test execution log
+              responses:
+                200:
+                  body:
+                    type: Log
+                404:
+                  body:
+                    displayName: Log not found
+                    type: ErrorResource

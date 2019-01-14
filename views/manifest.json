@@ -1,0 +1,7 @@
+{
+  "name": "api-components-status-frontend",
+  "short_name": "api-components-status-frontend",
+  "description": "Frontend for API components integration tests",
+  "start_url": "/",
+  "display": "standalone"
+}
