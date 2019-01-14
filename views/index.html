@@ -2,13 +2,35 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <base href="/status/">
+    <!-- <base href="/status/"> -->
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
     <title>api-components-status-frontend</title>
     <meta name="description" content="Frontend for API components integration tests">
-    <link rel="manifest" href="/manifest.json">
-    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script type="module" src="/src/apic-ci-status/apic-ci-status.js" crossorigin></script>
+    <link rel="manifest" href="manifest.json">
+    <script>
+      /**
+      * [polymer-root-path]
+      *
+      * Leave this line unchanged if you intend to serve your app from the root
+      * path (e.g., with URLs like `my.domain/` and `my.domain/view1`).
+      *
+      * If you intend to serve your app from a non-root path (e.g., with URLs
+      * like `my.domain/my-app/` and `my.domain/my-app/view1`), edit this line
+      * to indicate the path from which you'll be serving, including leading
+      * and trailing slashes (e.g., `/my-app/`).
+      */
+      window.ApicCiStatus = {rootPath: '/'};
+      let apiBase;
+      if (location.port) {
+        // Dev mode,
+        apiBase = location.origin.replace(location.port, '8080') + '/api/';
+      } else {
+        apiBase = '/api/';
+      }
+      window.ApicCiStatus.apiBase = apiBase;
+    </script>
+    <script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script type="module" src="src/apic-ci-status/apic-ci-status.js" crossorigin></script>
   </head>
   <body>
     <apic-ci-status></apic-ci-status>

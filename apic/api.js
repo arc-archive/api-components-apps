@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const {TestsModel} = require('./models/test-model');
 const {TestsComponentModel} = require('./models/test-component-model');
 const {TestsLogsModel} = require('./models/test-logs-model');
@@ -193,17 +194,33 @@ class ApicApiRoute {
     }
     res.send(data);
   }
+
+  processCors(req, callback) {
+    const whitelist = ['http://localhost:8080', 'http://localhost:8081'];
+    const origin = req.header('Origin');
+    let corsOptions;
+    if (!origin) {
+      corsOptions = {origin: false};
+    } else if (origin.indexOf('http://localhost:') === 0) {
+      corsOptions = {origin: true};
+    } else if (whitelist.indexOf(origin) !== -1) {
+      corsOptions = {origin: true};
+    }
+    callback(null, corsOptions);
+  }
 }
 
 const api = new ApicApiRoute();
 
-router.post('/tests', api.createTest.bind(api));
-router.get('/tests', api.listTest.bind(api));
-router.get('/tests/:testId', api.getTest.bind(api));
-router.get('/tests/:testId/components', api.listTestComponents.bind(api));
-router.get('/tests/:testId/components/:componentName', api.getTestComponent.bind(api));
-router.get('/tests/:testId/components/:componentName/logs', api.listLogs.bind(api));
-router.get('/tests/:testId/components/:componentName/logs/:logId', api.getLog.bind(api));
+const checkCorsFn = api.processCors.bind(api);
+router.options('*', cors(checkCorsFn));
+router.post('/tests', cors(checkCorsFn), api.createTest.bind(api));
+router.get('/tests', cors(checkCorsFn), api.listTest.bind(api));
+router.get('/tests/:testId', cors(checkCorsFn), api.getTest.bind(api));
+router.get('/tests/:testId/components', cors(checkCorsFn), api.listTestComponents.bind(api));
+router.get('/tests/:testId/components/:componentName', cors(checkCorsFn), api.getTestComponent.bind(api));
+router.get('/tests/:testId/components/:componentName/logs', cors(checkCorsFn), api.listLogs.bind(api));
+router.get('/tests/:testId/components/:componentName/logs/:logId', cors(checkCorsFn), api.getLog.bind(api));
 
 // Errors
 router.use((err, req, res) => {

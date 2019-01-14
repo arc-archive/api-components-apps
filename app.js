@@ -131,10 +131,18 @@ app.get('/_ah/health', (req, res) => {
   res.status(200).send('ok');
 });
 
+// const {babelCompile} = require('polyserve/lib/compile-middleware');
+// app.use('/status*', babelCompile('auto', 'npm', __dirname + '/views',
+//  'api-components-autotest', 'http://localhost:8080/status', __dirname + '/views'), (req, res) => {
+//   console.log(req.url);
+//   // debugger
+//   res.end();
+// });
+
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
+  app.use('/status', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
 } else {
-  app.use(express.static(path.join(__dirname, 'views')));
+  app.use('/status', express.static(path.join(__dirname, 'views')));
 }
 
 // Redirect root to /status

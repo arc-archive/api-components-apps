@@ -6,6 +6,7 @@
   "scripts": {
     "start": "xvfb-run node ${SCRIPT:-app.js}",
     "start-worker": "xvfb-run node --inspect=9228 worker.js",
+    "start-mac": "node --inspect=9228 app.js",
     "test": "mocha test/*.test.js",
     "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci .",
     "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci",
@@ -25,6 +26,7 @@
     "body-parser": "^1.18.3",
     "bower": "^1.8.4",
     "connect-memcached": "^1.0.0",
+    "cors": "^2.8.5",
     "decamelize": "^2.0.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
