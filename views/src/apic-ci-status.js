@@ -9,10 +9,10 @@ import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/iron-selector/iron-selector.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-styles/shadow.js';
 import '@polymer/paper-tabs/paper-tabs.js';
 import '@polymer/paper-tabs/paper-tab.js';
 import '@polymer/paper-progress/paper-progress.js';
+// import './data-factory.js';
 // Gesture events like tap and track generated from touch will not be
 // preventable, allowing for better scrolling performance.
 setPassiveTouchGestures(true);
@@ -146,8 +146,11 @@ class ApicCiStatus extends PolymerElement {
           }
         }
       </style>
-      <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
+      <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+      <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
+      <!-- <data-factory  tests-list="{{testsList}}" has-more-tests="{{hasMoreTests}}" components-list="{{componentsList}}" has-more-components="{{hasMoreComponents}}"></data-factory> -->
+
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
@@ -164,8 +167,9 @@ class ApicCiStatus extends PolymerElement {
           </app-toolbar>
         </app-header>
         <div class="content">
-          <iron-pages role="main" attr-for-selected="name" selected="[[routeData.page]]">
+          <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
+            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}"></arc-test-details>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
         </div>
@@ -195,7 +199,11 @@ class ApicCiStatus extends PolymerElement {
       // True if application drawer is opened.
       drawerOpened: Boolean,
       apiBase: String,
-      loading: {type: Boolean}
+      loading: {type: Boolean},
+      testsList: Array,
+      componentsList: Array,
+      hasMoreTests: Boolean,
+      hasMoreComponents: Boolean
     };
   }
 
@@ -216,7 +224,7 @@ class ApicCiStatus extends PolymerElement {
   _routePageChanged(page) {
     if (!page) {
       this.page = 'status';
-    } else if (['status', /*'features',*/ 'community', 'privacy'].indexOf(page) !== -1) {
+    } else if (['status', 'test-details'].indexOf(page) !== -1) {
       this.page = page;
     } else {
       this.page = 'arc-404';
@@ -232,6 +240,9 @@ class ApicCiStatus extends PolymerElement {
     switch (page) {
       case 'status':
         import('./arc-status.js');
+        break;
+      case 'test-details':
+        import('./arc-test-details.js');
         break;
       case 'arc-404':
         import('./arc-404.js');

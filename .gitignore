@@ -1,2 +1,3 @@
 node_modules
+!views/build/node_modules
 config.json

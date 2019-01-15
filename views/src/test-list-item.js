@@ -1,7 +1,7 @@
 import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import 'time-elements/dist/time-elements.js';
 import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-styles/shadow.js';
+import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 
 class TestListItem extends PolymerElement {
@@ -45,6 +45,10 @@ class TestListItem extends PolymerElement {
         display: block;
       }
 
+      .item.numbers {
+        width: 70px;
+      }
+
       .ration-counter,
       .failed-counter,
       .size-counter,
@@ -63,20 +67,31 @@ class TestListItem extends PolymerElement {
       .source-commit {
         color: #9E9E9E;
         font-size: 12px;
+        max-width: 120px;
         @apply --paper-font-common-nowrap;
       }
 
       .component {
+        width: 120px;
+        @apply --paper-font-common-nowrap;
+      }
+
+      a {
+        color: currentColor;
+      }
+
+      .time-item {
+        width: 120px;
         @apply --paper-font-common-nowrap;
       }
       </style>
       <div class="item-container">
-        <div class="item">
-          <template is="dom-if" if="[[!item.isFinished]]">
+        <div class="item time-item">
+          <template is="dom-if" if="[[!isFinished]]">
             <label>Scheduled:</label>
             <relative-time datetime$="[[computeIsoDate(item.startTime)]]"></relative-time>
           </template>
-          <template is="dom-if" if="[[item.isFinished]]">
+          <template is="dom-if" if="[[isFinished]]">
             <label>Ended:</label>
             <relative-time datetime$="[[computeIsoDate(item.endTime)]]"></relative-time>
           </template>
@@ -92,19 +107,19 @@ class TestListItem extends PolymerElement {
           <span class="passed-counter">[[_computePassed(item.*)]]</span>
         </div>
 
-        <div class="item">
+        <div class="item numbers">
           <label>Failed:</label>
           <span class="failed-counter">[[_computeFailed(item.*)]]</span>
         </div>
 
-        <div class="item">
+        <div class="item numbers">
           <label>Tested:</label>
           <span class="size-counter">[[_computeSize(item.*)]]</span>
         </div>
 
-        <div class="item">
+        <div class="item numbers">
           <label>Ratio:</label>
-          <span class="ration-counter">[[_computePassRatio(item.*)]]</span>
+          <span class="ration-counter">[[_computePassRatio(item.*)]]%</span>
         </div>
 
         <div class="item max">
@@ -120,6 +135,10 @@ class TestListItem extends PolymerElement {
             <span class="component">[[item.component]]</span>
           </div>
         </template>
+
+        <a href="#/test-details/[[item.id]]">
+          <paper-button>Details</paper-button>
+        </a>
       </div>
     `;
   }

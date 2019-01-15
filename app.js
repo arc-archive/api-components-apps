@@ -139,11 +139,7 @@ app.get('/_ah/health', (req, res) => {
 //   res.end();
 // });
 
-if (process.env.NODE_ENV === 'production') {
-  app.use('/status', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
-} else {
-  app.use('/status', express.static(path.join(__dirname, 'views')));
-}
+app.use('/status', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
 
 // Redirect root to /status
 // app.get('/', (req, res) => {

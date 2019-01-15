@@ -1,19 +1,25 @@
 {
   "entrypoint": "index.html",
   "shell": "src/apic-ci-status.js",
-  "sources": [
-    "images/**/*"
-  ],
-  "extraDependencies": [
-    "manifest.json",
-    "node_modules/@webcomponents/webcomponentsjs/*.js",
-    "!node_modules/@webcomponents/webcomponentsjs/gulpfile.js",
-    "node_modules/@webcomponents/webcomponentsjs/bundles/*.js"
-  ],
   "fragments": [
     "src/arc-status.js",
     "src/arc-test-details.js",
     "src/arc-404.js"
+  ],
+  "sources": [
+    "images/**/*",
+    "index.html",
+    "src/apic-ci-status.js",
+    "src/arc-status.js",
+    "src/arc-test-details.js",
+    "src/arc-404.js"
+  ],
+  "extraDependencies": [
+    "bower_components/webcomponentsjs/*.js",
+    "manifest.json",
+    "node_modules/@webcomponents/webcomponentsjs/*.js",
+    "!node_modules/@webcomponents/webcomponentsjs/gulpfile.js",
+    "node_modules/@webcomponents/webcomponentsjs/bundles/*.js"
   ],
   "builds": [
     {
@@ -35,11 +41,12 @@
       "addServiceWorker": true
     }
   ],
-  "moduleResolution": "node",
-  "npm": true,
   "lint": {
     "rules": [
       "polymer-3"
     ]
-  }
+  },
+  "npm": true,
+  "componentDir": "node_modules/",
+  "moduleResolution": "node"
 }
