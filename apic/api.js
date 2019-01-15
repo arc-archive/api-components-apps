@@ -59,6 +59,10 @@ class ApicApiRoute {
   }
 
   createTest(req, res) {
+    if (!req.user) {
+      this.sendError(res, 'Not authorized', 401);
+      return;
+    }
     const errors = this.validateCreateTest(req);
     if (errors) {
       this.sendError(res, errors);
@@ -111,6 +115,38 @@ class ApicApiRoute {
       } else {
         this.sendError(res, 'Test not found', 404);
       }
+    })
+    .catch((cause) => {
+      this.sendError(res, cause.message, 500);
+    });
+  }
+
+  deleteTest(req, res) {
+    if (!req.user) {
+      this.sendError(res, 'Not authorized', 401);
+      return;
+    }
+    const {testId} = req.params;
+    let responded = false;
+    this.testModel.getTest(testId)
+    .then((resource) => {
+      if (resource) {
+        if (resource.status !== 'queued') {
+          this.sendError(res, 'Test can be removed only when its state is queued', 400);
+          responded = true;
+        } else {
+          return this.testModel.deleteTest(testId);
+        }
+      } else {
+        this.sendError(res, 'Test not found', 404);
+        responded = true;
+      }
+    })
+    .then(() => {
+      if (responded) {
+        return;
+      }
+      res.sendStatus(204).end();
     })
     .catch((cause) => {
       this.sendError(res, cause.message, 500);
@@ -208,6 +244,19 @@ class ApicApiRoute {
     }
     callback(null, corsOptions);
   }
+
+  getCurrentUser(req, res) {
+    if (!req.user) {
+      res.send({
+        loggedIn: false
+      });
+    } else {
+      const user = Object.assign({}, req.user);
+      delete user.id;
+      user.loggedIn = true;
+      res.send(user);
+    }
+  }
 }
 
 const api = new ApicApiRoute();
@@ -217,10 +266,12 @@ router.options('*', cors(checkCorsFn));
 router.post('/tests', cors(checkCorsFn), api.createTest.bind(api));
 router.get('/tests', cors(checkCorsFn), api.listTest.bind(api));
 router.get('/tests/:testId', cors(checkCorsFn), api.getTest.bind(api));
+router.delete('/tests/:testId', cors(checkCorsFn), api.deleteTest.bind(api));
 router.get('/tests/:testId/components', cors(checkCorsFn), api.listTestComponents.bind(api));
 router.get('/tests/:testId/components/:componentName', cors(checkCorsFn), api.getTestComponent.bind(api));
 router.get('/tests/:testId/components/:componentName/logs', cors(checkCorsFn), api.listLogs.bind(api));
 router.get('/tests/:testId/components/:componentName/logs/:logId', cors(checkCorsFn), api.getLog.bind(api));
+router.get('/me', cors(checkCorsFn), api.getCurrentUser.bind(api));
 
 // Errors
 router.use((err, req, res) => {

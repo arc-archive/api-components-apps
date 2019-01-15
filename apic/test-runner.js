@@ -26,12 +26,13 @@ class ApicTestRunner extends EventEmitter {
     this.testsModel = new TestsModel();
     this.testsComponentModel = new TestsComponentModel();
     this.testsLogsModel = new TestsLogsModel();
+    this.abort = false;
   }
 
   run() {
-    // this.cmps = ['api-body-editor'];
-    // this._next();
-    // this.workingDir = '/opt/apic-test/builds';
+    if (this.abort) {
+      return Promise.resolve();
+    }
     return this.createWorkingDir()
     .then(() => this.catalogModel.listApiComponents())
     .then((result) => {
@@ -91,8 +92,10 @@ class ApicTestRunner extends EventEmitter {
     });
   }
 
-
   _next() {
+    if (this.abort) {
+      return;
+    }
     const component = this.cmps.shift();
     if (!component) {
       this.finish();
@@ -100,20 +103,22 @@ class ApicTestRunner extends EventEmitter {
     }
     logging.info('Executing test: ' + component);
     return Promise.resolve()
-      .then(() => {
-        return this.testsComponentModel.create(this.entryId, component);
-      })
-      .then(() => this.prepare(component))
-      .then(() => this.runTest(component))
-      .then((result) => this.reportSuccess(component, result))
-      .catch((cause) => this.reportError(component, cause))
-      .then(() => {
-        setImmediate(() => this._next());
-      });
+    .then(() => {
+      return this.testsComponentModel.create(this.entryId, component);
+    })
+    .then(() => this.prepare(component))
+    .then(() => this.runTest(component))
+    .then((result) => this.reportSuccess(component, result))
+    .catch((cause) => this.reportError(component, cause))
+    .then(() => {
+      setImmediate(() => this._next());
+    });
   }
 
   prepare(name) {
-    // return Promise.resolve();
+    if (this.abort) {
+      return Promise.resolve();
+    }
     logging.verbose(`Preparing ${name} component to run in test`);
     return prepareComponent(this.workingDir, name)
     .then(() => this.updateModels(name))
@@ -127,6 +132,9 @@ class ApicTestRunner extends EventEmitter {
   }
 
   updateModels(name) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
     logging.verbose('Generating API models for ' + name);
     const updater = new AmfModelGenerator(this.workingDir, name);
     return updater.generate()
@@ -136,11 +144,17 @@ class ApicTestRunner extends EventEmitter {
   }
 
   runTest(name) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
     const runner = new ComponentTestRunner(name, this.workingDir);
     return runner.run();
   }
 
   reportSuccess(name, result) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
     logging.verbose(`Component ${name} finished with success.`);
     return this.testsComponentModel.updateComponent(this.entryId, name, result)
     .then(() => this.testsLogsModel.addLogs(this.entryId, name, result.results))
@@ -148,6 +162,9 @@ class ApicTestRunner extends EventEmitter {
   }
 
   reportError(component, err) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
     logging.verbose(`Component ${component} finished with error.`);
     logging.error(err);
     if (err.message) {
@@ -161,6 +178,9 @@ class ApicTestRunner extends EventEmitter {
   }
 
   finish() {
+    if (this.abort) {
+      return Promise.resolve();
+    }
     logging.info('The test finished.');
     return this.testsModel.finishTest(this.entryId)
     .then(() => this.cleanup())

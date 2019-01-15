@@ -31,14 +31,33 @@ class TestsDataFactory extends PolymerElement {
     };
   }
 
+  constructor() {
+    super();
+    this._syncHandled = this._syncHandled.bind(this);
+  }
+
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener('tests-model-sync', this._syncHandled);
     if (cachedData && cachedData.length) {
       this.list = cachedData;
     }
     if (!(this.list && this.list.length)) {
       this.loadNext();
     }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('tests-model-sync', this._syncHandled);
+  }
+
+  clean() {
+    pageToken = undefined;
+    cachedData = [];
+    this.list = undefined;
+    this.hasMore = undefined;
+    this._syncCache();
   }
 
   loadNext() {
@@ -67,6 +86,7 @@ class TestsDataFactory extends PolymerElement {
       cachedData = cachedData.concat(data.items);
       this.list = this.list.concat(data.items);
     }
+    this._dispatchSync();
   }
 
   refreshTest(id) {
@@ -86,15 +106,50 @@ class TestsDataFactory extends PolymerElement {
         this.list = [resource];
         cachedData = [resource];
       } else {
+        let updated = false;
         for (let i = 0, len = cachedData.length; i < len; i++) {
           if (cachedData[i].id === id) {
             cachedData[i] = resource;
             this.set(`list.${i}`, resource);
+            updated = true;
             break;
           }
         }
+        if (!updated) {
+          cachedData.push(resource);
+          this.push('list', resource);
+        }
       }
+      this._dispatchSync();
     });
+  }
+
+  _dispatchSync() {
+    this.dispatchEvent(new CustomEvent('tests-model-sync', {
+      bubbles: true,
+      composed: true
+    }));
+  }
+
+  _syncHandled(e) {
+    const target = e.composedPath()[0];
+    if (target === this) {
+      return;
+    }
+
+    this._syncCache();
+  }
+
+  _syncCache() {
+    const list = this.list || [];
+    if (list.length !== cachedData.length) {
+      this.set('list', cachedData);
+    }
+    for (let i = 0, len = cachedData.length; i < len; i++) {
+      if (cachedData[i] !== list[i]) {
+        this.set(`list.${i}`, cachedData[i]);
+      }
+    }
   }
 }
 window.customElements.define('tests-data-factory', TestsDataFactory);

@@ -238,6 +238,14 @@ class TestsModel {
       return Promise.reject(cause);
     });
   }
+
+  deleteTest(id) {
+    const key = this._createKey(id);
+    return this.store.delete(key)
+    .then(() => {
+      background.dequeueTest(id);
+    });
+  }
 }
 
 module.exports.TestsModel = TestsModel;

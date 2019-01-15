@@ -146,8 +146,14 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         margin: 24px auto;
       }
 
+      header {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
+
       h1 {
         @apply --paper-font-headline;
+        @apply --layout-flex;
       }
 
       .li {
@@ -165,13 +171,17 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         border-left: 2px #9E9E9E solid;
       }
       </style>
-      <h1>API components tests</h1>
+      <header>
+        <h1>API components tests</h1>
+        <paper-icon-button icon="apic:refresh" title="Refresh the view" on-click="refresh"></paper-icon-button>
+      </header>
       <template is="dom-repeat" items="[[testsList]]">
         <test-list-item class="li" item="[[item]]"></test-list-item>
       </template>
       <tests-data-factory
+        id="model"
         api-base="[[apiBase]]"
         list="{{testsList}}"
         has-more="{{hasMore}}"
         loading="{{loading}}"></tests-data-factory>
-    `}static get properties(){return{testsList:{type:Array},apiBase:String,hasMore:{type:Boolean,value:!0},loading:{type:Boolean,notify:!0}}}}window.customElements.define("arc-status",ArcStatus);
+    `}static get properties(){return{testsList:{type:Array},apiBase:String,hasMore:{type:Boolean,value:!0},loading:{type:Boolean,notify:!0}}}refresh(){this.$.model.clean();this.$.model.loadNext()}}window.customElements.define("arc-status",ArcStatus);

@@ -23,7 +23,6 @@ const express = require('express');
 const config = require('./config');
 const logging = require('./lib/logging');
 const background = require('./lib/background');
-const {prepareAmfBuild} = require('./apic/amf-builder.js');
 const {CatalogModel} = require('./apic/models/catalog-model');
 const {TestsModel} = require('./apic/models/test-model');
 const {ApicTestRunner} = require('./apic/test-runner');
@@ -59,17 +58,32 @@ class ApiComponentsTestsWorker {
       }
       switch (data.action) {
         case 'runTest': this.runTest(data.id); break;
+        case 'removeTest': this.removeTest(data.id); break;
         default:
           logging.warn('Unknown request', data);
       }
     });
   }
 
+  removeTest(id) {
+    const i = this.queue.findIndex((item) => item.entryId === id);
+    if (i !== -1) {
+      const instance = this.queue[i];
+      instance.abort = true;
+      instance.removeAllListeners();
+      this.queue.splice(i, 1);
+      if (instance.workingDir) {
+        instance.cleanup();
+      }
+    }
+  }
+
   runTest(id) {
-    console.log('RUNNING TEST BY ID', id);
-    // master1547278945743
     return this.testsModel.getTest(id)
-    .then((info) => this.setupQueue(id, info));
+    .then((info) => this.setupQueue(id, info))
+    .catch((cause) => {
+      logging.warn(cause);
+    });
   }
 
   setupQueue(id, info) {

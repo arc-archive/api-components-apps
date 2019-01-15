@@ -23,7 +23,7 @@ const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const MemcachedStore = require('connect-memcached')(session);
-// const passport = require('passport');
+const passport = require('passport');
 const config = require('./config');
 const logging = require('./lib/logging');
 const fs = require('fs-extra');
@@ -58,9 +58,9 @@ if (config.get('NODE_ENV') === 'production' && config.get('MEMCACHE_URL')) {
 app.use(session(sessionConfig));
 
 // OAuth2
-// app.use(passport.initialize());
-// app.use(passport.session());
-// app.use(require('./lib/oauth2').router);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(require('./lib/oauth2').router);
 
 // Application routes
 // app.use('/books', require('./books/crud'));

@@ -41,6 +41,9 @@ types:
     displayName: Schedule a test
     description: |
       This method creates a test and schedules worker noed to execute the test.
+
+      Note, this endpoint requires Google authentication. Currently you can
+      interact with this method using web app only.
     body:
       type: TestCreate
     responses:
@@ -68,6 +71,27 @@ types:
           body:
             type: Test
         404:
+          body:
+            displayName: Test not found
+            type: ErrorResource
+    delete:
+      displayName: Remove test
+      description: |
+        Removes the test.
+        Note, currently the test can only be deleted when its status is `queued`.
+
+        Note, this endpoint requires Google authentication. Currently you can
+        interact with this method using web app only.
+      responses:
+        204:
+          description: Status returned when the test has been deleted.
+        400:
+          description: Returned when `status` of the test is not `queued`.
+          body:
+            displayName: Test cannot be deleted at this time.
+            type: ErrorResource
+        404:
+          description: The test cannot be found
           body:
             displayName: Test not found
             type: ErrorResource

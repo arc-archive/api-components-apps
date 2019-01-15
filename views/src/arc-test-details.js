@@ -2,11 +2,12 @@ import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
 import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
+import '@polymer/paper-icon-button/paper-icon-button.js';
+import '@polymer/paper-toast/paper-toast.js';
 import 'time-elements/dist/time-elements.js';
 import './tests-data-factory.js';
 import './test-components-data-factory.js';
 import './test-component-list-item.js';
-import '@polymer/paper-icon-button/paper-icon-button.js';
 import './apic-icons.js';
 
 class ArcTestDetails extends PolymerElement {
@@ -93,12 +94,31 @@ class ArcTestDetails extends PolymerElement {
       a {
         color: currentColor;
       }
+
+      .delete-test {
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
+      }
+
+      .test-actions {
+        margin: 24px 0;
+      }
+
+      .error-toast {
+        background-color: #FF5722;
+        color: #fff;
+      }
       </style>
       <header>
         <a href="#/">
           <paper-icon-button icon="apic:arrow-back" title="Return to tests list"></paper-icon-button>
         </a>
         <h1>Test details</h1>
+        <template is="dom-if" if="[[isQueued]]">
+          <template is="dom-if" if="[[canCreate]]">
+            <paper-icon-button icon="apic:delete" title="Delete this test" on-click="removeTest"></paper-icon-button>
+          </template>
+        </template>
         <paper-icon-button icon="apic:refresh" title="Refresh the view" on-click="refresh"></paper-icon-button>
       </header>
 
@@ -144,6 +164,7 @@ class ArcTestDetails extends PolymerElement {
         test-id="[[testId]]"
         list="{{componentsList}}"
         loading="{{loading}}"></test-components-data-factory>
+      <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
     `;
   }
 
@@ -176,7 +197,8 @@ class ArcTestDetails extends PolymerElement {
       isQueued: {
         type: Boolean,
         computed: '_computeTestQueued(testDetail.status)'
-      }
+      },
+      canCreate: Boolean
     };
   }
 
@@ -231,6 +253,37 @@ class ArcTestDetails extends PolymerElement {
     this.$.request.clean();
     this.$.request.loadNext();
     this.$.testFactory.refreshTest(this.testId);
+  }
+
+  _renderError(message) {
+    this.$.err.text = message;
+    this.$.err.opened = true;
+  }
+
+  removeTest() {
+    const url = this.apiBase + 'tests/' + this.testId;
+    const init = {
+      method: 'DELETE'
+    };
+    return fetch(url, init)
+    .then((response) => {
+      if (!response.ok) {
+        this._renderError('Unable to remove test.');
+      } else {
+        this.$.testFactory.clean();
+        this.dispatchEvent(new CustomEvent('navigate', {
+          composed: true,
+          bubbles: true,
+          detail: {
+            path: '/status'
+          }
+        }));
+      }
+    })
+    .catch((cause) => {
+      this._renderError('Unable to remove test.');
+      console.error(cause);
+    });
   }
 }
 window.customElements.define('arc-test-details', ArcTestDetails);

@@ -10,6 +10,13 @@ import '@polymer/iron-selector/iron-selector.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-progress/paper-progress.js';
+import '@polymer/paper-menu-button/paper-menu-button.js'
+import '@polymer/paper-icon-button/paper-icon-button.js';
+import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/paper-item/paper-item.js';
+import '@polymer/paper-fab/paper-fab.js';
+import './user-data-factory.js';
+import './apic-icons.js';
 // Gesture events like tap and track generated from touch will not be
 // preventable, allowing for better scrolling performance.
 setPassiveTouchGestures(true);
@@ -45,9 +52,10 @@ class ApicCiStatus extends PolymerElement {
 
           --light-primary-color: var(--paper-indygo-100);
           --dark-primary-color: var(--paper-blue-700);
-          --accent-color: var(--paper-red-a200);
-          --light-accent-color: #ff80ab;
-          --dark-accent-color: #f50057;
+          --accent-color: #2196F3;
+          --accent-text-color: #fff;
+          --light-accent-color: #64B5F6;
+          --dark-accent-color: #1565C0;
 
           --toolbar-color: #ffffff;
           --toolbar-background-color: var(--primary-color);
@@ -102,16 +110,36 @@ class ApicCiStatus extends PolymerElement {
           text-decoration: none;
         }
 
-        [main-title] {
-          -ms-flex: none;
-          -webkit-flex: none;
-          flex: none;
-          margin-right: 40px;
-        }
-
         paper-progress {
           width: 100%;
           --paper-progress-active-color: #00698c;
+        }
+
+        .user-icon {
+          --iron-icon: {
+            border-radius: 50%;
+            overflow: hidden;
+          }
+        }
+
+        a {
+          color: currentColor;
+        }
+
+        .login-button {
+          background-color: #FAFAFA;
+          color: #00a2df;
+        }
+
+        .status-add-test {
+          position: fixed;
+          bottom: 20px;
+          right: 40px;
+          transition: transform 0.24s ease-in-out;
+        }
+
+        .status-add-test[away] {
+          transform: translateX(88px);
         }
 
         @media all and (max-width: 740px) {
@@ -120,10 +148,10 @@ class ApicCiStatus extends PolymerElement {
           }
         }
       </style>
-      <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
+      <app-location id="loc" route="{{route}}" use-hash-as-path url-space-regex="^((?!/auth).)*$"></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
       <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
-
+      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}"></user-data-factory>
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
@@ -131,6 +159,21 @@ class ApicCiStatus extends PolymerElement {
               <img src="images/arc-icon.png" class="app-icon" alt="ARC logo"/>
             </a>
             <div main-title>API components CI</div>
+            <template is="dom-if" if="[[loggedIn]]">
+              <paper-menu-button horizontal-align="right">
+                <paper-icon-button src="[[user.imageUrl]]" icon="[[_computeUserIcon(user)]]" slot="dropdown-trigger" class="user-icon"></paper-icon-button>
+                <paper-listbox slot="dropdown-content">
+                  <a href="/auth/logout?return=%2Fstatus" target="_top">
+                    <paper-item>Log out</paper-item>
+                  </a>
+                </paper-listbox>
+              </paper-menu-button>
+            </template>
+            <template is="dom-if" if="[[!loggedIn]]">
+              <a href="/auth/login?return=%2Fstatus">
+                <paper-button class="login-button">Log in</paper-button>
+              </a>
+            </template>
             <template is="dom-if" if="[[loading]]">
               <paper-progress bottom-item indeterminate></paper-progress>
             </template>
@@ -139,9 +182,13 @@ class ApicCiStatus extends PolymerElement {
         <div class="content">
           <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
-            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}"></arc-test-details>
+            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]"></arc-test-details>
+            <arc-add-test name="add-test" api-base="[[apiBase]]"></arc-add-test>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
+          <template is="dom-if" if="[[canCreate]]">
+            <paper-fab class="status-add-test" title="Schedule a test" icon="apic:add" on-click="_createTestHandler" away$="[[!isStatusPage]]"></paper-fab>
+          </template>
         </div>
       </app-header-layout>
     `;
@@ -173,7 +220,17 @@ class ApicCiStatus extends PolymerElement {
       testsList: Array,
       componentsList: Array,
       hasMoreTests: Boolean,
-      hasMoreComponents: Boolean
+      hasMoreComponents: Boolean,
+      loggedIn: Boolean,
+      user: Object,
+      canCreate: {
+        type: Boolean,
+        computed: '_computeCanCreate(loggedIn, user.orgUser)'
+      },
+      isStatusPage: {
+        type: Boolean,
+        computed: '_computeIsStatusPage(page)'
+      }
     };
   }
 
@@ -183,18 +240,39 @@ class ApicCiStatus extends PolymerElement {
     ];
   }
 
+  constructor() {
+    super();
+    this._navigateHandler = this._navigateHandler.bind(this);
+  }
+
   connectedCallback() {
     super.connectedCallback();
+    this.addEventListener('navigate', this._navigateHandler);
     if (!this.route.path || this.route.path === '/') {
       this.set('route.path', '/status');
     }
     this.apiBase = window.ApicCiStatus.apiBase;
+    // setTimeout(() => {
+    //   this.user = {
+    //     displayName: 'Paweł Psztyć',
+    //     imageUrl: 'https://lh6.googleusercontent.com/-veehGFoGpso/AAAAAAAAAAI/AAAAAAACr8Y/YmMhVu8Ol-I/photo.jpg?sz=50',
+    //     loggedIn: true,
+    //     orgUser: true,
+    //     superUser: true
+    //   };
+    //   this.loggedIn = true;
+    // }, 500);
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.removeEventListener('navigate', this._navigateHandler);
   }
 
   _routePageChanged(page) {
     if (!page) {
       this.page = 'status';
-    } else if (['status', 'test-details'].indexOf(page) !== -1) {
+    } else if (['status', 'test-details', 'add-test'].indexOf(page) !== -1) {
       this.page = page;
     } else {
       this.page = 'arc-404';
@@ -213,14 +291,44 @@ class ApicCiStatus extends PolymerElement {
       case 'test-details':
         import('./arc-test-details.js');
         break;
+      case 'add-test':
+        if (!this.loggedIn) {
+          this.page = 'arc-404';
+          return;
+        }
+        import('./arc-add-test.js');
+        break;
       case 'arc-404':
         import('./arc-404.js');
         break;
     }
     /* global gtag */
-    // gtag('config', 'UA-71458341-5', {
-    //   'page_path': '/' + page
-    // });
+    gtag('config', 'UA-71458341-7', {
+      'page_path': '/' + page
+    });
+  }
+
+  _computeUserIcon(user) {
+    return (user && user.imageUrl) ? undefined : 'apic:account-circle';
+  }
+
+  _computeCanCreate(loggedIn, orgUser) {
+    return loggedIn && orgUser;
+  }
+
+  _createTestHandler() {
+    if (!this.loggedIn || !this.user || !this.user.orgUser) {
+      return;
+    }
+    this.$.loc.path = '/add-test';
+  }
+
+  _computeIsStatusPage(page) {
+    return page === 'status';
+  }
+
+  _navigateHandler(e) {
+    this.$.loc.path = e.detail.path;
   }
 }
 

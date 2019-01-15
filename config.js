@@ -53,9 +53,9 @@ nconf
     // MYSQL_USER: '',
     // MYSQL_PASSWORD: '',
     //
-    OAUTH2_CLIENT_ID: 'your-client-id',
-    // OAUTH2_CLIENT_SECRET: 'your-client-secret',
-    OAUTH2_CALLBACK: 'http://localhost:8080/auth/google/callback',
+    OAUTH2_CLIENT_ID: '',
+    OAUTH2_CLIENT_SECRET: '',
+    OAUTH2_CALLBACK: '',
 
     PORT: 8080,
 
