@@ -8,15 +8,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: apic-auto-ci-frontend
+  name: apic-ci-frontend
   labels:
-    app: api-components-autotest
+    app: apic-ci
     tier: frontend
 spec:
   type: LoadBalancer
+  loadBalancerIP: 35.233.153.23
   ports:
   - port: 80
     targetPort: http-server
   selector:
-    app: api-components-autotest
+    app: apic-ci
     tier: frontend

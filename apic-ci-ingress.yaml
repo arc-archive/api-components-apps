@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: apic-ci-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: apic-ci
+  labels:
+    app: apic-ci
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: apic-ci-frontend
+          servicePort: 80

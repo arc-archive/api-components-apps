@@ -18,9 +18,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: apic-auto-ci-worker
+  name: apic-ci-worker
   labels:
-    app: api-components-autotest
+    app: apic-ci
 # For more info about Pods see:
 #   https://cloud.google.com/container-engine/docs/pods/
 spec:
@@ -28,11 +28,11 @@ spec:
   template:
     metadata:
       labels:
-        app: api-components-autotest
+        app: apic-ci
         tier: worker
     spec:
       containers:
-      - name: api-components-autotest-app
+      - name: apic-ci
         image: gcr.io/advancedrestclient-1155/api-components-autotest-ci
         # This setting makes nodes pull the docker image every time before
         # starting the pod. This is useful when debugging, but should be turned

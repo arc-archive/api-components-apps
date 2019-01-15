@@ -18,9 +18,9 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: apic-auto-ci-frontend
+  name: apic-ci-frontend
   labels:
-    app: api-components-autotest
+    app: apic-ci
 # For more info about Pods see:
 #   https://cloud.google.com/container-engine/docs/pods/
 spec:
@@ -28,11 +28,11 @@ spec:
   template:
     metadata:
       labels:
-        app: api-components-autotest
+        app: apic-ci
         tier: frontend
     spec:
       containers:
-      - name: api-components-autotest-app
+      - name: apic-ci
         image: gcr.io/advancedrestclient-1155/api-components-autotest-ci
         # This setting makes nodes pull the docker image every time before
         # starting the pod. This is useful when debugging, but should be turned
@@ -45,3 +45,7 @@ spec:
         env:
           - name: PROJECT_ID
             value: advancedrestclient-1155
+          - name: OAUTH2_CALLBACK
+            value: http://ci.advancedrestclient.com/auth/callback
+          - name: OAUTH2_CLIENT_ID
+            value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
