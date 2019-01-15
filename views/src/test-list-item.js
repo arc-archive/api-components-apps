@@ -60,6 +60,11 @@ class TestListItem extends PolymerElement {
         color: #2E7D32;
       }
 
+      :host([queued]) .passed-counter,
+      :host([queued]) .failed-counter {
+        color: currentColor;
+      }
+
       :host([failed]) .failed-counter {
         color: #F44336;
       }
@@ -148,7 +153,8 @@ class TestListItem extends PolymerElement {
       item: String,
       isAmfBuild: {type: Boolean, computed: '_computeIsAmfBuid(item.type)'},
       isFinished: {type: Boolean, value: false, computed: '_computeIsFinished(item.status)'},
-      failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'}
+      failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},
+      queued: {type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)'}
     };
   }
 
@@ -158,6 +164,10 @@ class TestListItem extends PolymerElement {
 
   _computeIsFinished(status) {
     return status === 'finished';
+  }
+
+  _computeIsQueued(status) {
+    return status === 'queued';
   }
 
   _computeIsFailed(item) {

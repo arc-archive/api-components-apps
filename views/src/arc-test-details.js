@@ -35,13 +35,13 @@ class ArcTestDetails extends PolymerElement {
         margin: 8px 0;
       }
 
-      .passed-count,
-      .result-value[passing] {
+      .desc > span.passed-count,
+      .desc > span.result-value[passing] {
         color: #2E7D32;
       }
 
-      .failed-count,
-      .result-value {
+      .desc > span.failed-count,
+      .desc > span.result-value {
         color: #F44336;
       }
 
@@ -51,6 +51,9 @@ class ArcTestDetails extends PolymerElement {
 
       .desc {
         color: #616161;
+        font-size: 18px;
+        line-height: 24px;
+        letter-spacing: 0.011em;
       }
 
       .desc > span {
@@ -121,7 +124,7 @@ class ArcTestDetails extends PolymerElement {
         </template>
       <div>
       <template is="dom-repeat" items="[[componentsList]]">
-        <test-component-list-item class="li" item="[[item]]"></test-component-list-item>
+        <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
       </template>
 
       <template is="dom-if" if="[[isQueued]]">
@@ -134,7 +137,7 @@ class ArcTestDetails extends PolymerElement {
         </div>
       </template>
 
-      <tests-data-factory id="testFactory" api-base="[[apiBase]]" list="{{testsList}}"></tests-data-factory>
+      <tests-data-factory id="testFactory" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}"></tests-data-factory>
       <test-components-data-factory
         id="request"
         api-base="[[apiBase]]"
@@ -179,7 +182,7 @@ class ArcTestDetails extends PolymerElement {
 
   static get observers() {
     return [
-      '_requestDataObserver(opened, hasMoreComponents, testId)'
+      '_requestDataObserver(opened, hasMore, testId)'
     ];
   }
 
@@ -190,12 +193,12 @@ class ArcTestDetails extends PolymerElement {
     return testsList.find((item) => item.id === testId);
   }
 
-  _requestDataObserver(opened, hasMoreComponents, testId) {
-    if (!opened || hasMoreComponents === false || !testId) {
+  _requestDataObserver(opened, hasMore, testId) {
+    if (!opened || hasMore === false || !testId || this.loading) {
       return;
     }
     afterNextRender(this, () => {
-      if (!this.componentsList) {
+      if (!this.componentsList && !this.loading) {
         this.$.request.loadNext();
       }
     });

@@ -52,6 +52,11 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         color: #2E7D32;
       }
 
+      :host([queued]) .passed-counter,
+      :host([queued]) .failed-counter {
+        color: currentColor;
+      }
+
       :host([failed]) .failed-counter {
         color: #F44336;
       }
@@ -132,7 +137,7 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
           <paper-button>Details</paper-button>
         </a>
       </div>
-    `}static get properties(){return{item:String,isAmfBuild:{type:Boolean,computed:"_computeIsAmfBuid(item.type)"},isFinished:{type:Boolean,value:!1,computed:"_computeIsFinished(item.status)"},failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"}}}_computeIsAmfBuid(type){return"amf-build"===type}_computeIsFinished(status){return"finished"===status}_computeIsFailed(item){if(!item){return!1}if("finished"!==item.status){return!1}if(item.failed&&0<item.failed){return!0}return!1}computeIsoDate(time){if(!time||isNaN(time)){return}const d=new Date(+time);return d.toISOString()}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computeSize(record){const item=record&&record.base,size=item&&item.size||0;return size}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,size=item&&item.size||0;if(!passed||!size){return 0}return Math.round(100*(passed/size))}}window.customElements.define("test-list-item",TestListItem);class ArcStatus extends PolymerElement{static get template(){return html`
+    `}static get properties(){return{item:String,isAmfBuild:{type:Boolean,computed:"_computeIsAmfBuid(item.type)"},isFinished:{type:Boolean,value:!1,computed:"_computeIsFinished(item.status)"},failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"},queued:{type:Boolean,reflectToAttribute:!0,computed:"_computeIsQueued(item.status)"}}}_computeIsAmfBuid(type){return"amf-build"===type}_computeIsFinished(status){return"finished"===status}_computeIsQueued(status){return"queued"===status}_computeIsFailed(item){if(!item){return!1}if("finished"!==item.status){return!1}if(item.failed&&0<item.failed){return!0}return!1}computeIsoDate(time){if(!time||isNaN(time)){return}const d=new Date(+time);return d.toISOString()}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computeSize(record){const item=record&&record.base,size=item&&item.size||0;return size}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,size=item&&item.size||0;if(!passed||!size){return 0}return Math.round(100*(passed/size))}}window.customElements.define("test-list-item",TestListItem);class ArcStatus extends PolymerElement{static get template(){return html`
       <style>
       :host {
         display: block;
@@ -149,10 +154,15 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         border: 1px #E0E0E0 solid;
         border-radius: 3px;
         margin: 8px 0;
+        border-left: 2px #2E7D32 solid;
       }
 
       .li[failed] {
-        border-color: #F44336;
+        border-left: 2px #F44336 solid;
+      }
+
+      .li[queued] {
+        border-left: 2px #9E9E9E solid;
       }
       </style>
       <h1>API components tests</h1>

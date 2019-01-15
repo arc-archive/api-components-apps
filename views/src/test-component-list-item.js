@@ -5,6 +5,7 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import './apic-icons.js';
+import './component-logs-viewer.js';
 class TestComponentListItem extends PolymerElement {
   static get template() {
     return html`
@@ -72,6 +73,7 @@ class TestComponentListItem extends PolymerElement {
       .cmp-message {
         margin: 1em 8px;
         font-size: 16px;
+        color: #F44336;
       }
 
       .toggle-button {
@@ -87,6 +89,10 @@ class TestComponentListItem extends PolymerElement {
 
       .toggle-button[opened] {
         transform: rotateZ(-180deg);
+      }
+
+      .viewer {
+        margin: 0 8px;
       }
       </style>
       <div class="item-container">
@@ -117,7 +123,7 @@ class TestComponentListItem extends PolymerElement {
           <p class="cmp-message">[[item.message]]</p>
         </template>
         <template is="dom-if" if="[[item.hasLogs]]">
-          <p class="cmp-message">LOGS!!!</p>
+          <component-logs-viewer test-id="[[testId]]" component-name="[[item.component]]" api-base="[[apiBase]]" class="viewer"></component-logs-viewer>
         </template>
       </template>
     `;
@@ -127,7 +133,8 @@ class TestComponentListItem extends PolymerElement {
     return {
       item: String,
       failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},
-      detailsOpened: Boolean
+      detailsOpened: Boolean,
+      testId: String
     };
   }
 

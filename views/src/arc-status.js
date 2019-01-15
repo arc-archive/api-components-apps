@@ -24,10 +24,15 @@ class ArcStatus extends PolymerElement {
         border: 1px #E0E0E0 solid;
         border-radius: 3px;
         margin: 8px 0;
+        border-left: 2px #2E7D32 solid;
       }
 
       .li[failed] {
-        border-color: #F44336;
+        border-left: 2px #F44336 solid;
+      }
+
+      .li[queued] {
+        border-left: 2px #9E9E9E solid;
       }
       </style>
       <h1>API components tests</h1>

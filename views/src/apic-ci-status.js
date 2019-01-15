@@ -9,10 +9,7 @@ import '@polymer/iron-pages/iron-pages.js';
 import '@polymer/iron-selector/iron-selector.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-styles/typography.js';
-import '@polymer/paper-tabs/paper-tabs.js';
-import '@polymer/paper-tabs/paper-tab.js';
 import '@polymer/paper-progress/paper-progress.js';
-// import './data-factory.js';
 // Gesture events like tap and track generated from touch will not be
 // preventable, allowing for better scrolling performance.
 setPassiveTouchGestures(true);
@@ -39,8 +36,6 @@ class ApicCiStatus extends PolymerElement {
           background-color: var(--primary-background-color);
           @apply --layout-fit;
           @apply --paper-font-body1;
-
-          font-family: Roboto, sans-serif;
           --primary-color: #00A2DF;
           --primary-text-color: rgba(0, 0, 0, 0.87);
           --primary-background-color: #ffffff;
@@ -56,27 +51,6 @@ class ApicCiStatus extends PolymerElement {
 
           --toolbar-color: #ffffff;
           --toolbar-background-color: var(--primary-color);
-
-          /* buttons */
-          --action-button: {
-            background-color: var(--primary-color);
-            background-image: none;
-            color: white;
-            transition: background-color 300ms linear;
-          };
-
-          --paper-tab-ink: #fff;
-          --paper-tabs-selection-bar-color: #fff;
-
-          --paper-tabs-content: {
-            color: #fff;
-            font-weight: 400;
-          };
-
-          --paper-tab-content-unselected: {
-            color: #fff;
-            font-weight: 400;
-          };
         }
 
         app-header-layout {
@@ -149,18 +123,14 @@ class ApicCiStatus extends PolymerElement {
       <app-location route="{{route}}" url-space-regex="^[[rootPath]]" use-hash-as-path></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
       <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
-      <!-- <data-factory  tests-list="{{testsList}}" has-more-tests="{{hasMoreTests}}" components-list="{{componentsList}}" has-more-components="{{hasMoreComponents}}"></data-factory> -->
 
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
-            <a href="/" class="main-link">
+            <a href="#/status" class="main-link">
               <img src="images/arc-icon.png" class="app-icon" alt="ARC logo"/>
             </a>
-            <div main-title>API components</div>
-            <paper-tabs attr-for-selected="name" selected="{{routeData.page}}">
-              <paper-tab name="status">Status</paper-tab>
-            </paper-tabs>
+            <div main-title>API components CI</div>
             <template is="dom-if" if="[[loading]]">
               <paper-progress bottom-item indeterminate></paper-progress>
             </template>
@@ -236,7 +206,6 @@ class ApicCiStatus extends PolymerElement {
     //
     // Note: `polymer build` doesn't like string concatenation in the import
     // statement, so break it up.
-    console.log(page);
     switch (page) {
       case 'status':
         import('./arc-status.js');

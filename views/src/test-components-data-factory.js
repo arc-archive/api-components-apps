@@ -89,6 +89,9 @@ class TestComponentsDataFactory extends PolymerElement {
       return;
     }
     const data = e.target.lastResponse;
+    if (!data) {
+      return;
+    }
     const token = data.nextPageToken;
     pageTokens[id] = token;
     if (!cachedData[id]) {
