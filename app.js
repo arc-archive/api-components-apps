@@ -142,9 +142,9 @@ app.get('/_ah/health', (req, res) => {
 app.use('/status', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
 
 // Redirect root to /status
-// app.get('/', (req, res) => {
-//   res.redirect('/status');
-// });
+app.get('/', (req, res) => {
+  res.redirect('/status');
+});
 
 // Add the error logger after all middleware and routes so that
 // it can log errors from the whole application. Any custom error
