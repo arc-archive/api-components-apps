@@ -53,32 +53,42 @@ class TestApiRoute extends BaseApi {
   }
 
   createTest(req, res) {
-    if (!req.user) {
-      this.sendError(res, 'Not authorized', 401);
-      return;
-    }
-    const errors = this.validateCreateTest(req);
-    if (errors) {
-      this.sendError(res, errors);
-      return;
-    }
-    const body = req.body;
-    const info = {
-      branch: body.branch,
-      type: body.type,
-    };
-    if (body.commit) {
-      info.commit = body.commit;
-    }
-    if (body.component) {
-      info.component = body.component;
-    }
-    this.testModel.insertTest(info)
+    return this.isValidAccess(req, 'delete-test')
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      const errors = this.validateCreateTest(req);
+      if (errors) {
+        const o = {
+          message: errors,
+          status: 400
+        };
+        throw o;
+      }
+      const body = req.body;
+      const info = {
+        branch: body.branch,
+        type: body.type,
+      };
+      if (body.commit) {
+        info.commit = body.commit;
+      }
+      if (body.component) {
+        info.component = body.component;
+      }
+      return this.testModel.insertTest(info);
+    })
     .then((testId) => {
       res.send({id: testId});
     })
     .catch((cause) => {
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
     });
   }
 
@@ -116,34 +126,41 @@ class TestApiRoute extends BaseApi {
   }
 
   deleteTest(req, res) {
-    if (!req.user) {
-      this.sendError(res, 'Not authorized', 401);
-      return;
-    }
     const {testId} = req.params;
-    let responded = false;
-    this.testModel.getTest(testId)
-    .then((resource) => {
-      if (resource) {
-        if (resource.status !== 'queued') {
-          this.sendError(res, 'Test can be removed only when its state is queued', 400);
-          responded = true;
-        } else {
-          return this.testModel.deleteTest(testId);
-        }
-      } else {
-        this.sendError(res, 'Test not found', 404);
-        responded = true;
+    return this.isValidAccess(req, 'delete-test')
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
       }
+      return this.testModel.getTest(testId);
+    })
+    .then((resource) => {
+      if (!resource) {
+        const o = {
+          message: 'Test not found',
+          status: 404
+        };
+        throw o;
+      }
+      if (resource.status !== 'queued') {
+        const o = {
+          message: 'Test can be removed only when its state is queued',
+          status: 400
+        };
+        throw o;
+      }
+      return this.testModel.deleteTest(testId);
     })
     .then(() => {
-      if (responded) {
-        return;
-      }
       res.sendStatus(204).end();
     })
     .catch((cause) => {
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
     });
   }
 

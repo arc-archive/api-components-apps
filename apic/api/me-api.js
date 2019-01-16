@@ -28,17 +28,27 @@ class MeApiRoute extends BaseApi {
   }
 
   listUserTokens(req, res) {
-    if (!this.canCreate(req)) {
-      this.sendError(res, 'Unauthorized', 401);
-      return;
-    }
-    const errors = this.validatePagination(req);
-    if (errors) {
-      this.sendError(res, errors);
-      return;
-    }
-    let {limit, nextPageToken} = req.query;
-    this.userModel.listTokens(req.user.id, limit, nextPageToken)
+    return this.isValidAccess(req)
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      const errors = this.validatePagination(req);
+      if (errors) {
+        const o = {
+          message: errors,
+          status: 400
+        };
+        throw o;
+      }
+
+      let {limit, nextPageToken} = req.query;
+      return this.userModel.listTokens(req.user.id, limit, nextPageToken);
+    })
     .then((result) => {
       const now = Date.now() / 1000;
       result[0].forEach((item) => {
@@ -51,7 +61,8 @@ class MeApiRoute extends BaseApi {
         this.sendError(res, 'Inavlid nextPageToken parameter');
         return;
       }
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
     });
   }
 
@@ -67,41 +78,58 @@ class MeApiRoute extends BaseApi {
   }
 
   createUserToken(req, res) {
-    if (!this.canCreate(req)) {
-      this.sendError(res, 'Unauthorized', 401);
-      return;
-    }
-    const message = this._validateTokenCreate(req);
-    if (message) {
-      this.sendError(res, message, 400);
-      return;
-    }
-    const opts = {
-      scopes: req.body.scopes
-    };
-    if (req.body.expiresIn) {
-      opts.expiresIn = req.body.expiresIn;
-    }
-    const token = jwt.generateToken(req.user, opts);
-    jwt.verifyToken(token)
+    let token;
+    return this.isValidAccess(req)
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      const message = this._validateTokenCreate(req);
+      if (message) {
+        const o = {
+          message,
+          status: 400
+        };
+        throw o;
+      }
+      const opts = {
+        scopes: req.body.scopes
+      };
+      if (req.body.expiresIn) {
+        opts.expiresIn = req.body.expiresIn;
+      }
+      token = jwt.generateToken(req.user, opts);
+      return jwt.verifyToken(token);
+    })
     .then((info) => this.userModel.insertUserToken(req.user, info, token))
     .then((token) => {
       token.expired = false;
       res.send(token);
     })
     .catch((cause) => {
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
       return;
     });
   }
 
   getUserToken(req, res) {
-    if (!this.canCreate(req)) {
-      this.sendError(res, 'Unauthorized', 401);
-      return;
-    }
-    const {token} = req.params;
-    this.userModel.getToken(req.user.id, token)
+    return this.isValidAccess(req)
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      const {token} = req.params;
+      return this.userModel.getToken(req.user.id, token);
+    })
     .then((resource) => {
       if (resource) {
         const now = Date.now() / 1000;
@@ -112,17 +140,24 @@ class MeApiRoute extends BaseApi {
       }
     })
     .catch((cause) => {
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
     });
   }
 
   deleteUserToken(req, res) {
-    if (!this.canCreate(req)) {
-      this.sendError(res, 'Unauthorized', 401);
-      return;
-    }
     const {token} = req.params;
-    this.userModel.getToken(req.user.id, token)
+    return this.isValidAccess(req)
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      return this.userModel.getToken(req.user.id, token);
+    })
     .then((resource) => {
       if (resource) {
         if (resource.issuer.id !== req.user.id) {
@@ -141,7 +176,8 @@ class MeApiRoute extends BaseApi {
       }
     })
     .catch((cause) => {
-      this.sendError(res, cause.message, 500);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
     });
   }
 }

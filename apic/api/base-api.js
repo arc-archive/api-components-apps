@@ -1,29 +1,69 @@
-const config = require('../../config');
+const jwt = require('../../lib/jwt');
+const {TokenModel} = require('../models/token-model');
+
+let tokenModel;
 class BaseApi {
+  get tokenModel() {
+    if (!tokenModel) {
+      tokenModel = new TokenModel();
+    }
+    return tokenModel;
+  }
+
   sendError(res, message, status) {
     res.status(status || 400).send({
       error: true,
       message
     });
   }
-
   /**
    * Tests whether the request has user session that is admin / org user or has
-   * x-api-token included into request that matches the one on `config.json`
-   * file or it was defined in env.
+   * authorization header with valid JWT.
    * @param {Object} req
-   * @return {Boolean}
+   * @param {?String} scope
+   * @return {Promise<Boolean>}
    */
-  canCreate(req) {
+  isValidAccess(req, scope) {
     const user = req.user;
     if (user && (user.orgUser || user.superUser)) {
-      return true;
+      return Promise.resolve(true);
     }
-    const token = req.get('x-api-token');
-    if (token && token === config.get('CI_API_SECRET')) {
-      return true;
+    const auth = req.get('authorization');
+    if (!auth) {
+      return Promise.resolve(false);
     }
-    return false;
+    if (!String(auth).toLowerCase().startsWith('bearer ')) {
+      return Promise.resolve(false);
+    }
+    const token = auth.substr(7);
+    let detail;
+    try {
+      detail = jwt.verifyTokenSync(token);
+    } catch (_) {
+      return Promise.resolve(false);
+    }
+    if (jwt.isTokenExpired(detail)) {
+      return Promise.resolve(false);
+    }
+    if (scope) {
+      if (!jwt.hasScope(detail, 'all')) {
+        if (!jwt.hasScope(detail, scope)) {
+          return Promise.resolve(false);
+        }
+      }
+    }
+    return this.tokenModel.find(token)
+    .catch(() => {})
+    .then((token) => {
+      if (!token) {
+        return false;
+      }
+      req.user = {
+        id: token.issuer.id,
+        displayName: token.issuer.displayName
+      };
+      return true;
+    });
   }
 
   processCors(req, callback) {
