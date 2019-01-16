@@ -31,15 +31,9 @@ const fs = require('fs-extra');
 const app = express();
 
 app.disable('etag');
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'pug');
 app.set('trust proxy', true);
-
-// Add the request logger before anything else so that it can
-// accurately log requests.
 app.use(logging.requestLogger);
 
-// Configure the session and session storage.
 const sessionConfig = {
   resave: false,
   saveUninitialized: false,
@@ -47,8 +41,6 @@ const sessionConfig = {
   signed: true,
 };
 
-// In production use the App Engine Memcache instance to store session data,
-// otherwise fallback to the default MemoryStore in development.
 if (config.get('NODE_ENV') === 'production' && config.get('MEMCACHE_URL')) {
   sessionConfig.store = new MemcachedStore({
     hosts: [config.get('MEMCACHE_URL')],
@@ -62,9 +54,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(require('./lib/oauth2').router);
 
-// Application routes
-// app.use('/books', require('./books/crud'));
-app.use('/api', require('./apic/api'));
+app.use('/api', require('./apic/api/api'));
 
 // API console
 app.get('/api-docs*', (req, res) => {
@@ -95,49 +85,9 @@ app.get('/api-docs*', (req, res) => {
   });
 });
 
-// Front-end
-// app.get('/status*', (req, res) => {
-//   let url = req.url.replace('/status', '');
-//   if (url[0] === '/') {
-//     url = url.substr(1);
-//   }
-//   if (url.indexOf('#') !== -1) {
-//     url = url.substr(0, url.indexOf('#'));
-//   }
-//   if (!url) {
-//     url = 'status.html';
-//   }
-//   const file = path.join('views', url);
-//   fs.pathExists(file)
-//   .then((exists) => {
-//     console.log(file, 'status: ', exists);
-//     if (!exists) {
-//       throw new Error('Not found');
-//     }
-//     return fs.readFile(file, 'utf8');
-//   })
-//   .then((content) => {
-//     res.type(path.extname(file));
-//     res.status(200).send(content);
-//   })
-//   .catch((cause) => {
-//     res.status(404).send(cause.message);
-//   });
-// });
-
-// Our application will need to respond to health checks when running on
-// Compute Engine with Managed Instance Groups.
 app.get('/_ah/health', (req, res) => {
   res.status(200).send('ok');
 });
-
-// const {babelCompile} = require('polyserve/lib/compile-middleware');
-// app.use('/status*', babelCompile('auto', 'npm', __dirname + '/views',
-//  'api-components-autotest', 'http://localhost:8080/status', __dirname + '/views'), (req, res) => {
-//   console.log(req.url);
-//   // debugger
-//   res.end();
-// });
 
 app.use('/status', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
 
@@ -158,7 +108,6 @@ app.use((req, res) => {
 
 // Render default page
 app.use((req, res) => {
-  console.log('FALLBACK TO DEFAULT FILE', req.url);
   const file = path.join(__dirname, 'public', 'build', 'esm-bundled', 'index.html');
   res.sendFile(file);
 });
@@ -168,6 +117,7 @@ app.use((err, req, res) => {
   /* jshint unused:false */
   // If our routes specified a specific response, then send that. Otherwise,
   // send a generic message so as not to leak anything.
+  logging.error(err.response);
   res.status(500).send(err.response || 'Something broke!');
 });
 

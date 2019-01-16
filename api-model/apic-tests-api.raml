@@ -10,11 +10,19 @@ description: |
 traits:
   Paginated: !include traits/paginated.raml
 
+documentation:
+  - title: Authorization
+    content: !include documentation/authorization.md
+
 types:
   Test: !include types/test.raml
   TestCreate: !include types/create-test.raml
   Component: !include types/component.raml
   Log: !include types/log.raml
+  User: !include types/user.raml
+  JWT: !include types/jwt-token.raml
+  JWTcreate: !include types/jwt-token-create.raml
+  JWTinfo: !include types/jwt-token-info.raml
   ErrorResource:
     description: A response that is errored
     type: object
@@ -29,6 +37,9 @@ types:
         type: string
         description: The error message associated with the error.
         required: true
+securitySchemes:
+  JwtSecurity: !include security/x-api-token.raml
+
 /tests:
   displayName: Tests
   get:
@@ -39,6 +50,7 @@ types:
       Use `limit` and `nextPageToken` parameters to enable pagination.
   post:
     displayName: Schedule a test
+    securedBy: [JwtSecurity]
     description: |
       This method creates a test and schedules worker noed to execute the test.
 
@@ -75,6 +87,7 @@ types:
             displayName: Test not found
             type: ErrorResource
     delete:
+      securedBy: [JwtSecurity]
       displayName: Remove test
       description: |
         Removes the test.
@@ -140,3 +153,82 @@ types:
                   body:
                     displayName: Log not found
                     type: ErrorResource
+/me:
+  displayName: User
+  get:
+    displayName: Get current user
+    description: |
+      Returns an information about current user.
+      The information may come from current session on the web server or
+      it can be encoded in JWT.
+    responses:
+      200:
+        body:
+          type: User
+  /tokens:
+    securedBy: [JwtSecurity]
+    displayName: JSON tokens
+    get:
+      is: [Paginated: {resourceType: JWT}]
+      displayName: List tokens
+      description: |
+        Lists created by the user authorization tokens,
+    post:
+      displayName: Create a token
+      description: Creates a new authorization token.
+      body:
+        type: JWTcreate
+      responses:
+        200:
+          description: Token has been created
+          body:
+            type: JWT
+        400:
+          description: Returned when request verification failed.
+          body:
+            displayName: Request validation failed
+            type: ErrorResource
+    /{tokenId}:
+      uriParameters:
+        tokenId:
+          type: string
+          displayName: Token datastore id
+          description: Received from create / list operation token id.
+      get:
+        displayName: Get a token
+        responses:
+          200:
+            body:
+              type: JWT
+          404:
+            body:
+              displayName: Token not found
+              type: ErrorResource
+      delete:
+        displayName: Revoke token
+        description: |
+          Used to revoke the token. Any call to the service with the token will
+          end up receiving 401 status code.
+        responses:
+          204:
+            description: The token has been deleted.
+/tokeninfo:
+  get:
+    displayName: Token info
+    description: |
+      Allows to gen basic information about the token without being authorized.
+      It only returns basic information about the token without user information.
+    queryParameters:
+      token:
+        type: string
+        description: The token to test.
+    responses:
+      200:
+        description: The token has been processed.
+        body:
+          type: JWTinfo
+      400:
+        description: Token processing error response.
+        body:
+          displayName: Token is invalid.
+          type: ErrorResource

@@ -4,7 +4,7 @@
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
-    "start": "xvfb-run node ${SCRIPT:-app.js}",
+    "start": "xvfb-run node --inspect=9228 ${SCRIPT:-app.js}",
     "start-worker": "xvfb-run node --inspect=9228 worker.js",
     "start-mac": "node --inspect=9228 app.js",
     "test": "mocha test/*.test.js",
@@ -32,6 +32,8 @@
     "express-session": "^1.15.6",
     "express-winston": "^3.0.1",
     "fs-extra": "^7.0.1",
+    "jsonwebtoken": "^8.4.0",
+    "moment": "^2.23.0",
     "nconf": "^0.10.0",
     "passport": "^0.4.0",
     "passport-google-oauth20": "^1.0.0",

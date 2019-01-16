@@ -8,23 +8,17 @@ nconf
   // 2. Environment variables
   .env([
     // 'CLOUD_BUCKET',
-    'DATA_BACKEND',
     'GCLOUD_PROJECT',
-    // 'MEMCACHE_URL',
-    // 'MONGO_URL',
-    // 'MONGO_COLLECTION',
-    // 'MONGO_DB_NAME',
-    // 'MYSQL_USER',
-    // 'MYSQL_PASSWORD',
     'NODE_ENV',
     'OAUTH2_CLIENT_ID',
     'OAUTH2_CLIENT_SECRET',
     'OAUTH2_CALLBACK',
     'PORT',
-    // 'SECRET',
-    // 'SUBSCRIPTION_NAME',
+    'SECRET',
+    'SUBSCRIPTION_NAME',
     'INSTANCE_CONNECTION_NAME',
     'TOPIC_NAME',
+    'CI_API_SECRET'
   ])
   // 3. Config file
   .file({file: path.join(__dirname, 'config.json')})
@@ -33,37 +27,27 @@ nconf
     // Typically you will create a bucket with the same name as your project ID.
     // CLOUD_BUCKET: '',
 
-    // dataBackend can be 'datastore', 'cloudsql', or 'mongodb'. Be sure to
-    // configure the appropriate settings for each storage engine below.
-    // If you are unsure, use datastore as it requires no additional
-    // configuration.
-    DATA_BACKEND: 'datastore',
-
     // This is the id of your project in the Google Cloud Developers Console.
     GCLOUD_PROJECT: '',
 
     // Connection url for the Memcache instance used to store session data
-    // MEMCACHE_URL: 'localhost:11211',
+    MEMCACHE_URL: 'localhost:11211',
 
-    // MongoDB connection string
-    // https://docs.mongodb.org/manual/reference/connection-string/
-    // MONGO_URL: 'mongodb://localhost:27017',
-    // MONGO_COLLECTION: 'books',
-    //
-    // MYSQL_USER: '',
-    // MYSQL_PASSWORD: '',
-    //
     OAUTH2_CLIENT_ID: '',
     OAUTH2_CLIENT_SECRET: '',
-    OAUTH2_CALLBACK: '',
+    OAUTH2_CALLBACK: 'http://localhost:8080/auth/callback',
 
     PORT: 8080,
 
     // Set this a secret string of your choosing
     SECRET: '',
 
-    SUBSCRIPTION_NAME: 'shared-worker-subscription',
+    SUBSCRIPTION_NAME: 'apic-worker-subscription',
     TOPIC_NAME: 'test-process-queue',
+
+    // The secret passed to the interested teams to perform unauthenticated calls
+    // as an authenticated user.
+    CI_API_SECRET: ''
   });
 
 function checkConfig(setting) {
@@ -78,13 +62,4 @@ function checkConfig(setting) {
 checkConfig('GCLOUD_PROJECT');
 // checkConfig('CLOUD_BUCKET');
 checkConfig('OAUTH2_CLIENT_ID');
-// checkConfig('OAUTH2_CLIENT_SECRET');
-
-// if (nconf.get('DATA_BACKEND') === 'cloudsql') {
-//   checkConfig('MYSQL_USER');
-//   checkConfig('MYSQL_PASSWORD');
-// } else if (nconf.get('DATA_BACKEND') === 'mongodb') {
-//   checkConfig('MONGO_URL');
-//   checkConfig('MONGO_COLLECTION');
-//   checkConfig('MONGO_DB_NAME');
-// }
+checkConfig('OAUTH2_CLIENT_SECRET');

@@ -1,26 +1,20 @@
-'use strict';
-
+const {BaseApi} = require('./base-api');
+const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-const {TestsModel} = require('./models/test-model');
-const {TestsComponentModel} = require('./models/test-component-model');
-const {TestsLogsModel} = require('./models/test-logs-model');
+const {TestsModel} = require('../models/test-model');
+const {TestsComponentModel} = require('../models/test-component-model');
+const {TestsLogsModel} = require('../models/test-logs-model');
+
 const router = express.Router();
 router.use(bodyParser.json());
 
-class ApicApiRoute {
+class TestApiRoute extends BaseApi {
   constructor() {
+    super();
     this.testModel = new TestsModel();
     this.testsComponentModel = new TestsComponentModel();
     this.testsLogsModel = new TestsLogsModel();
-  }
-
-  sendError(res, message, status) {
-    res.status(status || 400).send({
-      error: true,
-      message
-    });
   }
 
   validateCreateTest(req) {
@@ -230,53 +224,19 @@ class ApicApiRoute {
     }
     res.send(data);
   }
-
-  processCors(req, callback) {
-    const whitelist = ['http://localhost:8080', 'http://localhost:8081'];
-    const origin = req.header('Origin');
-    let corsOptions;
-    if (!origin) {
-      corsOptions = {origin: false};
-    } else if (origin.indexOf('http://localhost:') === 0) {
-      corsOptions = {origin: true};
-    } else if (whitelist.indexOf(origin) !== -1) {
-      corsOptions = {origin: true};
-    }
-    callback(null, corsOptions);
-  }
-
-  getCurrentUser(req, res) {
-    if (!req.user) {
-      res.send({
-        loggedIn: false
-      });
-    } else {
-      const user = Object.assign({}, req.user);
-      delete user.id;
-      user.loggedIn = true;
-      res.send(user);
-    }
-  }
 }
 
-const api = new ApicApiRoute();
+const api = new TestApiRoute();
 
 const checkCorsFn = api.processCors.bind(api);
 router.options('*', cors(checkCorsFn));
-router.post('/tests', cors(checkCorsFn), api.createTest.bind(api));
-router.get('/tests', cors(checkCorsFn), api.listTest.bind(api));
-router.get('/tests/:testId', cors(checkCorsFn), api.getTest.bind(api));
-router.delete('/tests/:testId', cors(checkCorsFn), api.deleteTest.bind(api));
-router.get('/tests/:testId/components', cors(checkCorsFn), api.listTestComponents.bind(api));
-router.get('/tests/:testId/components/:componentName', cors(checkCorsFn), api.getTestComponent.bind(api));
-router.get('/tests/:testId/components/:componentName/logs', cors(checkCorsFn), api.listLogs.bind(api));
-router.get('/tests/:testId/components/:componentName/logs/:logId', cors(checkCorsFn), api.getLog.bind(api));
-router.get('/me', cors(checkCorsFn), api.getCurrentUser.bind(api));
-
-// Errors
-router.use((err, req, res) => {
-  console.log('ERROR API HANDLER');
-  res.send({error: err.message});
-});
+router.post('/', cors(checkCorsFn), api.createTest.bind(api));
+router.get('/', cors(checkCorsFn), api.listTest.bind(api));
+router.get('/:testId', cors(checkCorsFn), api.getTest.bind(api));
+router.delete('/:testId', cors(checkCorsFn), api.deleteTest.bind(api));
+router.get('/:testId/components', cors(checkCorsFn), api.listTestComponents.bind(api));
+router.get('/:testId/components/:componentName', cors(checkCorsFn), api.getTestComponent.bind(api));
+router.get('/:testId/components/:componentName/logs', cors(checkCorsFn), api.listLogs.bind(api));
+router.get('/:testId/components/:componentName/logs/:logId', cors(checkCorsFn), api.getLog.bind(api));
 
 module.exports = router;
