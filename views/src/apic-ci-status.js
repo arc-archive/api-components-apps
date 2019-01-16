@@ -163,7 +163,10 @@ class ApicCiStatus extends PolymerElement {
               <paper-menu-button horizontal-align="right">
                 <paper-icon-button src="[[user.imageUrl]]" icon="[[_computeUserIcon(user)]]" slot="dropdown-trigger" class="user-icon"></paper-icon-button>
                 <paper-listbox slot="dropdown-content">
-                  <a href="/auth/logout?return=%2Fstatus" target="_top">
+                  <a href="#/tokens">
+                    <paper-item>Tokens</paper-item>
+                  </a>
+                  <a href="/auth/logout?return=%2Fstatus">
                     <paper-item>Log out</paper-item>
                   </a>
                 </paper-listbox>
@@ -184,6 +187,7 @@ class ApicCiStatus extends PolymerElement {
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
             <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]"></arc-test-details>
             <arc-add-test name="add-test" api-base="[[apiBase]]"></arc-add-test>
+            <arc-tokens name="tokens" api-base="[[apiBase]]"></arc-tokens>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
           <template is="dom-if" if="[[canCreate]]">
@@ -272,7 +276,7 @@ class ApicCiStatus extends PolymerElement {
   _routePageChanged(page) {
     if (!page) {
       this.page = 'status';
-    } else if (['status', 'test-details', 'add-test'].indexOf(page) !== -1) {
+    } else if (['status', 'test-details', 'add-test', 'tokens'].indexOf(page) !== -1) {
       this.page = page;
     } else {
       this.page = 'arc-404';
@@ -297,6 +301,9 @@ class ApicCiStatus extends PolymerElement {
           return;
         }
         import('./arc-add-test.js');
+        break;
+      case 'tokens':
+        import('./arc-tokens.js');
         break;
       case 'arc-404':
         import('./arc-404.js');
