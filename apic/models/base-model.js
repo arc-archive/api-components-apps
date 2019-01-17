@@ -8,8 +8,6 @@ class BaseModel {
    */
   constructor(namespace) {
     this.namespace = namespace;
-    this.testKind = 'Test';
-    this.componentsKind = 'Component';
     this.store = new Datastore({
       projectId: config.get('GCLOUD_PROJECT'),
       namespace: this.namespace
@@ -19,6 +17,34 @@ class BaseModel {
   get NO_MORE_RESULTS() {
     return Datastore.NO_MORE_RESULTS;
   }
+
+  get testKind() {
+    return 'Test';
+  }
+
+  get componentsKind() {
+    return 'Component';
+  }
+
+  get testLogsKind() {
+    return 'TestComponentLogs';
+  }
+
+  get userKind() {
+    return 'User';
+  }
+
+  get tokenKind() {
+    return 'Jwt';
+  }
+
+  get apicUsersNamespace() {
+    return 'api-components-users';
+  }
+
+  get apicTestsNamespace() {
+    return 'api-components-tests';
+  }
   /**
    * Creates a slug from a string.
    *
@@ -27,25 +53,6 @@ class BaseModel {
    */
   slug(name) {
     return slug(decamelize(name, '-'));
-  }
-  /**
-   * Validates pagination parameetrs.
-   * @param {Object} req Request
-   * @return {String|undefined} Error message or undefined if valid.
-   */
-  validatePagination(req) {
-    const messages = [];
-    let {limit} = req.query;
-    if (limit) {
-      if (isNaN(limit)) {
-        messages[messages.length] = 'Limit value is not a number';
-      }
-      limit = Number(limit);
-      if (limit > 300 || limit < 0) {
-        messages[messages.length] = 'Limit out of bounds [0, 300]';
-      }
-    }
-    return messages.length ? messages.join(' ') : undefined;
   }
   /**
    * Translates from Datastore's entity format to
@@ -99,6 +106,20 @@ class BaseModel {
         testId,
         this.componentsKind,
         this.slug(componentName)
+      ]
+    });
+  }
+
+  createTestLogKey(testId, componentName, id) {
+    return this.store.key({
+      namespace: this.namespace,
+      path: [
+        this.testKind,
+        testId,
+        this.componentsKind,
+        this.slug(componentName),
+        this.testLogsKind,
+        id
       ]
     });
   }

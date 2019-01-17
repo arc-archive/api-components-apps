@@ -94,7 +94,6 @@ class ApicCiStatus extends PolymerElement {
 
         .content {
           @apply --layout-flex;
-          height: 100%;
         }
 
         iron-pages {

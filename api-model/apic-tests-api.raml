@@ -108,6 +108,17 @@ securitySchemes:
           body:
             displayName: Test not found
             type: ErrorResource
+    /restart:
+      securedBy: [JwtSecurity]
+      put:
+        displayName: Restart test
+        description: |
+          Removes all test execution logs and restarts the test.
+        responses:
+          204:
+            description: |
+              The test has ben reset and scheduled.
+              Be aware of other response codes (400, 401, or 404).
     /components:
       get:
         is: [Paginated: {resourceType: Component}]

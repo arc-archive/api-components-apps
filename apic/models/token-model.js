@@ -6,8 +6,6 @@ class TokenModel extends BaseModel {
    */
   constructor() {
     super('api-components-users');
-    this.userKind = 'User';
-    this.tokenKind = 'Jwt';
   }
   /**
    * Finds a token in the data store.

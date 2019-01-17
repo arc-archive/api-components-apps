@@ -43,7 +43,7 @@ nconf
     SECRET: '',
 
     SUBSCRIPTION_NAME: 'apic-worker-subscription',
-    TOPIC_NAME: 'test-process-queue',
+    TESTS_PROCESS_TOPIC_NAME: 'test-process-queue',
 
     // The secret passed to the interested teams to perform unauthenticated calls
     // as an authenticated user.

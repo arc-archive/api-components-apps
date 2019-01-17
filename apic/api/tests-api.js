@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const {TestsModel} = require('../models/test-model');
 const {TestsComponentModel} = require('../models/test-component-model');
 const {TestsLogsModel} = require('../models/test-logs-model');
+const logging = require('../../lib/logging');
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -33,21 +34,6 @@ class TestApiRoute extends BaseApi {
     }
     if (body.type === 'bottom-up' && !body.component) {
       messages[messages.length] = 'The "component" property is required with "bottom-up" type.';
-    }
-    return messages.length ? messages.join(' ') : undefined;
-  }
-
-  validatePagination(req) {
-    const messages = [];
-    let {limit} = req.query;
-    if (limit) {
-      if (isNaN(limit)) {
-        messages[messages.length] = 'Limit value is not a number';
-      }
-      limit = Number(limit);
-      if (limit > 300 || limit < 0) {
-        messages[messages.length] = 'Limit out of bounds [0, 300]';
-      }
     }
     return messages.length ? messages.join(' ') : undefined;
   }
@@ -87,6 +73,7 @@ class TestApiRoute extends BaseApi {
       res.send({id: testId});
     })
     .catch((cause) => {
+      logging.error(cause);
       const status = cause.status || 500;
       this.sendError(res, cause.message, status);
     });
@@ -100,8 +87,9 @@ class TestApiRoute extends BaseApi {
     }
     let {limit, nextPageToken} = req.query;
     this.testModel.listTests(limit, nextPageToken)
-    .then((result) => this._sendListResult(result, res))
+    .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
+      logging.error(cause);
       if (cause.code === 3) {
         this.sendError(res, 'Inavlid nextPageToken parameter');
         return;
@@ -121,6 +109,7 @@ class TestApiRoute extends BaseApi {
       }
     })
     .catch((cause) => {
+      logging.error(cause);
       this.sendError(res, cause.message, 500);
     });
   }
@@ -159,6 +148,34 @@ class TestApiRoute extends BaseApi {
       res.sendStatus(204).end();
     })
     .catch((cause) => {
+      logging.error(cause);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
+    });
+  }
+  /**
+   * An edpoint to reset test state and re-run the test.
+   * @param {Object} req
+   * @param {Object} res
+   */
+  restartTest(req, res) {
+    const {testId} = req.params;
+    this.isValidAccess(req, 'create-test')
+    .then((hasAccess) => {
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      return this.testModel.resetTest(testId);
+    })
+    .then(() => {
+      res.sendStatus(204).end();
+    })
+    .catch((cause) => {
+      logging.error(cause);
       const status = cause.status || 500;
       this.sendError(res, cause.message, status);
     });
@@ -173,8 +190,9 @@ class TestApiRoute extends BaseApi {
     const {testId} = req.params;
     let {limit, nextPageToken} = req.query;
     this.testsComponentModel.list(testId, limit, nextPageToken)
-    .then((result) => this._sendListResult(result, res))
+    .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
+      logging.error(cause);
       if (cause.code === 3) {
         this.sendError(res, 'Inavlid nextPageToken parameter');
         return;
@@ -194,6 +212,7 @@ class TestApiRoute extends BaseApi {
       }
     })
     .catch((cause) => {
+      logging.error(cause);
       this.sendError(res, cause.message, 500);
     });
   }
@@ -207,8 +226,9 @@ class TestApiRoute extends BaseApi {
     const {testId, componentName} = req.params;
     let {limit, nextPageToken} = req.query;
     this.testsLogsModel.list(testId, componentName, limit, nextPageToken)
-    .then((result) => this._sendListResult(result, res))
+    .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
+      logging.error(cause);
       if (cause.code === 3) {
         this.sendError(res, 'Inavlid nextPageToken parameter');
         return;
@@ -228,18 +248,9 @@ class TestApiRoute extends BaseApi {
       }
     })
     .catch((cause) => {
+      logging.error(cause);
       this.sendError(res, cause.message, 500);
     });
-  }
-
-  _sendListResult(result, res) {
-    const data = {
-      items: result[0]
-    };
-    if (result[1]) {
-      data.nextPageToken = result[1];
-    }
-    res.send(data);
   }
 }
 
@@ -251,6 +262,7 @@ router.post('/', cors(checkCorsFn), api.createTest.bind(api));
 router.get('/', cors(checkCorsFn), api.listTest.bind(api));
 router.get('/:testId', cors(checkCorsFn), api.getTest.bind(api));
 router.delete('/:testId', cors(checkCorsFn), api.deleteTest.bind(api));
+router.put('/:testId/restart', cors(checkCorsFn), api.restartTest.bind(api));
 router.get('/:testId/components', cors(checkCorsFn), api.listTestComponents.bind(api));
 router.get('/:testId/components/:componentName', cors(checkCorsFn), api.getTestComponent.bind(api));
 router.get('/:testId/components/:componentName/logs', cors(checkCorsFn), api.listLogs.bind(api));

@@ -1,56 +1,27 @@
 'use strict';
-const Datastore = require('@google-cloud/datastore');
-const config = require('../../config');
-const slug = require('slug');
-const decamelize = require('decamelize');
+const {BaseModel} = require('./base-model');
 const logging = require('../../lib/logging');
 /**
  * A model for a componet test results in a run.
  */
-class TestsComponentModel {
+class TestsComponentModel extends BaseModel {
   /**
    * @constructor
    */
   constructor() {
-    this.namespace = 'api-components-tests';
-    this.testKind = 'Test';
-    this.componentsKind = 'Component';
-    this.store = new Datastore({
-      projectId: config.get('GCLOUD_PROJECT'),
-      namespace: this.namespace
-    });
-  }
-
-  /**
-   * Creates a slug from a string.
-   *
-   * @param {String} name Value to slug,
-   * @return {String}
-   */
-  slug(name) {
-    return slug(decamelize(name, '-'));
-  }
-
-  _createKey(testId, componentName) {
-    return this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.testKind,
-        testId,
-        this.componentsKind,
-        this.slug(componentName)
-      ]
-    });
+    super('api-components-tests');
   }
 
   create(testId, componentName) {
-    const key = this._createKey(testId, componentName);
+    const key = this.createTestComponentKey(testId, componentName);
     const results = [{
       name: 'component',
-      value: componentName
+      value: componentName,
+      excludeFromIndexes: true
     }, {
       name: 'status',
-      value: 'running'
+      value: 'running',
+      excludeFromIndexes: true
     }, {
       name: 'startTime',
       value: Date.now()
@@ -58,10 +29,7 @@ class TestsComponentModel {
 
     const entity = {
       key,
-      data: results,
-      excludeFromIndexes: [
-        'component', 'status'
-      ]
+      data: results
     };
     return this.store.get(key)
     .catch(() => {})
@@ -74,7 +42,7 @@ class TestsComponentModel {
   }
 
   get(testId, componentName) {
-    const key = this._createKey(testId, componentName);
+    const key = this.createTestComponentKey(testId, componentName);
     return this.store.get(key)
     .then((entity) => {
       if (entity && entity[0]) {
@@ -85,7 +53,7 @@ class TestsComponentModel {
 
   updateComponent(testId, componentName, report) {
     const transaction = this.store.transaction();
-    const key = this._createKey(testId, componentName);
+    const key = this.createTestComponentKey(testId, componentName);
     return transaction.run()
     .then(() => transaction.get(key))
     .then((data) => {
@@ -118,7 +86,7 @@ class TestsComponentModel {
 
   updateComponentError(testId, componentName, message) {
     const transaction = this.store.transaction();
-    const key = this._createKey(testId, componentName);
+    const key = this.createTestComponentKey(testId, componentName);
     return transaction.run()
     .then(() => transaction.get(key))
     .then((data) => {
@@ -144,26 +112,11 @@ class TestsComponentModel {
     });
   }
 
-  getTestKey(testId) {
-    return this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.testKind,
-        testId
-      ]
-    });
-  }
-
-  fromDatastore(obj) {
-    obj.id = obj[this.store.KEY].name;
-    return obj;
-  }
-
   list(testId, limit, nextPageToken) {
     if (!limit) {
       limit = 25;
     }
-    const ancestorKey = this.getTestKey(testId);
+    const ancestorKey = this.createTestKey(testId);
     let query = this.store.createQuery(this.namespace, this.componentsKind).hasAncestor(ancestorKey);
     query = query.limit(limit);
     if (nextPageToken) {
@@ -172,8 +125,29 @@ class TestsComponentModel {
     return this.store.runQuery(query)
     .then((result) => {
       const entities = result[0].map(this.fromDatastore.bind(this));
-      const hasMore = result[1].moreResults !== Datastore.NO_MORE_RESULTS ? result[1].endCursor : false;
+      const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
+    });
+  }
+
+  clearResult(testId) {
+    const transaction = this.store.transaction();
+    const ancestorKey = this.createTestKey(testId);
+    return transaction.run()
+    .then(() => {
+      const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(ancestorKey);
+      return query.run();
+    })
+    .then((result) => {
+      const keys = result[0].map((item) => item[this.store.KEY]);
+      if (keys.length) {
+        transaction.delete(keys);
+      }
+      return transaction.commit();
+    })
+    .catch((cause) => {
+      transaction.rollback();
+      return Promise.reject(cause);
     });
   }
 }

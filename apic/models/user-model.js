@@ -1,6 +1,5 @@
 const uuidv4 = require('uuid/v4');
 const {BaseModel} = require('./base-model');
-const logging = require('../../lib/logging');
 
 class UserModel extends BaseModel {
   /**
@@ -8,8 +7,6 @@ class UserModel extends BaseModel {
    */
   constructor() {
     super('api-components-users');
-    this.userKind = 'User';
-    this.tokenKind = 'Jwt';
   }
 
   get excludedIndexes() {

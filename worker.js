@@ -1,16 +1,3 @@
-// Copyright 2018, Google, Inc.
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//    http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 'use strict';
 
 // Activate Google Cloud Trace and Debug when in production
@@ -45,27 +32,37 @@ class ApiComponentsTestsWorker {
     this.catalogModel = new CatalogModel();
     this.testsModel = new TestsModel();
     this.queue = [];
+    this._onMessage = this._onMessage.bind(this);
+    this._onError = this._onError.bind(this);
   }
   /**
    * Subscribe to Cloud Pub/Sub and receive messages to process tests requests.
-   * The subscription will continue to listen for messages until the process
-   * is killed
+   *
+   * @return {Promise}
    */
   subscribe() {
-    background.subscribe((err, data) => {
-      if (err) {
-        throw err;
-      }
-      switch (data.action) {
-        case 'runTest': this.runTest(data.id); break;
-        case 'removeTest': this.removeTest(data.id); break;
-        default:
-          logging.warn('Unknown request', data);
-      }
-    });
+    background.on('message', this._onMessage);
+    background.on('error', this._onError);
+    return background.subscribe();
+  }
+
+  _onMessage(topic, data) {
+    switch (data.action) {
+      case 'runTest': this.runTest(data.id); break;
+      case 'removeTest': this.removeTest(data.id); break;
+      default:
+        logging.warn('Unknown request');
+        logging.warn(data);
+    }
+  }
+
+  _onError(topic, err) {
+    logging.error(`Error in topic ${topic}`);
+    logging.error(err);
   }
 
   removeTest(id) {
+    logging.verbose('Removing test ' + id);
     const i = this.queue.findIndex((item) => item.entryId === id);
     if (i !== -1) {
       const instance = this.queue[i];
@@ -79,6 +76,7 @@ class ApiComponentsTestsWorker {
   }
 
   runTest(id) {
+    logging.verbose('Running test ' + id);
     return this.testsModel.getTest(id)
     .then((info) => this.setupQueue(id, info))
     .catch((cause) => {

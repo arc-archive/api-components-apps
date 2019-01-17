@@ -4,8 +4,8 @@
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
-    "start": "xvfb-run node --inspect=9228 ${SCRIPT:-app.js}",
-    "start-worker": "xvfb-run node --inspect=9228 worker.js",
+    "start": "node --inspect=9228 ${SCRIPT:-app.js}",
+    "start-worker": "xvfb-run node --inspect=9227 worker.js --PORT=8082",
     "start-mac": "node --inspect=9228 app.js",
     "test": "mocha test/*.test.js",
     "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci .",

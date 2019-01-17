@@ -1,52 +1,21 @@
 'use strict';
-const Datastore = require('@google-cloud/datastore');
-const config = require('../../config');
 const background = require('../../lib/background');
 const logging = require('../../lib/logging');
+const {BaseModel} = require('./base-model');
 const uuidv4 = require('uuid/v4');
 /**
  * A model for catalog items.
  */
-class TestsModel {
+class TestsModel extends BaseModel {
   /**
    * @constructor
    */
   constructor() {
-    this.namespace = 'api-components-tests';
-    this.testKind = 'Test';
-    this.store = new Datastore({
-      projectId: config.get('GCLOUD_PROJECT'),
-      namespace: this.namespace
-    });
+    super('api-components-tests');
   }
 
   get excludedIndexes() {
-    return ['type', 'commit', 'branch', 'status', 'size', 'passed', 'failed', 'component'];
-  }
-
-  /**
-   * Translates from Datastore's entity format to
-   * the format expected by the application.
-   *
-   * Datastore format:
-   *    {
-   *      key: [kind, id],
-   *      data: {
-   *        property: value
-   *      }
-   *    }
-   *
-   *  Application format:
-   *    {
-   *      id: id,
-   *      property: value
-   *    }
-   * @param {Object} obj Datastore entry
-   * @return {Object}
-   */
-  fromDatastore(obj) {
-    obj.id = obj[this.store.KEY].name;
-    return obj;
+    return ['type', 'commit', 'branch', 'status', 'size', 'passed', 'failed', 'component', 'error', 'message'];
   }
 
   listTests(limit, nextPageToken) {
@@ -61,7 +30,7 @@ class TestsModel {
     return this.store.runQuery(query)
     .then((result) => {
       const entities = result[0].map(this.fromDatastore.bind(this));
-      const hasMore = result[1].moreResults !== Datastore.NO_MORE_RESULTS ? result[1].endCursor : false;
+      const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
     });
   }
@@ -69,13 +38,7 @@ class TestsModel {
   insertTest(info) {
     const now = Date.now();
     const keyName = uuidv4();
-    const key = this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.testKind,
-        keyName
-      ]
-    });
+    const key = this.createTestKey(keyName);
     const results = [{
       name: 'type',
       value: info.type,
@@ -85,7 +48,7 @@ class TestsModel {
       value: info.branch,
       excludeFromIndexes: true
     }, {
-      name: 'startTime',
+      name: 'created',
       value: now
     }, {
       name: 'status',
@@ -122,18 +85,60 @@ class TestsModel {
     });
   }
 
-  _createKey(id) {
-    return this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.testKind,
-        id
-      ]
+  resetTest(testId) {
+    const transaction = this.store.transaction();
+    const key = this.createTestKey(testId);
+    return transaction.run()
+    .then(() => transaction.get(key))
+    .then((data) => {
+      const [test] = data;
+      test.status = 'queued';
+      delete test.passed;
+      delete test.failed;
+      delete test.size;
+      delete test.startTime;
+      delete test.error;
+      delete test.message;
+      transaction.save({
+        key: key,
+        data: test,
+        excludeFromIndexes: this.excludedIndexes
+      });
+    })
+    .then(() => {
+      const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
+      return query.run();
+    })
+    .then((result) => {
+      const keys = result[0].map((item) => item[this.store.KEY]);
+      if (keys.length) {
+        transaction.delete(keys);
+      }
+    })
+    .then(() => {
+      const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
+      return query.run();
+    })
+    .then((result) => {
+      const keys = result[0].map((item) => item[this.store.KEY]);
+      if (keys.length) {
+        transaction.delete(keys);
+      }
+    })
+    .then(() => {
+      return transaction.commit();
+    })
+    .then(() => {
+      background.queueTest(testId);
+    })
+    .catch((cause) => {
+      transaction.rollback();
+      return Promise.reject(cause);
     });
   }
 
   getTest(id) {
-    const key = this._createKey(id);
+    const key = this.createTestKey(id);
     return this.store.get(key)
     .then((entity) => {
       if (entity && entity[0]) {
@@ -142,16 +147,31 @@ class TestsModel {
     });
   }
 
-  updateTestScope(id, componentsSize) {
+  startTest(id) {
     return this.updateTestProperties(id, {
       status: 'running',
+      startTime: Date.now()
+    });
+  }
+
+  setTestError(id, message) {
+    return this.updateTestProperties(id, {
+      status: 'finished',
+      endTime: Date.now(),
+      error: true,
+      message
+    });
+  }
+
+  updateTestScope(id, componentsSize) {
+    return this.updateTestProperties(id, {
       size: componentsSize
     });
   }
 
   setComponentError(id) {
     const transaction = this.store.transaction();
-    const key = this._createKey(id);
+    const key = this.createTestKey(id);
     return transaction.run()
     .then(() => transaction.get(key))
     .then((data) => {
@@ -178,7 +198,7 @@ class TestsModel {
 
   updateComponentResult(id, report) {
     const transaction = this.store.transaction();
-    const key = this._createKey(id);
+    const key = this.createTestKey(id);
     return transaction.run()
     .then(() => transaction.get(key))
     .then((data) => {
@@ -210,15 +230,20 @@ class TestsModel {
     });
   }
 
-  finishTest(id) {
-    return this.updateTestProperties(id, {
-      status: 'finished'
-    });
+  finishTest(id, message) {
+    const props = {
+      status: 'finished',
+      endTime: Date.now()
+    };
+    if (message) {
+      props.message = message;
+    }
+    return this.updateTestProperties(id, props);
   }
 
   updateTestProperties(id, props) {
     const transaction = this.store.transaction();
-    const key = this._createKey(id);
+    const key = this.createTestKey(id);
     return transaction.run()
     .then(() => transaction.get(key))
     .then((data) => {
@@ -240,7 +265,7 @@ class TestsModel {
   }
 
   deleteTest(id) {
-    const key = this._createKey(id);
+    const key = this.createTestKey(id);
     return this.store.delete(key)
     .then(() => {
       background.dequeueTest(id);
