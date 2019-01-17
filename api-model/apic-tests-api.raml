@@ -205,13 +205,41 @@ securitySchemes:
               displayName: Token not found
               type: ErrorResource
       delete:
-        displayName: Revoke token
+        displayName: Delete token
         description: |
-          Used to revoke the token. Any call to the service with the token will
-          end up receiving 401 status code.
+          Used to delete a token. Revoke token method should be used to revoke
+          the token but to keep record of it.
         responses:
           204:
             description: The token has been deleted.
+          401:
+            description: The token belongs to other person
+            body:
+              displayName: Token not found
+              type: ErrorResource
+          404:
+            body:
+              displayName: Token not found
+              type: ErrorResource
+      /revoke:
+        post:
+          displayName: Revoke token
+          description: |
+            This method does not require body on the request nor resturns any body.
+            Use this endpoint to revoke the token. Every request with the token after
+            it is revoked will result with 401 status code.
+          responses:
+            204:
+              description: The token has been revoked.
+            401:
+              description: The token belongs to other person
+              body:
+                displayName: Token not found
+                type: ErrorResource
+            404:
+              body:
+                displayName: Token not found
+                type: ErrorResource
 /tokeninfo:
   get:
     displayName: Token info

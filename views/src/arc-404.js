@@ -4,14 +4,33 @@ class Arc404 extends PolymerElement {
   static get template() {
     return html`
       <style>
-        :host {
-          display: block;
+      :host {
+        display: block;
+        max-width: 1200px;
+        margin: 24px auto;
+      }
 
-          padding: 10px 20px;
-        }
+      header {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
+
+      h1 {
+        @apply --paper-font-headline;
+        @apply --layout-flex;
+      }
+
+      a {
+        color: currentColor;
+      }
       </style>
-
-      Oops you hit a 404. <a href="[[rootPath]]">Head back to home.</a>
+      <header>
+        <a href="#/">
+          <paper-icon-button icon="apic:arrow-back" title="Return to tests list"></paper-icon-button>
+        </a>
+        <h1>404</h1>
+      </header>
+      Oops you hit a 404. The page cannot be found.
     `;
   }
 }

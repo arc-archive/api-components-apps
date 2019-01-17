@@ -27,7 +27,7 @@
 ],
 "raml-http:server": [
 {
-"@id": "#443",
+"@id": "#460",
 "@type": [
 "raml-http:Server",
 "doc:DomainElement"
@@ -39,7 +39,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#443/source-map",
+"@id": "#460/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -61,7 +61,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#443"
+"@value": "amf://id#460"
 }
 ],
 "sourcemaps:value": [
@@ -82,7 +82,7 @@
 ],
 "schema-org:documentation": [
 {
-"@id": "#444",
+"@id": "#461",
 "@type": [
 "schema-org:CreativeWork",
 "doc:DomainElement"
@@ -99,7 +99,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#444/source-map",
+"@id": "#461/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -119,7 +119,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#444"
+"@value": "amf://id#461"
 }
 ],
 "sourcemaps:value": [
@@ -15670,7 +15670,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(156,0)-(215,0)]"
+"@value": "[(156,0)-(243,0)]"
 }
 ]
 }
@@ -21750,7 +21750,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(168,2)-(215,0)]"
+"@value": "[(168,2)-(243,0)]"
 }
 ]
 }
@@ -22554,12 +22554,12 @@
 ],
 "schema-org:name": [
 {
-"@value": "Revoke token"
+"@value": "Delete token"
 }
 ],
 "schema-org:description": [
 {
-"@value": "Used to revoke the token. Any call to the service with the token will\nend up receiving 401 status code.\n"
+"@value": "Used to delete a token. Revoke token method should be used to revoke\nthe token but to keep record of it.\n"
 }
 ],
 "hydra:returns": [
@@ -22619,6 +22619,1243 @@
 ]
 }
 ]
+},
+{
+"@id": "#431",
+"@type": [
+"raml-http:Response",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "401"
+}
+],
+"schema-org:description": [
+{
+"@value": "The token belongs to other person"
+}
+],
+"hydra:statusCode": [
+{
+"@value": "401"
+}
+],
+"raml-http:payload": [
+{
+"@id": "#432",
+"@type": [
+"raml-http:Payload",
+"doc:DomainElement"
+],
+"raml-http:mediaType": [
+{
+"@value": "application/json"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#433",
+"@type": [
+"shacl:NodeShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:closed": [
+{
+"@value": false
+}
+],
+"shacl:property": [
+{
+"@id": "#223",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#error"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#224",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#boolean"
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"schema-org:description": [
+{
+"@value": "Indicate that the response is errored."
+}
+],
+"shacl:defaultValue": [
+{
+"@id": "#225",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#225/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#225"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,17)-(34,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:defaultValueStr": [
+{
+"@value": "true"
+}
+],
+"doc:examples": [
+{
+"@id": "#226",
+"@type": [
+"doc:Example",
+"doc:DomainElement"
+],
+"doc:strict": [
+{
+"@value": true
+}
+],
+"doc:structuredValue": [
+{
+"@id": "#226",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:raw": [
+{
+"@value": "true"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "doc:strict"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:raw"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#224/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(31,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:defaultValueStr"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,8)-(35,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(32,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(35,8)-(36,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#223/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(32,8)-(33,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#223"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#227",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#message"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#228",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"schema-org:description": [
+{
+"@value": "The error message associated with the error."
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#228/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(37,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(38,8)-(39,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(38,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#227/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(39,8)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#227"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:name": [
+{
+"@value": "default"
+}
+],
+"schema-org:name": [
+{
+"@value": "Token not found"
+}
+],
+"schema-org:description": [
+{
+"@value": "A response that is errored"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#433/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#433"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(219,14)-(219,18)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(27,4)-(28,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#433"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(217,12)-(220,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(218,14)-(219,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#432/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#432"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(217,12)-(220,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#431/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(216,12)-(217,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#431"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(215,10)-(220,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#434",
+"@type": [
+"raml-http:Response",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "404"
+}
+],
+"hydra:statusCode": [
+{
+"@value": "404"
+}
+],
+"raml-http:payload": [
+{
+"@id": "#435",
+"@type": [
+"raml-http:Payload",
+"doc:DomainElement"
+],
+"raml-http:mediaType": [
+{
+"@value": "application/json"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#436",
+"@type": [
+"shacl:NodeShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:closed": [
+{
+"@value": false
+}
+],
+"shacl:property": [
+{
+"@id": "#223",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#error"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#224",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#boolean"
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"schema-org:description": [
+{
+"@value": "Indicate that the response is errored."
+}
+],
+"shacl:defaultValue": [
+{
+"@id": "#225",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#225/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#225"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,17)-(34,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:defaultValueStr": [
+{
+"@value": "true"
+}
+],
+"doc:examples": [
+{
+"@id": "#226",
+"@type": [
+"doc:Example",
+"doc:DomainElement"
+],
+"doc:strict": [
+{
+"@value": true
+}
+],
+"doc:structuredValue": [
+{
+"@id": "#226",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:raw": [
+{
+"@value": "true"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "doc:strict"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:raw"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#224/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(31,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:defaultValueStr"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,8)-(35,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(32,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(35,8)-(36,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#223/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(32,8)-(33,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#223"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#227",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#message"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#228",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"schema-org:description": [
+{
+"@value": "The error message associated with the error."
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#228/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(37,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(38,8)-(39,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(38,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#227/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(39,8)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#227"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:name": [
+{
+"@value": "default"
+}
+],
+"schema-org:name": [
+{
+"@value": "Token not found"
+}
+],
+"schema-org:description": [
+{
+"@value": "A response that is errored"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#436/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#436"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(223,14)-(223,18)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(27,4)-(28,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#436"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(221,12)-(224,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(222,14)-(223,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#435/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#435"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(221,12)-(224,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#434/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#434"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(220,10)-(224,0)]"
+}
+]
+}
+]
+}
+]
 }
 ],
 "sourcemaps:sources": [
@@ -22636,7 +23873,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(212,8)-(215,0)]"
+"@value": "[(212,8)-(224,0)]"
 }
 ]
 },
@@ -22660,7 +23897,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(207,6)-(215,0)]"
+"@value": "[(207,6)-(224,0)]"
 }
 ]
 },
@@ -22683,7 +23920,7 @@
 ],
 "raml-http:parameter": [
 {
-"@id": "#431",
+"@id": "#437",
 "@type": [
 "raml-http:Parameter",
 "doc:DomainElement"
@@ -22715,7 +23952,7 @@
 ],
 "raml-http:schema": [
 {
-"@id": "#432",
+"@id": "#438",
 "@type": [
 "raml-shapes:ScalarShape",
 "shacl:Shape",
@@ -22744,7 +23981,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#432/source-map",
+"@id": "#438/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -22752,7 +23989,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#432"
+"@value": "amf://id#438"
 }
 ],
 "sourcemaps:value": [
@@ -22790,7 +24027,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#432"
+"@value": "amf://id#438"
 }
 ],
 "sourcemaps:value": [
@@ -22818,7 +24055,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#431/source-map",
+"@id": "#437/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -22838,7 +24075,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#431"
+"@value": "amf://id#437"
 }
 ],
 "sourcemaps:value": [
@@ -22893,7 +24130,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(191,4)-(215,0)]"
+"@value": "[(191,4)-(243,0)]"
 }
 ]
 }
@@ -22902,7 +24139,1618 @@
 ]
 },
 {
-"@id": "#433",
+"@id": "#439",
+"@type": [
+"raml-http:EndPoint",
+"doc:DomainElement"
+],
+"raml-http:path": [
+{
+"@value": "/me/tokens/{tokenId}/revoke"
+}
+],
+"hydra:supportedOperation": [
+{
+"@id": "#440",
+"@type": [
+"hydra:Operation",
+"doc:DomainElement"
+],
+"hydra:method": [
+{
+"@value": "post"
+}
+],
+"schema-org:name": [
+{
+"@value": "Revoke token"
+}
+],
+"schema-org:description": [
+{
+"@value": "This method does not require body on the request nor resturns any body.\nUse this endpoint to revoke the token. Every request with the token after\nit is revoked will result with 401 status code.\n"
+}
+],
+"hydra:returns": [
+{
+"@id": "#441",
+"@type": [
+"raml-http:Response",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "204"
+}
+],
+"schema-org:description": [
+{
+"@value": "The token has been revoked."
+}
+],
+"hydra:statusCode": [
+{
+"@value": "204"
+}
+],
+"raml-http:payload": [],
+"sourcemaps:sources": [
+{
+"@id": "#441/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(233,14)-(234,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#441"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(232,12)-(234,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#442",
+"@type": [
+"raml-http:Response",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "401"
+}
+],
+"schema-org:description": [
+{
+"@value": "The token belongs to other person"
+}
+],
+"hydra:statusCode": [
+{
+"@value": "401"
+}
+],
+"raml-http:payload": [
+{
+"@id": "#443",
+"@type": [
+"raml-http:Payload",
+"doc:DomainElement"
+],
+"raml-http:mediaType": [
+{
+"@value": "application/json"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#444",
+"@type": [
+"shacl:NodeShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:closed": [
+{
+"@value": false
+}
+],
+"shacl:property": [
+{
+"@id": "#223",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#error"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#224",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#boolean"
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"schema-org:description": [
+{
+"@value": "Indicate that the response is errored."
+}
+],
+"shacl:defaultValue": [
+{
+"@id": "#225",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#225/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#225"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,17)-(34,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:defaultValueStr": [
+{
+"@value": "true"
+}
+],
+"doc:examples": [
+{
+"@id": "#226",
+"@type": [
+"doc:Example",
+"doc:DomainElement"
+],
+"doc:strict": [
+{
+"@value": true
+}
+],
+"doc:structuredValue": [
+{
+"@id": "#226",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:raw": [
+{
+"@value": "true"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "doc:strict"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:raw"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#224/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(31,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:defaultValueStr"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,8)-(35,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(32,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(35,8)-(36,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#223/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(32,8)-(33,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#223"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#227",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#message"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#228",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"schema-org:description": [
+{
+"@value": "The error message associated with the error."
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#228/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(37,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(38,8)-(39,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(38,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#227/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(39,8)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#227"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:name": [
+{
+"@value": "default"
+}
+],
+"schema-org:name": [
+{
+"@value": "Token not found"
+}
+],
+"schema-org:description": [
+{
+"@value": "A response that is errored"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#444/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#444"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(238,16)-(238,20)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(27,4)-(28,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#444"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(236,14)-(239,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(237,16)-(238,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#443/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#443"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(236,14)-(239,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#442/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(235,14)-(236,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#442"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(234,12)-(239,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#445",
+"@type": [
+"raml-http:Response",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "404"
+}
+],
+"hydra:statusCode": [
+{
+"@value": "404"
+}
+],
+"raml-http:payload": [
+{
+"@id": "#446",
+"@type": [
+"raml-http:Payload",
+"doc:DomainElement"
+],
+"raml-http:mediaType": [
+{
+"@value": "application/json"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#447",
+"@type": [
+"shacl:NodeShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:closed": [
+{
+"@value": false
+}
+],
+"shacl:property": [
+{
+"@id": "#223",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#error"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#224",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#boolean"
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"schema-org:description": [
+{
+"@value": "Indicate that the response is errored."
+}
+],
+"shacl:defaultValue": [
+{
+"@id": "#225",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#225/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#225"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,17)-(34,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:defaultValueStr": [
+{
+"@value": "true"
+}
+],
+"doc:examples": [
+{
+"@id": "#226",
+"@type": [
+"doc:Example",
+"doc:DomainElement"
+],
+"doc:strict": [
+{
+"@value": true
+}
+],
+"doc:structuredValue": [
+{
+"@id": "#226",
+"@type": [
+"data:Scalar"
+],
+"data:value": [
+{
+"@value": "true",
+"@type": "xsd:boolean"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:raw": [
+{
+"@value": "true"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#226/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "doc:strict"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:raw"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#226"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(33,17)-(33,21)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#224/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(31,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:defaultValueStr"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(34,8)-(35,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(31,8)-(32,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#224"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(35,8)-(36,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "error"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#223/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(32,8)-(33,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#223"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(30,6)-(36,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#227",
+"@type": [
+"shacl:PropertyShape",
+"shacl:Shape",
+"raml-shapes:Shape"
+],
+"shacl:path": [
+{
+"@id": "http://a.ml/vocabularies/data#message"
+}
+],
+"raml-shapes:range": [
+{
+"@id": "#228",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"schema-org:description": [
+{
+"@value": "The error message associated with the error."
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#228/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(37,12)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(38,8)-(39,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#228"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(37,8)-(38,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:minCount": [
+{
+"@value": 1
+}
+],
+"shacl:name": [
+{
+"@value": "message"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#227/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:minCount"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(39,8)-(40,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#227"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(36,6)-(40,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"shacl:name": [
+{
+"@value": "default"
+}
+],
+"schema-org:name": [
+{
+"@value": "Token not found"
+}
+],
+"schema-org:description": [
+{
+"@value": "A response that is errored"
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#447/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#447"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(242,16)-(242,20)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(27,4)-(28,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#447"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(240,14)-(243,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(241,16)-(242,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#446/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#446"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(240,14)-(243,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#445/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#445"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(239,12)-(243,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#440/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "hydra:returns"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(231,10)-(243,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(226,10)-(227,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#440"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(225,8)-(243,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(227,10)-(231,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"raml-http:parameter": [
+{
+"@id": "#448",
+"@type": [
+"raml-http:Parameter",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "tokenId"
+}
+],
+"raml-http:paramName": [
+{
+"@value": "tokenId"
+}
+],
+"schema-org:description": [
+{
+"@value": "Received from create / list operation token id."
+}
+],
+"hydra:required": [
+{
+"@value": true
+}
+],
+"raml-http:binding": [
+{
+"@value": "path"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#449",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "schema"
+}
+],
+"schema-org:name": [
+{
+"@value": "Token datastore id"
+}
+],
+"schema-org:description": [
+{
+"@value": "Received from create / list operation token id."
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#449/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:type-property-lexical-info": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#449"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(194,10)-(194,14)]"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(196,10)-(197,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "shacl:datatype"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(194,10)-(195,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#449"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(193,8)-(197,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:name"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(195,10)-(196,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#448/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#448"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "schema-org:description"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(196,10)-(197,0)]"
+}
+]
+},
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#448"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(193,8)-(197,0)]"
+}
+]
+}
+]
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#439/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:parent-end-point": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#439"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fme%2Ftokens%2F%7BtokenId%7D"
+}
+]
+}
+],
+"sourcemaps:lexical": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#439"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "[(224,6)-(243,0)]"
+}
+]
+}
+]
+}
+]
+},
+{
+"@id": "#450",
 "@type": [
 "raml-http:EndPoint",
 "doc:DomainElement"
@@ -22914,7 +25762,7 @@
 ],
 "hydra:supportedOperation": [
 {
-"@id": "#434",
+"@id": "#451",
 "@type": [
 "hydra:Operation",
 "doc:DomainElement"
@@ -22936,14 +25784,14 @@
 ],
 "hydra:expects": [
 {
-"@id": "#435",
+"@id": "#452",
 "@type": [
 "raml-http:Request",
 "doc:DomainElement"
 ],
 "raml-http:parameter": [
 {
-"@id": "#436",
+"@id": "#453",
 "@type": [
 "raml-http:Parameter",
 "doc:DomainElement"
@@ -22975,7 +25823,7 @@
 ],
 "raml-http:schema": [
 {
-"@id": "#437",
+"@id": "#454",
 "@type": [
 "raml-shapes:ScalarShape",
 "shacl:Shape",
@@ -22999,7 +25847,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#437/source-map",
+"@id": "#454/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23007,12 +25855,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#437"
+"@value": "amf://id#454"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(223,8)-(223,12)]"
+"@value": "[(251,8)-(251,12)]"
 }
 ]
 }
@@ -23026,19 +25874,19 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(224,8)-(225,0)]"
+"@value": "[(252,8)-(253,0)]"
 }
 ]
 },
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#437"
+"@value": "amf://id#454"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(222,6)-(225,0)]"
+"@value": "[(250,6)-(253,0)]"
 }
 ]
 },
@@ -23050,7 +25898,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(223,8)-(224,0)]"
+"@value": "[(251,8)-(252,0)]"
 }
 ]
 }
@@ -23061,7 +25909,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#436/source-map",
+"@id": "#453/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23074,19 +25922,19 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(224,8)-(225,0)]"
+"@value": "[(252,8)-(253,0)]"
 }
 ]
 },
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#436"
+"@value": "amf://id#453"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(222,6)-(225,0)]"
+"@value": "[(250,6)-(253,0)]"
 }
 ]
 }
@@ -23098,7 +25946,7 @@
 "raml-http:payload": [],
 "sourcemaps:sources": [
 {
-"@id": "#435/source-map",
+"@id": "#452/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23111,7 +25959,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(221,4)-(225,0)]"
+"@value": "[(249,4)-(253,0)]"
 }
 ]
 }
@@ -23122,7 +25970,7 @@
 ],
 "hydra:returns": [
 {
-"@id": "#438",
+"@id": "#455",
 "@type": [
 "raml-http:Response",
 "doc:DomainElement"
@@ -23144,7 +25992,7 @@
 ],
 "raml-http:payload": [
 {
-"@id": "#439",
+"@id": "#456",
 "@type": [
 "raml-http:Payload",
 "doc:DomainElement"
@@ -23177,7 +26025,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#439/source-map",
+"@id": "#456/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23185,12 +26033,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#439"
+"@value": "amf://id#456"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(228,8)-(230,0)]"
+"@value": "[(256,8)-(258,0)]"
 }
 ]
 }
@@ -23201,7 +26049,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#438/source-map",
+"@id": "#455/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23214,19 +26062,19 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(227,8)-(228,0)]"
+"@value": "[(255,8)-(256,0)]"
 }
 ]
 },
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#438"
+"@value": "amf://id#455"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(226,6)-(230,0)]"
+"@value": "[(254,6)-(258,0)]"
 }
 ]
 }
@@ -23235,7 +26083,7 @@
 ]
 },
 {
-"@id": "#440",
+"@id": "#457",
 "@type": [
 "raml-http:Response",
 "doc:DomainElement"
@@ -23257,7 +26105,7 @@
 ],
 "raml-http:payload": [
 {
-"@id": "#441",
+"@id": "#458",
 "@type": [
 "raml-http:Payload",
 "doc:DomainElement"
@@ -23269,7 +26117,7 @@
 ],
 "raml-http:schema": [
 {
-"@id": "#442",
+"@id": "#459",
 "@type": [
 "shacl:NodeShape",
 "shacl:Shape",
@@ -23742,7 +26590,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#442/source-map",
+"@id": "#459/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23750,12 +26598,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#442"
+"@value": "amf://id#459"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(234,10)-(234,14)]"
+"@value": "[(262,10)-(262,14)]"
 }
 ]
 }
@@ -23776,12 +26624,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#442"
+"@value": "amf://id#459"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(232,8)-(235,0)]"
+"@value": "[(260,8)-(263,0)]"
 }
 ]
 },
@@ -23793,7 +26641,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(233,10)-(234,0)]"
+"@value": "[(261,10)-(262,0)]"
 }
 ]
 }
@@ -23804,7 +26652,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#441/source-map",
+"@id": "#458/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23812,12 +26660,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#441"
+"@value": "amf://id#458"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(232,8)-(235,0)]"
+"@value": "[(260,8)-(263,0)]"
 }
 ]
 }
@@ -23828,7 +26676,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#440/source-map",
+"@id": "#457/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23841,19 +26689,19 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(231,8)-(232,0)]"
+"@value": "[(259,8)-(260,0)]"
 }
 ]
 },
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#440"
+"@value": "amf://id#457"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(230,6)-(235,0)]"
+"@value": "[(258,6)-(263,0)]"
 }
 ]
 }
@@ -23864,7 +26712,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#434/source-map",
+"@id": "#451/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23877,7 +26725,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(225,4)-(235,0)]"
+"@value": "[(253,4)-(263,0)]"
 }
 ]
 },
@@ -23889,19 +26737,19 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(217,4)-(218,0)]"
+"@value": "[(245,4)-(246,0)]"
 }
 ]
 },
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#434"
+"@value": "amf://id#451"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(216,2)-(235,0)]"
+"@value": "[(244,2)-(263,0)]"
 }
 ]
 },
@@ -23913,7 +26761,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(218,4)-(221,0)]"
+"@value": "[(246,4)-(249,0)]"
 }
 ]
 }
@@ -23924,7 +26772,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#433/source-map",
+"@id": "#450/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -23932,12 +26780,12 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#433"
+"@value": "amf://id#450"
 }
 ],
 "sourcemaps:value": [
 {
-"@value": "[(215,0)-(235,0)]"
+"@value": "[(243,0)-(263,0)]"
 }
 ]
 }
@@ -24011,7 +26859,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "[(2,0)-(235,0)]"
+"@value": "[(2,0)-(263,0)]"
 }
 ]
 },

@@ -16,6 +16,7 @@ class TokensDataFactory extends PolymerElement {
         url="[[apiBase]]me/tokens"
         handle-as="json"
         params="[[requestParams]]"
+        headers="[[requestHeaders]]"
         on-response="_handleResponse"
         debounce-duration="300">
     `;
@@ -27,18 +28,36 @@ class TokensDataFactory extends PolymerElement {
       list: {type: Array, notify: true},
       hasMore: {type: Boolean, value: true, notify: true},
       loading: {type: Boolean, notify: true},
-      requestParams: Object
+      requestParams: Object,
+      apiToken: {type: String, observer: '_tokenChanged'},
+      requestHeaders: Object
     };
+  }
+
+  constructor() {
+    super();
+    this._tokenRefreshHandler = this._tokenRefreshHandler.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
+    window.addEventListener('data-model-refresh-tokens', this._tokenRefreshHandler);
     if (cachedData && cachedData.length) {
       this.list = cachedData;
     }
     if (!(this.list && this.list.length)) {
       this.loadNext();
     }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('data-model-refresh-tokens', this._tokenRefreshHandler);
+  }
+
+  _tokenRefreshHandler() {
+    this.clean();
+    this.loadNext();
   }
 
   clean() {
@@ -73,6 +92,14 @@ class TokensDataFactory extends PolymerElement {
     } else {
       cachedData = cachedData.concat(data.items);
       this.list = this.list.concat(data.items);
+    }
+  }
+
+  _tokenChanged(token) {
+    if (!token) {
+      this.requestHeaders = undefined;
+    } else {
+      this.requestHeaders = {'authorization': 'Bearer ' + token};
     }
   }
 }

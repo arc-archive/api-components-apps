@@ -625,7 +625,19 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
     <div id="contentWrapper">
       <slot id="content" name="dropdown-content"></slot>
     </div>
-`,is:"iron-dropdown",behaviors:[IronControlState,IronA11yKeysBehavior,IronOverlayBehavior,NeonAnimationRunnerBehavior],properties:{horizontalAlign:{type:String,value:"left",reflectToAttribute:!0},verticalAlign:{type:String,value:"top",reflectToAttribute:!0},openAnimationConfig:{type:Object},closeAnimationConfig:{type:Object},focusTarget:{type:Object},noAnimations:{type:Boolean,value:!1},allowOutsideScroll:{type:Boolean,value:!1,observer:"_allowOutsideScrollChanged"}},listeners:{"neon-animation-finish":"_onNeonAnimationFinish"},observers:["_updateOverlayPosition(positionTarget, verticalAlign, horizontalAlign, verticalOffset, horizontalOffset)"],get containedElement(){for(var nodes=dom(this.$.content).getDistributedNodes(),i=0,l=nodes.length;i<l;i++){if(nodes[i].nodeType===Node.ELEMENT_NODE){return nodes[i]}}},ready:function(){if(!this.scrollAction){this.scrollAction=this.allowOutsideScroll?"refit":"lock"}this._readied=!0},attached:function(){if(!this.sizingTarget||this.sizingTarget===this){this.sizingTarget=this.containedElement||this}},detached:function(){this.cancelAnimation()},_openedChanged:function(){if(this.opened&&this.disabled){this.cancel()}else{this.cancelAnimation();this._updateAnimationConfig();IronOverlayBehaviorImpl._openedChanged.apply(this,arguments)}},_renderOpened:function(){if(!this.noAnimations&&this.animationConfig.open){this.$.contentWrapper.classList.add("animating");this.playAnimation("open")}else{IronOverlayBehaviorImpl._renderOpened.apply(this,arguments)}},_renderClosed:function(){if(!this.noAnimations&&this.animationConfig.close){this.$.contentWrapper.classList.add("animating");this.playAnimation("close")}else{IronOverlayBehaviorImpl._renderClosed.apply(this,arguments)}},_onNeonAnimationFinish:function(){this.$.contentWrapper.classList.remove("animating");if(this.opened){this._finishRenderOpened()}else{this._finishRenderClosed()}},_updateAnimationConfig:function(){for(var animationNode=this.containedElement,animations=[].concat(this.openAnimationConfig||[]).concat(this.closeAnimationConfig||[]),i=0;i<animations.length;i++){animations[i].node=animationNode}this.animationConfig={open:this.openAnimationConfig,close:this.closeAnimationConfig}},_updateOverlayPosition:function(){if(this.isAttached){this.notifyResize()}},_allowOutsideScrollChanged:function(allowOutsideScroll){if(!this._readied){return}if(!allowOutsideScroll){this.scrollAction="lock"}else if(!this.scrollAction||"lock"===this.scrollAction){this.scrollAction="refit"}},_applyFocus:function(){var focusTarget=this.focusTarget||this.containedElement;if(focusTarget&&this.opened&&!this.noAutoFocus){focusTarget.focus()}else{IronOverlayBehaviorImpl._applyFocus.apply(this,arguments)}}});class IronMeta{constructor(options){IronMeta[" "](options);this.type=options&&options.type||"default";this.key=options&&options.key;if(options&&"value"in options){this.value=options.value}}get value(){var type=this.type,key=this.key;if(type&&key){return IronMeta.types[type]&&IronMeta.types[type][key]}}set value(value){var type=this.type,key=this.key;if(type&&key){type=IronMeta.types[type]=IronMeta.types[type]||{};if(null==value){delete type[key]}else{type[key]=value}}}get list(){var type=this.type;if(type){var items=IronMeta.types[this.type];if(!items){return[]}return Object.keys(items).map(function(key){return metaDatas[this.type][key]},this)}}byKey(key){this.key=key;return this.value}}IronMeta[" "]=function(){};IronMeta.types={};var metaDatas=IronMeta.types;Polymer({is:"iron-meta",properties:{type:{type:String,value:"default"},key:{type:String},value:{type:String,notify:!0},self:{type:Boolean,observer:"_selfChanged"},__meta:{type:Boolean,computed:"__computeMeta(type, key, value)"}},hostAttributes:{hidden:!0},__computeMeta:function(type,key,value){var meta=new IronMeta({type:type,key:key});if(value!==void 0&&value!==meta.value){meta.value=value}else if(this.value!==meta.value){this.value=meta.value}return meta},get list(){return this.__meta&&this.__meta.list},_selfChanged:function(self){if(self){this.value=this}},byKey:function(key){return new IronMeta({type:this.type,key:key}).value}});var ironMeta={IronMeta:IronMeta};Polymer({_template:html`
+`,is:"iron-dropdown",behaviors:[IronControlState,IronA11yKeysBehavior,IronOverlayBehavior,NeonAnimationRunnerBehavior],properties:{horizontalAlign:{type:String,value:"left",reflectToAttribute:!0},verticalAlign:{type:String,value:"top",reflectToAttribute:!0},openAnimationConfig:{type:Object},closeAnimationConfig:{type:Object},focusTarget:{type:Object},noAnimations:{type:Boolean,value:!1},allowOutsideScroll:{type:Boolean,value:!1,observer:"_allowOutsideScrollChanged"}},listeners:{"neon-animation-finish":"_onNeonAnimationFinish"},observers:["_updateOverlayPosition(positionTarget, verticalAlign, horizontalAlign, verticalOffset, horizontalOffset)"],get containedElement(){for(var nodes=dom(this.$.content).getDistributedNodes(),i=0,l=nodes.length;i<l;i++){if(nodes[i].nodeType===Node.ELEMENT_NODE){return nodes[i]}}},ready:function(){if(!this.scrollAction){this.scrollAction=this.allowOutsideScroll?"refit":"lock"}this._readied=!0},attached:function(){if(!this.sizingTarget||this.sizingTarget===this){this.sizingTarget=this.containedElement||this}},detached:function(){this.cancelAnimation()},_openedChanged:function(){if(this.opened&&this.disabled){this.cancel()}else{this.cancelAnimation();this._updateAnimationConfig();IronOverlayBehaviorImpl._openedChanged.apply(this,arguments)}},_renderOpened:function(){if(!this.noAnimations&&this.animationConfig.open){this.$.contentWrapper.classList.add("animating");this.playAnimation("open")}else{IronOverlayBehaviorImpl._renderOpened.apply(this,arguments)}},_renderClosed:function(){if(!this.noAnimations&&this.animationConfig.close){this.$.contentWrapper.classList.add("animating");this.playAnimation("close")}else{IronOverlayBehaviorImpl._renderClosed.apply(this,arguments)}},_onNeonAnimationFinish:function(){this.$.contentWrapper.classList.remove("animating");if(this.opened){this._finishRenderOpened()}else{this._finishRenderClosed()}},_updateAnimationConfig:function(){for(var animationNode=this.containedElement,animations=[].concat(this.openAnimationConfig||[]).concat(this.closeAnimationConfig||[]),i=0;i<animations.length;i++){animations[i].node=animationNode}this.animationConfig={open:this.openAnimationConfig,close:this.closeAnimationConfig}},_updateOverlayPosition:function(){if(this.isAttached){this.notifyResize()}},_allowOutsideScrollChanged:function(allowOutsideScroll){if(!this._readied){return}if(!allowOutsideScroll){this.scrollAction="lock"}else if(!this.scrollAction||"lock"===this.scrollAction){this.scrollAction="refit"}},_applyFocus:function(){var focusTarget=this.focusTarget||this.containedElement;if(focusTarget&&this.opened&&!this.noAutoFocus){focusTarget.focus()}else{IronOverlayBehaviorImpl._applyFocus.apply(this,arguments)}}});const IronFormElementBehavior={properties:{name:{type:String},value:{notify:!0,type:String},required:{type:Boolean,value:!1}},attached:function(){},detached:function(){}};var ironFormElementBehavior={IronFormElementBehavior:IronFormElementBehavior};Polymer({_template:html`
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <!-- This form is used to collect the elements that should be submitted -->
+    <slot></slot>
+
+    <!-- This form is used for submission -->
+    <form id="helper" action\$="[[action]]" method\$="[[method]]" enctype\$="[[enctype]]"></form>
+`,is:"iron-form",properties:{allowRedirect:{type:Boolean,value:!1},headers:{type:Object,value:function(){return{}}},withCredentials:{type:Boolean,value:!1}},attached:function(){if(this._form){return}this._form=dom(this).querySelector("form");if(this._form){this._init();this.async(this._saveInitialValues.bind(this),1)}else{this._nodeObserver=dom(this).observeNodes(function(mutations){for(var i=0;i<mutations.addedNodes.length;i++){if("FORM"===mutations.addedNodes[i].tagName){this._form=mutations.addedNodes[i];this._init();dom(this).unobserveNodes(this._nodeObserver);this._nodeObserver=null}}}.bind(this))}},detached:function(){if(this._nodeObserver){dom(this).unobserveNodes(this._nodeObserver);this._nodeObserver=null}},_init:function(){this._form.addEventListener("submit",this.submit.bind(this));this._form.addEventListener("reset",this.reset.bind(this));this._defaults=this._defaults||new WeakMap;this._saveInitialValues()},saveResetValues:function(){this._saveInitialValues(!0)},_saveInitialValues:function(overwriteValues){for(var nodes=this._getValidatableElements(),i=0,node;i<nodes.length;i++){node=nodes[i];if(!this._defaults.has(node)||overwriteValues){var defaults={value:node.value};if("checked"in node){defaults.checked=node.checked}if("invalid"in node){defaults.invalid=node.invalid}this._defaults.set(node,defaults)}}},validate:function(){if(!this._form){return!1}if(""===this._form.getAttribute("novalidate"))return!0;for(var valid=this._form.checkValidity(),elements=this._getValidatableElements(),el,i=0,validatable;el=elements[i],i<elements.length;i++){validatable=el;if(validatable.validate){valid=!!validatable.validate()&&valid}}return valid},submit:function(event){if(event){event.preventDefault()}if(!this._form){return}if(!this.validate()){this.fire("iron-form-invalid");return}this.$.helper.textContent="";var json=this.serializeForm();if(this.allowRedirect){for(var element in json){this.$.helper.appendChild(this._createHiddenElement(element,json[element]))}this.$.helper.action=this._form.getAttribute("action");this.$.helper.method=this._form.getAttribute("method")||"GET";this.$.helper.contentType=this._form.getAttribute("enctype")||"application/x-www-form-urlencoded";this.$.helper.submit();this.fire("iron-form-submit")}else{this._makeAjaxRequest(json)}},reset:function(event){if(event)event.preventDefault();if(!this._form){return}if(!event||"reset"!==event.type||event.target!==this._form){this._form.reset();return}for(var nodes=this._getValidatableElements(),i=0,node;i<nodes.length;i++){node=nodes[i];if(this._defaults.has(node)){var defaults=this._defaults.get(node);for(var propName in defaults){node[propName]=defaults[propName]}}}this.fire("iron-form-reset")},serializeForm:function(){for(var elements=this._getSubmittableElements(),json={},i=0,values;i<elements.length;i++){values=this._serializeElementValues(elements[i]);for(var v=0;v<values.length;v++){this._addSerializedElement(json,elements[i].name,values[v])}}return json},_handleFormResponse:function(event){this.fire("iron-form-response",event.detail)},_handleFormError:function(event){this.fire("iron-form-error",event.detail)},_makeAjaxRequest:function(json){if(!this.request){this.request=document.createElement("iron-ajax");this.request.addEventListener("response",this._handleFormResponse.bind(this));this.request.addEventListener("error",this._handleFormError.bind(this))}this.request.url=this._form.getAttribute("action");this.request.method=this._form.getAttribute("method")||"GET";this.request.contentType=this._form.getAttribute("enctype")||"application/x-www-form-urlencoded";this.request.withCredentials=this.withCredentials;this.request.headers=this.headers;if("POST"===this._form.method.toUpperCase()){this.request.body=json}else{this.request.params=json}var event=this.fire("iron-form-presubmit",{},{cancelable:!0});if(!event.defaultPrevented){this.request.generateRequest();this.fire("iron-form-submit",json)}},_getValidatableElements:function(){return this._findElements(this._form,!0,!1)},_getSubmittableElements:function(){return this._findElements(this._form,!1,!1)},_findElements:function(parent,ignoreName,skipSlots,submittable){submittable=submittable||[];for(var nodes=dom(parent).querySelectorAll("*"),i=0;i<nodes.length;i++){if(!skipSlots&&("slot"===nodes[i].localName||"content"===nodes[i].localName)){this._searchSubmittableInSlot(submittable,nodes[i],ignoreName)}else{this._searchSubmittable(submittable,nodes[i],ignoreName)}}return submittable},_searchSubmittableInSlot:function(submittable,node,ignoreName){for(var assignedNodes=dom(node).getDistributedNodes(),i=0;i<assignedNodes.length;i++){if(assignedNodes[i].nodeType===Node.TEXT_NODE){continue}this._searchSubmittable(submittable,assignedNodes[i],ignoreName);for(var nestedAssignedNodes=dom(assignedNodes[i]).querySelectorAll("*"),j=0;j<nestedAssignedNodes.length;j++){this._searchSubmittable(submittable,nestedAssignedNodes[j],ignoreName)}}},_searchSubmittable:function(submittable,node,ignoreName){if(this._isSubmittable(node,ignoreName)){submittable.push(node)}else if(node.root){this._findElements(node.root,ignoreName,!0,submittable)}},_isSubmittable:function(node,ignoreName){return!node.disabled&&(ignoreName?node.name||"function"===typeof node.validate:node.name)},_serializeElementValues:function(element){var tag=element.tagName.toLowerCase();if("button"===tag||"input"===tag&&("submit"===element.type||"reset"===element.type)){return[]}if("select"===tag){return this._serializeSelectValues(element)}else if("input"===tag){return this._serializeInputValues(element)}else{if(element._hasIronCheckedElementBehavior&&!element.checked)return[];return[element.value]}},_serializeSelectValues:function(element){for(var values=[],i=0;i<element.options.length;i++){if(element.options[i].selected){values.push(element.options[i].value)}}return values},_serializeInputValues:function(element){var type=element.type.toLowerCase();if(("checkbox"===type||"radio"===type)&&!element.checked||"file"===type){return[]}return[element.value]},_createHiddenElement:function(name,value){var input=document.createElement("input");input.setAttribute("type","hidden");input.setAttribute("name",name);input.setAttribute("value",value);return input},_addSerializedElement:function(json,name,value){if(json[name]===void 0){json[name]=value}else{if(!Array.isArray(json[name])){json[name]=[json[name]]}json[name].push(value)}}});class IronMeta{constructor(options){IronMeta[" "](options);this.type=options&&options.type||"default";this.key=options&&options.key;if(options&&"value"in options){this.value=options.value}}get value(){var type=this.type,key=this.key;if(type&&key){return IronMeta.types[type]&&IronMeta.types[type][key]}}set value(value){var type=this.type,key=this.key;if(type&&key){type=IronMeta.types[type]=IronMeta.types[type]||{};if(null==value){delete type[key]}else{type[key]=value}}}get list(){var type=this.type;if(type){var items=IronMeta.types[this.type];if(!items){return[]}return Object.keys(items).map(function(key){return metaDatas[this.type][key]},this)}}byKey(key){this.key=key;return this.value}}IronMeta[" "]=function(){};IronMeta.types={};var metaDatas=IronMeta.types;Polymer({is:"iron-meta",properties:{type:{type:String,value:"default"},key:{type:String},value:{type:String,notify:!0},self:{type:Boolean,observer:"_selfChanged"},__meta:{type:Boolean,computed:"__computeMeta(type, key, value)"}},hostAttributes:{hidden:!0},__computeMeta:function(type,key,value){var meta=new IronMeta({type:type,key:key});if(value!==void 0&&value!==meta.value){meta.value=value}else if(this.value!==meta.value){this.value=meta.value}return meta},get list(){return this.__meta&&this.__meta.list},_selfChanged:function(self){if(self){this.value=this}},byKey:function(key){return new IronMeta({type:this.type,key:key}).value}});var ironMeta={IronMeta:IronMeta};Polymer({_template:html`
     <style>
       :host {
         @apply --layout-inline;
@@ -646,7 +658,14 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
         display: none;
       }
     </style>
-`,is:"iron-icon",properties:{icon:{type:String},theme:{type:String},src:{type:String},_meta:{value:Base.create("iron-meta",{type:"iconset"})}},observers:["_updateIcon(_meta, isAttached)","_updateIcon(theme, isAttached)","_srcChanged(src, isAttached)","_iconChanged(icon, isAttached)"],_DEFAULT_ICONSET:"icons",_iconChanged:function(icon){var parts=(icon||"").split(":");this._iconName=parts.pop();this._iconsetName=parts.pop()||this._DEFAULT_ICONSET;this._updateIcon()},_srcChanged:function(src){this._updateIcon()},_usesIconset:function(){return this.icon||!this.src},_updateIcon:function(){if(this._usesIconset()){if(this._img&&this._img.parentNode){dom(this.root).removeChild(this._img)}if(""===this._iconName){if(this._iconset){this._iconset.removeIcon(this)}}else if(this._iconsetName&&this._meta){this._iconset=this._meta.byKey(this._iconsetName);if(this._iconset){this._iconset.applyIcon(this,this._iconName,this.theme);this.unlisten(window,"iron-iconset-added","_updateIcon")}else{this.listen(window,"iron-iconset-added","_updateIcon")}}}else{if(this._iconset){this._iconset.removeIcon(this)}if(!this._img){this._img=document.createElement("img");this._img.style.width="100%";this._img.style.height="100%";this._img.draggable=!1}this._img.src=this.src;dom(this.root).appendChild(this._img)}}});Polymer({is:"iron-iconset-svg",properties:{name:{type:String,observer:"_nameChanged"},size:{type:Number,value:24},rtlMirroring:{type:Boolean,value:!1},useGlobalRtlAttribute:{type:Boolean,value:!1}},created:function(){this._meta=new IronMeta({type:"iconset",key:null,value:null})},attached:function(){this.style.display="none"},getIconNames:function(){this._icons=this._createIconMap();return Object.keys(this._icons).map(function(n){return this.name+":"+n},this)},applyIcon:function(element,iconName){this.removeIcon(element);var svg=this._cloneIcon(iconName,this.rtlMirroring&&this._targetIsRTL(element));if(svg){var pde=dom(element.root||element);pde.insertBefore(svg,pde.childNodes[0]);return element._svgIcon=svg}return null},removeIcon:function(element){if(element._svgIcon){dom(element.root||element).removeChild(element._svgIcon);element._svgIcon=null}},_targetIsRTL:function(target){if(null==this.__targetIsRTL){if(this.useGlobalRtlAttribute){var globalElement=document.body&&document.body.hasAttribute("dir")?document.body:document.documentElement;this.__targetIsRTL="rtl"===globalElement.getAttribute("dir")}else{if(target&&target.nodeType!==Node.ELEMENT_NODE){target=target.host}this.__targetIsRTL=target&&"rtl"===window.getComputedStyle(target).direction}}return this.__targetIsRTL},_nameChanged:function(){this._meta.value=null;this._meta.key=this.name;this._meta.value=this;this.async(function(){this.fire("iron-iconset-added",this,{node:window})})},_createIconMap:function(){var icons=Object.create(null);dom(this).querySelectorAll("[id]").forEach(function(icon){icons[icon.id]=icon});return icons},_cloneIcon:function(id,mirrorAllowed){this._icons=this._icons||this._createIconMap();return this._prepareSvgClone(this._icons[id],this.size,mirrorAllowed)},_prepareSvgClone:function(sourceSvg,size,mirrorAllowed){if(sourceSvg){var content=sourceSvg.cloneNode(!0),svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),viewBox=content.getAttribute("viewBox")||"0 0 "+size+" "+size,cssText="pointer-events: none; display: block; width: 100%; height: 100%;";if(mirrorAllowed&&content.hasAttribute("mirror-in-rtl")){cssText+="-webkit-transform:scale(-1,1);transform:scale(-1,1);transform-origin:center;"}svg.setAttribute("viewBox",viewBox);svg.setAttribute("preserveAspectRatio","xMidYMid meet");svg.setAttribute("focusable","false");svg.style.cssText=cssText;svg.appendChild(content).removeAttribute("id");return svg}return null}});class IronSelection{constructor(selectCallback){this.selection=[];this.selectCallback=selectCallback}get(){return this.multi?this.selection.slice():this.selection[0]}clear(excludes){this.selection.slice().forEach(function(item){if(!excludes||0>excludes.indexOf(item)){this.setItemSelected(item,!1)}},this)}isSelected(item){return 0<=this.selection.indexOf(item)}setItemSelected(item,isSelected){if(null!=item){if(isSelected!==this.isSelected(item)){if(isSelected){this.selection.push(item)}else{var i=this.selection.indexOf(item);if(0<=i){this.selection.splice(i,1)}}if(this.selectCallback){this.selectCallback(item,isSelected)}}}}select(item){if(this.multi){this.toggle(item)}else if(this.get()!==item){this.setItemSelected(this.get(),!1);this.setItemSelected(item,!0)}}toggle(item){this.setItemSelected(item,!this.isSelected(item))}}var ironSelection={IronSelection:IronSelection};const IronSelectableBehavior={properties:{attrForSelected:{type:String,value:null},selected:{type:String,notify:!0},selectedItem:{type:Object,readOnly:!0,notify:!0},activateEvent:{type:String,value:"tap",observer:"_activateEventChanged"},selectable:String,selectedClass:{type:String,value:"iron-selected"},selectedAttribute:{type:String,value:null},fallbackSelection:{type:String,value:null},items:{type:Array,readOnly:!0,notify:!0,value:function(){return[]}},_excludedLocalNames:{type:Object,value:function(){return{template:1,"dom-bind":1,"dom-if":1,"dom-repeat":1}}}},observers:["_updateAttrForSelected(attrForSelected)","_updateSelected(selected)","_checkFallback(fallbackSelection)"],created:function(){this._bindFilterItem=this._filterItem.bind(this);this._selection=new IronSelection(this._applySelection.bind(this))},attached:function(){this._observer=this._observeItems(this);this._addListener(this.activateEvent)},detached:function(){if(this._observer){dom(this).unobserveNodes(this._observer)}this._removeListener(this.activateEvent)},indexOf:function(item){return this.items?this.items.indexOf(item):-1},select:function(value){this.selected=value},selectPrevious:function(){var length=this.items.length,index=length-1;if(this.selected!==void 0){index=(+this._valueToIndex(this.selected)-1+length)%length}this.selected=this._indexToValue(index)},selectNext:function(){var index=0;if(this.selected!==void 0){index=(+this._valueToIndex(this.selected)+1)%this.items.length}this.selected=this._indexToValue(index)},selectIndex:function(index){this.select(this._indexToValue(index))},forceSynchronousItemUpdate:function(){if(this._observer&&"function"===typeof this._observer.flush){this._observer.flush()}else{this._updateItems()}},get _shouldUpdateSelection(){return null!=this.selected},_checkFallback:function(){this._updateSelected()},_addListener:function(eventName){this.listen(this,eventName,"_activateHandler")},_removeListener:function(eventName){this.unlisten(this,eventName,"_activateHandler")},_activateEventChanged:function(eventName,old){this._removeListener(old);this._addListener(eventName)},_updateItems:function(){var nodes=dom(this).queryDistributedElements(this.selectable||"*");nodes=Array.prototype.filter.call(nodes,this._bindFilterItem);this._setItems(nodes)},_updateAttrForSelected:function(){if(this.selectedItem){this.selected=this._valueForItem(this.selectedItem)}},_updateSelected:function(){this._selectSelected(this.selected)},_selectSelected:function(selected){if(!this.items){return}var item=this._valueToItem(this.selected);if(item){this._selection.select(item)}else{this._selection.clear()}if(this.fallbackSelection&&this.items.length&&this._selection.get()===void 0){this.selected=this.fallbackSelection}},_filterItem:function(node){return!this._excludedLocalNames[node.localName]},_valueToItem:function(value){return null==value?null:this.items[this._valueToIndex(value)]},_valueToIndex:function(value){if(this.attrForSelected){for(var i=0,item;item=this.items[i];i++){if(this._valueForItem(item)==value){return i}}}else{return+value}},_indexToValue:function(index){if(this.attrForSelected){var item=this.items[index];if(item){return this._valueForItem(item)}}else{return index}},_valueForItem:function(item){if(!item){return null}if(!this.attrForSelected){var i=this.indexOf(item);return-1===i?null:i}var propValue=item[dashToCamelCase(this.attrForSelected)];return propValue!=void 0?propValue:item.getAttribute(this.attrForSelected)},_applySelection:function(item,isSelected){if(this.selectedClass){this.toggleClass(this.selectedClass,isSelected,item)}if(this.selectedAttribute){this.toggleAttribute(this.selectedAttribute,isSelected,item)}this._selectionChange();this.fire("iron-"+(isSelected?"select":"deselect"),{item:item})},_selectionChange:function(){this._setSelectedItem(this._selection.get())},_observeItems:function(node){return dom(node).observeNodes(function(mutation){this._updateItems();this._updateSelected();this.fire("iron-items-changed",mutation,{bubbles:!1,cancelable:!1})})},_activateHandler:function(e){var t=e.target,items=this.items;while(t&&t!=this){var i=items.indexOf(t);if(0<=i){var value=this._indexToValue(i);this._itemActivate(value,t);return}t=t.parentNode}},_itemActivate:function(value,item){if(!this.fire("iron-activate",{selected:value,item:item},{cancelable:!0}).defaultPrevented){this.select(value)}}};var ironSelectable={IronSelectableBehavior:IronSelectableBehavior};const IronMultiSelectableBehaviorImpl={properties:{multi:{type:Boolean,value:!1,observer:"multiChanged"},selectedValues:{type:Array,notify:!0,value:function(){return[]}},selectedItems:{type:Array,readOnly:!0,notify:!0,value:function(){return[]}}},observers:["_updateSelected(selectedValues.splices)"],select:function(value){if(this.multi){this._toggleSelected(value)}else{this.selected=value}},multiChanged:function(multi){this._selection.multi=multi;this._updateSelected()},get _shouldUpdateSelection(){return null!=this.selected||null!=this.selectedValues&&this.selectedValues.length},_updateAttrForSelected:function(){if(!this.multi){IronSelectableBehavior._updateAttrForSelected.apply(this)}else if(this.selectedItems&&0<this.selectedItems.length){this.selectedValues=this.selectedItems.map(function(selectedItem){return this._indexToValue(this.indexOf(selectedItem))},this).filter(function(unfilteredValue){return null!=unfilteredValue},this)}},_updateSelected:function(){if(this.multi){this._selectMulti(this.selectedValues)}else{this._selectSelected(this.selected)}},_selectMulti:function(values){values=values||[];var selectedItems=(this._valuesToItems(values)||[]).filter(function(item){return null!==item&&item!==void 0});this._selection.clear(selectedItems);for(var i=0;i<selectedItems.length;i++){this._selection.setItemSelected(selectedItems[i],!0)}if(this.fallbackSelection&&!this._selection.get().length){var fallback=this._valueToItem(this.fallbackSelection);if(fallback){this.select(this.fallbackSelection)}}},_selectionChange:function(){var s=this._selection.get();if(this.multi){this._setSelectedItems(s);this._setSelectedItem(s.length?s[0]:null)}else{if(null!==s&&s!==void 0){this._setSelectedItems([s]);this._setSelectedItem(s)}else{this._setSelectedItems([]);this._setSelectedItem(null)}}},_toggleSelected:function(value){var i=this.selectedValues.indexOf(value),unselected=0>i;if(unselected){this.push("selectedValues",value)}else{this.splice("selectedValues",i,1)}},_valuesToItems:function(values){return null==values?null:values.map(function(value){return this._valueToItem(value)},this)}},IronMultiSelectableBehavior=[IronSelectableBehavior,IronMultiSelectableBehaviorImpl];var ironMultiSelectable={IronMultiSelectableBehaviorImpl:IronMultiSelectableBehaviorImpl,IronMultiSelectableBehavior:IronMultiSelectableBehavior};const IronMenuBehaviorImpl={properties:{focusedItem:{observer:"_focusedItemChanged",readOnly:!0,type:Object},attrForItemTitle:{type:String},disabled:{type:Boolean,value:!1,observer:"_disabledChanged"}},_MODIFIER_KEYS:["Alt","AltGraph","CapsLock","Control","Fn","FnLock","Hyper","Meta","NumLock","OS","ScrollLock","Shift","Super","Symbol","SymbolLock"],_SEARCH_RESET_TIMEOUT_MS:1e3,_previousTabIndex:0,hostAttributes:{role:"menu"},observers:["_updateMultiselectable(multi)"],listeners:{focus:"_onFocus",keydown:"_onKeydown","iron-items-changed":"_onIronItemsChanged"},keyBindings:{up:"_onUpKey",down:"_onDownKey",esc:"_onEscKey","shift+tab:keydown":"_onShiftTabDown"},attached:function(){this._resetTabindices()},select:function(value){if(this._defaultFocusAsync){this.cancelAsync(this._defaultFocusAsync);this._defaultFocusAsync=null}var item=this._valueToItem(value);if(item&&item.hasAttribute("disabled"))return;this._setFocusedItem(item);IronMultiSelectableBehaviorImpl.select.apply(this,arguments)},_resetTabindices:function(){var selectedItem=this.multi?this.selectedItems&&this.selectedItems[0]:this.selectedItem;this.items.forEach(function(item){item.setAttribute("tabindex",item===selectedItem?"0":"-1")},this)},_updateMultiselectable:function(multi){if(multi){this.setAttribute("aria-multiselectable","true")}else{this.removeAttribute("aria-multiselectable")}},_focusWithKeyboardEvent:function(event){if(-1!==this._MODIFIER_KEYS.indexOf(event.key))return;this.cancelDebouncer("_clearSearchText");var searchText=this._searchText||"",key=event.key&&1==event.key.length?event.key:String.fromCharCode(event.keyCode);searchText+=key.toLocaleLowerCase();for(var searchLength=searchText.length,i=0,item;item=this.items[i];i++){if(item.hasAttribute("disabled")){continue}var attr=this.attrForItemTitle||"textContent",title=(item[attr]||item.getAttribute(attr)||"").trim();if(title.length<searchLength){continue}if(title.slice(0,searchLength).toLocaleLowerCase()==searchText){this._setFocusedItem(item);break}}this._searchText=searchText;this.debounce("_clearSearchText",this._clearSearchText,this._SEARCH_RESET_TIMEOUT_MS)},_clearSearchText:function(){this._searchText=""},_focusPrevious:function(){for(var length=this.items.length,curFocusIndex=+this.indexOf(this.focusedItem),i=1,item;i<length+1;i++){item=this.items[(curFocusIndex-i+length)%length];if(!item.hasAttribute("disabled")){var owner=dom(item).getOwnerRoot()||document;this._setFocusedItem(item);if(dom(owner).activeElement==item){return}}}},_focusNext:function(){for(var length=this.items.length,curFocusIndex=+this.indexOf(this.focusedItem),i=1,item;i<length+1;i++){item=this.items[(curFocusIndex+i)%length];if(!item.hasAttribute("disabled")){var owner=dom(item).getOwnerRoot()||document;this._setFocusedItem(item);if(dom(owner).activeElement==item){return}}}},_applySelection:function(item,isSelected){if(isSelected){item.setAttribute("aria-selected","true")}else{item.removeAttribute("aria-selected")}IronSelectableBehavior._applySelection.apply(this,arguments)},_focusedItemChanged:function(focusedItem,old){old&&old.setAttribute("tabindex","-1");if(focusedItem&&!focusedItem.hasAttribute("disabled")&&!this.disabled){focusedItem.setAttribute("tabindex","0");focusedItem.focus()}},_onIronItemsChanged:function(event){if(event.detail.addedNodes.length){this._resetTabindices()}},_onShiftTabDown:function(event){var oldTabIndex=this.getAttribute("tabindex");IronMenuBehaviorImpl._shiftTabPressed=!0;this._setFocusedItem(null);this.setAttribute("tabindex","-1");this.async(function(){this.setAttribute("tabindex",oldTabIndex);IronMenuBehaviorImpl._shiftTabPressed=!1},1)},_onFocus:function(event){if(IronMenuBehaviorImpl._shiftTabPressed){return}var rootTarget=dom(event).rootTarget;if(rootTarget!==this&&"undefined"!==typeof rootTarget.tabIndex&&!this.isLightDescendant(rootTarget)){return}this._defaultFocusAsync=this.async(function(){var selectedItem=this.multi?this.selectedItems&&this.selectedItems[0]:this.selectedItem;this._setFocusedItem(null);if(selectedItem){this._setFocusedItem(selectedItem)}else if(this.items[0]){this._focusNext()}})},_onUpKey:function(event){this._focusPrevious();event.detail.keyboardEvent.preventDefault()},_onDownKey:function(event){this._focusNext();event.detail.keyboardEvent.preventDefault()},_onEscKey:function(event){var focusedItem=this.focusedItem;if(focusedItem){focusedItem.blur()}},_onKeydown:function(event){if(!this.keyboardEventMatchesKeys(event,"up down esc")){this._focusWithKeyboardEvent(event)}event.stopPropagation()},_activateHandler:function(event){IronSelectableBehavior._activateHandler.call(this,event);event.stopPropagation()},_disabledChanged:function(disabled){if(disabled){this._previousTabIndex=this.hasAttribute("tabindex")?this.tabIndex:0;this.removeAttribute("tabindex")}else if(!this.hasAttribute("tabindex")){this.setAttribute("tabindex",this._previousTabIndex)}},_shiftTabPressed:!1},IronMenuBehavior=[IronMultiSelectableBehavior,IronA11yKeysBehavior,IronMenuBehaviorImpl];var ironMenuBehavior={IronMenuBehaviorImpl:IronMenuBehaviorImpl,IronMenuBehavior:IronMenuBehavior};Polymer({_template:html`
+`,is:"iron-icon",properties:{icon:{type:String},theme:{type:String},src:{type:String},_meta:{value:Base.create("iron-meta",{type:"iconset"})}},observers:["_updateIcon(_meta, isAttached)","_updateIcon(theme, isAttached)","_srcChanged(src, isAttached)","_iconChanged(icon, isAttached)"],_DEFAULT_ICONSET:"icons",_iconChanged:function(icon){var parts=(icon||"").split(":");this._iconName=parts.pop();this._iconsetName=parts.pop()||this._DEFAULT_ICONSET;this._updateIcon()},_srcChanged:function(src){this._updateIcon()},_usesIconset:function(){return this.icon||!this.src},_updateIcon:function(){if(this._usesIconset()){if(this._img&&this._img.parentNode){dom(this.root).removeChild(this._img)}if(""===this._iconName){if(this._iconset){this._iconset.removeIcon(this)}}else if(this._iconsetName&&this._meta){this._iconset=this._meta.byKey(this._iconsetName);if(this._iconset){this._iconset.applyIcon(this,this._iconName,this.theme);this.unlisten(window,"iron-iconset-added","_updateIcon")}else{this.listen(window,"iron-iconset-added","_updateIcon")}}}else{if(this._iconset){this._iconset.removeIcon(this)}if(!this._img){this._img=document.createElement("img");this._img.style.width="100%";this._img.style.height="100%";this._img.draggable=!1}this._img.src=this.src;dom(this.root).appendChild(this._img)}}});Polymer({is:"iron-iconset-svg",properties:{name:{type:String,observer:"_nameChanged"},size:{type:Number,value:24},rtlMirroring:{type:Boolean,value:!1},useGlobalRtlAttribute:{type:Boolean,value:!1}},created:function(){this._meta=new IronMeta({type:"iconset",key:null,value:null})},attached:function(){this.style.display="none"},getIconNames:function(){this._icons=this._createIconMap();return Object.keys(this._icons).map(function(n){return this.name+":"+n},this)},applyIcon:function(element,iconName){this.removeIcon(element);var svg=this._cloneIcon(iconName,this.rtlMirroring&&this._targetIsRTL(element));if(svg){var pde=dom(element.root||element);pde.insertBefore(svg,pde.childNodes[0]);return element._svgIcon=svg}return null},removeIcon:function(element){if(element._svgIcon){dom(element.root||element).removeChild(element._svgIcon);element._svgIcon=null}},_targetIsRTL:function(target){if(null==this.__targetIsRTL){if(this.useGlobalRtlAttribute){var globalElement=document.body&&document.body.hasAttribute("dir")?document.body:document.documentElement;this.__targetIsRTL="rtl"===globalElement.getAttribute("dir")}else{if(target&&target.nodeType!==Node.ELEMENT_NODE){target=target.host}this.__targetIsRTL=target&&"rtl"===window.getComputedStyle(target).direction}}return this.__targetIsRTL},_nameChanged:function(){this._meta.value=null;this._meta.key=this.name;this._meta.value=this;this.async(function(){this.fire("iron-iconset-added",this,{node:window})})},_createIconMap:function(){var icons=Object.create(null);dom(this).querySelectorAll("[id]").forEach(function(icon){icons[icon.id]=icon});return icons},_cloneIcon:function(id,mirrorAllowed){this._icons=this._icons||this._createIconMap();return this._prepareSvgClone(this._icons[id],this.size,mirrorAllowed)},_prepareSvgClone:function(sourceSvg,size,mirrorAllowed){if(sourceSvg){var content=sourceSvg.cloneNode(!0),svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),viewBox=content.getAttribute("viewBox")||"0 0 "+size+" "+size,cssText="pointer-events: none; display: block; width: 100%; height: 100%;";if(mirrorAllowed&&content.hasAttribute("mirror-in-rtl")){cssText+="-webkit-transform:scale(-1,1);transform:scale(-1,1);transform-origin:center;"}svg.setAttribute("viewBox",viewBox);svg.setAttribute("preserveAspectRatio","xMidYMid meet");svg.setAttribute("focusable","false");svg.style.cssText=cssText;svg.appendChild(content).removeAttribute("id");return svg}return null}});let IronValidatableBehaviorMeta=null;const IronValidatableBehavior={properties:{validator:{type:String},invalid:{notify:!0,reflectToAttribute:!0,type:Boolean,value:!1,observer:"_invalidChanged"}},registered:function(){IronValidatableBehaviorMeta=new IronMeta({type:"validator"})},_invalidChanged:function(){if(this.invalid){this.setAttribute("aria-invalid","true")}else{this.removeAttribute("aria-invalid")}},get _validator(){return IronValidatableBehaviorMeta&&IronValidatableBehaviorMeta.byKey(this.validator)},hasValidator:function(){return null!=this._validator},validate:function(value){if(value===void 0&&this.value!==void 0)this.invalid=!this._getValidity(this.value);else this.invalid=!this._getValidity(value);return!this.invalid},_getValidity:function(value){if(this.hasValidator()){return this._validator.validate(value)}return!0}};var ironValidatableBehavior={get IronValidatableBehaviorMeta(){return IronValidatableBehaviorMeta},IronValidatableBehavior:IronValidatableBehavior};Polymer({_template:html`
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+    <slot id="content"></slot>
+`,is:"iron-input",behaviors:[IronValidatableBehavior],properties:{bindValue:{type:String,value:""},value:{type:String,computed:"_computeValue(bindValue)"},allowedPattern:{type:String},autoValidate:{type:Boolean,value:!1},_inputElement:Object},observers:["_bindValueChanged(bindValue, _inputElement)"],listeners:{input:"_onInput",keypress:"_onKeypress"},created:function(){IronA11yAnnouncer.requestAvailability();this._previousValidInput="";this._patternAlreadyChecked=!1},attached:function(){this._observer=dom(this).observeNodes(function(info){this._initSlottedInput()}.bind(this))},detached:function(){if(this._observer){dom(this).unobserveNodes(this._observer);this._observer=null}},get inputElement(){return this._inputElement},_initSlottedInput:function(){this._inputElement=this.getEffectiveChildren()[0];if(this.inputElement&&this.inputElement.value){this.bindValue=this.inputElement.value}this.fire("iron-input-ready")},get _patternRegExp(){var pattern;if(this.allowedPattern){pattern=new RegExp(this.allowedPattern)}else{switch(this.inputElement.type){case"number":pattern=/[0-9.,e-]/;break;}}return pattern},_bindValueChanged:function(bindValue,inputElement){if(!inputElement){return}if(bindValue===void 0){inputElement.value=null}else if(bindValue!==inputElement.value){this.inputElement.value=bindValue}if(this.autoValidate){this.validate()}this.fire("bind-value-changed",{value:bindValue})},_onInput:function(){if(this.allowedPattern&&!this._patternAlreadyChecked){var valid=this._checkPatternValidity();if(!valid){this._announceInvalidCharacter("Invalid string of characters not entered.");this.inputElement.value=this._previousValidInput}}this.bindValue=this._previousValidInput=this.inputElement.value;this._patternAlreadyChecked=!1},_isPrintable:function(event){var anyNonPrintable=8==event.keyCode||9==event.keyCode||13==event.keyCode||27==event.keyCode,mozNonPrintable=19==event.keyCode||20==event.keyCode||45==event.keyCode||46==event.keyCode||144==event.keyCode||145==event.keyCode||32<event.keyCode&&41>event.keyCode||111<event.keyCode&&124>event.keyCode;return!anyNonPrintable&&!(0==event.charCode&&mozNonPrintable)},_onKeypress:function(event){if(!this.allowedPattern&&"number"!==this.inputElement.type){return}var regexp=this._patternRegExp;if(!regexp){return}if(event.metaKey||event.ctrlKey||event.altKey){return}this._patternAlreadyChecked=!0;var thisChar=String.fromCharCode(event.charCode);if(this._isPrintable(event)&&!regexp.test(thisChar)){event.preventDefault();this._announceInvalidCharacter("Invalid character "+thisChar+" not entered.")}},_checkPatternValidity:function(){var regexp=this._patternRegExp;if(!regexp){return!0}for(var i=0;i<this.inputElement.value.length;i++){if(!regexp.test(this.inputElement.value[i])){return!1}}return!0},validate:function(){if(!this.inputElement){this.invalid=!1;return!0}var valid=this.inputElement.checkValidity();if(valid){if(this.required&&""===this.bindValue){valid=!1}else if(this.hasValidator()){valid=IronValidatableBehavior.validate.call(this,this.bindValue)}}this.invalid=!valid;this.fire("iron-input-validate");return valid},_announceInvalidCharacter:function(message){this.fire("iron-announce",{text:message})},_computeValue:function(bindValue){return bindValue}});class IronSelection{constructor(selectCallback){this.selection=[];this.selectCallback=selectCallback}get(){return this.multi?this.selection.slice():this.selection[0]}clear(excludes){this.selection.slice().forEach(function(item){if(!excludes||0>excludes.indexOf(item)){this.setItemSelected(item,!1)}},this)}isSelected(item){return 0<=this.selection.indexOf(item)}setItemSelected(item,isSelected){if(null!=item){if(isSelected!==this.isSelected(item)){if(isSelected){this.selection.push(item)}else{var i=this.selection.indexOf(item);if(0<=i){this.selection.splice(i,1)}}if(this.selectCallback){this.selectCallback(item,isSelected)}}}}select(item){if(this.multi){this.toggle(item)}else if(this.get()!==item){this.setItemSelected(this.get(),!1);this.setItemSelected(item,!0)}}toggle(item){this.setItemSelected(item,!this.isSelected(item))}}var ironSelection={IronSelection:IronSelection};const IronSelectableBehavior={properties:{attrForSelected:{type:String,value:null},selected:{type:String,notify:!0},selectedItem:{type:Object,readOnly:!0,notify:!0},activateEvent:{type:String,value:"tap",observer:"_activateEventChanged"},selectable:String,selectedClass:{type:String,value:"iron-selected"},selectedAttribute:{type:String,value:null},fallbackSelection:{type:String,value:null},items:{type:Array,readOnly:!0,notify:!0,value:function(){return[]}},_excludedLocalNames:{type:Object,value:function(){return{template:1,"dom-bind":1,"dom-if":1,"dom-repeat":1}}}},observers:["_updateAttrForSelected(attrForSelected)","_updateSelected(selected)","_checkFallback(fallbackSelection)"],created:function(){this._bindFilterItem=this._filterItem.bind(this);this._selection=new IronSelection(this._applySelection.bind(this))},attached:function(){this._observer=this._observeItems(this);this._addListener(this.activateEvent)},detached:function(){if(this._observer){dom(this).unobserveNodes(this._observer)}this._removeListener(this.activateEvent)},indexOf:function(item){return this.items?this.items.indexOf(item):-1},select:function(value){this.selected=value},selectPrevious:function(){var length=this.items.length,index=length-1;if(this.selected!==void 0){index=(+this._valueToIndex(this.selected)-1+length)%length}this.selected=this._indexToValue(index)},selectNext:function(){var index=0;if(this.selected!==void 0){index=(+this._valueToIndex(this.selected)+1)%this.items.length}this.selected=this._indexToValue(index)},selectIndex:function(index){this.select(this._indexToValue(index))},forceSynchronousItemUpdate:function(){if(this._observer&&"function"===typeof this._observer.flush){this._observer.flush()}else{this._updateItems()}},get _shouldUpdateSelection(){return null!=this.selected},_checkFallback:function(){this._updateSelected()},_addListener:function(eventName){this.listen(this,eventName,"_activateHandler")},_removeListener:function(eventName){this.unlisten(this,eventName,"_activateHandler")},_activateEventChanged:function(eventName,old){this._removeListener(old);this._addListener(eventName)},_updateItems:function(){var nodes=dom(this).queryDistributedElements(this.selectable||"*");nodes=Array.prototype.filter.call(nodes,this._bindFilterItem);this._setItems(nodes)},_updateAttrForSelected:function(){if(this.selectedItem){this.selected=this._valueForItem(this.selectedItem)}},_updateSelected:function(){this._selectSelected(this.selected)},_selectSelected:function(selected){if(!this.items){return}var item=this._valueToItem(this.selected);if(item){this._selection.select(item)}else{this._selection.clear()}if(this.fallbackSelection&&this.items.length&&this._selection.get()===void 0){this.selected=this.fallbackSelection}},_filterItem:function(node){return!this._excludedLocalNames[node.localName]},_valueToItem:function(value){return null==value?null:this.items[this._valueToIndex(value)]},_valueToIndex:function(value){if(this.attrForSelected){for(var i=0,item;item=this.items[i];i++){if(this._valueForItem(item)==value){return i}}}else{return+value}},_indexToValue:function(index){if(this.attrForSelected){var item=this.items[index];if(item){return this._valueForItem(item)}}else{return index}},_valueForItem:function(item){if(!item){return null}if(!this.attrForSelected){var i=this.indexOf(item);return-1===i?null:i}var propValue=item[dashToCamelCase(this.attrForSelected)];return propValue!=void 0?propValue:item.getAttribute(this.attrForSelected)},_applySelection:function(item,isSelected){if(this.selectedClass){this.toggleClass(this.selectedClass,isSelected,item)}if(this.selectedAttribute){this.toggleAttribute(this.selectedAttribute,isSelected,item)}this._selectionChange();this.fire("iron-"+(isSelected?"select":"deselect"),{item:item})},_selectionChange:function(){this._setSelectedItem(this._selection.get())},_observeItems:function(node){return dom(node).observeNodes(function(mutation){this._updateItems();this._updateSelected();this.fire("iron-items-changed",mutation,{bubbles:!1,cancelable:!1})})},_activateHandler:function(e){var t=e.target,items=this.items;while(t&&t!=this){var i=items.indexOf(t);if(0<=i){var value=this._indexToValue(i);this._itemActivate(value,t);return}t=t.parentNode}},_itemActivate:function(value,item){if(!this.fire("iron-activate",{selected:value,item:item},{cancelable:!0}).defaultPrevented){this.select(value)}}};var ironSelectable={IronSelectableBehavior:IronSelectableBehavior};const IronMultiSelectableBehaviorImpl={properties:{multi:{type:Boolean,value:!1,observer:"multiChanged"},selectedValues:{type:Array,notify:!0,value:function(){return[]}},selectedItems:{type:Array,readOnly:!0,notify:!0,value:function(){return[]}}},observers:["_updateSelected(selectedValues.splices)"],select:function(value){if(this.multi){this._toggleSelected(value)}else{this.selected=value}},multiChanged:function(multi){this._selection.multi=multi;this._updateSelected()},get _shouldUpdateSelection(){return null!=this.selected||null!=this.selectedValues&&this.selectedValues.length},_updateAttrForSelected:function(){if(!this.multi){IronSelectableBehavior._updateAttrForSelected.apply(this)}else if(this.selectedItems&&0<this.selectedItems.length){this.selectedValues=this.selectedItems.map(function(selectedItem){return this._indexToValue(this.indexOf(selectedItem))},this).filter(function(unfilteredValue){return null!=unfilteredValue},this)}},_updateSelected:function(){if(this.multi){this._selectMulti(this.selectedValues)}else{this._selectSelected(this.selected)}},_selectMulti:function(values){values=values||[];var selectedItems=(this._valuesToItems(values)||[]).filter(function(item){return null!==item&&item!==void 0});this._selection.clear(selectedItems);for(var i=0;i<selectedItems.length;i++){this._selection.setItemSelected(selectedItems[i],!0)}if(this.fallbackSelection&&!this._selection.get().length){var fallback=this._valueToItem(this.fallbackSelection);if(fallback){this.select(this.fallbackSelection)}}},_selectionChange:function(){var s=this._selection.get();if(this.multi){this._setSelectedItems(s);this._setSelectedItem(s.length?s[0]:null)}else{if(null!==s&&s!==void 0){this._setSelectedItems([s]);this._setSelectedItem(s)}else{this._setSelectedItems([]);this._setSelectedItem(null)}}},_toggleSelected:function(value){var i=this.selectedValues.indexOf(value),unselected=0>i;if(unselected){this.push("selectedValues",value)}else{this.splice("selectedValues",i,1)}},_valuesToItems:function(values){return null==values?null:values.map(function(value){return this._valueToItem(value)},this)}},IronMultiSelectableBehavior=[IronSelectableBehavior,IronMultiSelectableBehaviorImpl];var ironMultiSelectable={IronMultiSelectableBehaviorImpl:IronMultiSelectableBehaviorImpl,IronMultiSelectableBehavior:IronMultiSelectableBehavior};const IronMenuBehaviorImpl={properties:{focusedItem:{observer:"_focusedItemChanged",readOnly:!0,type:Object},attrForItemTitle:{type:String},disabled:{type:Boolean,value:!1,observer:"_disabledChanged"}},_MODIFIER_KEYS:["Alt","AltGraph","CapsLock","Control","Fn","FnLock","Hyper","Meta","NumLock","OS","ScrollLock","Shift","Super","Symbol","SymbolLock"],_SEARCH_RESET_TIMEOUT_MS:1e3,_previousTabIndex:0,hostAttributes:{role:"menu"},observers:["_updateMultiselectable(multi)"],listeners:{focus:"_onFocus",keydown:"_onKeydown","iron-items-changed":"_onIronItemsChanged"},keyBindings:{up:"_onUpKey",down:"_onDownKey",esc:"_onEscKey","shift+tab:keydown":"_onShiftTabDown"},attached:function(){this._resetTabindices()},select:function(value){if(this._defaultFocusAsync){this.cancelAsync(this._defaultFocusAsync);this._defaultFocusAsync=null}var item=this._valueToItem(value);if(item&&item.hasAttribute("disabled"))return;this._setFocusedItem(item);IronMultiSelectableBehaviorImpl.select.apply(this,arguments)},_resetTabindices:function(){var selectedItem=this.multi?this.selectedItems&&this.selectedItems[0]:this.selectedItem;this.items.forEach(function(item){item.setAttribute("tabindex",item===selectedItem?"0":"-1")},this)},_updateMultiselectable:function(multi){if(multi){this.setAttribute("aria-multiselectable","true")}else{this.removeAttribute("aria-multiselectable")}},_focusWithKeyboardEvent:function(event){if(-1!==this._MODIFIER_KEYS.indexOf(event.key))return;this.cancelDebouncer("_clearSearchText");var searchText=this._searchText||"",key=event.key&&1==event.key.length?event.key:String.fromCharCode(event.keyCode);searchText+=key.toLocaleLowerCase();for(var searchLength=searchText.length,i=0,item;item=this.items[i];i++){if(item.hasAttribute("disabled")){continue}var attr=this.attrForItemTitle||"textContent",title=(item[attr]||item.getAttribute(attr)||"").trim();if(title.length<searchLength){continue}if(title.slice(0,searchLength).toLocaleLowerCase()==searchText){this._setFocusedItem(item);break}}this._searchText=searchText;this.debounce("_clearSearchText",this._clearSearchText,this._SEARCH_RESET_TIMEOUT_MS)},_clearSearchText:function(){this._searchText=""},_focusPrevious:function(){for(var length=this.items.length,curFocusIndex=+this.indexOf(this.focusedItem),i=1,item;i<length+1;i++){item=this.items[(curFocusIndex-i+length)%length];if(!item.hasAttribute("disabled")){var owner=dom(item).getOwnerRoot()||document;this._setFocusedItem(item);if(dom(owner).activeElement==item){return}}}},_focusNext:function(){for(var length=this.items.length,curFocusIndex=+this.indexOf(this.focusedItem),i=1,item;i<length+1;i++){item=this.items[(curFocusIndex+i)%length];if(!item.hasAttribute("disabled")){var owner=dom(item).getOwnerRoot()||document;this._setFocusedItem(item);if(dom(owner).activeElement==item){return}}}},_applySelection:function(item,isSelected){if(isSelected){item.setAttribute("aria-selected","true")}else{item.removeAttribute("aria-selected")}IronSelectableBehavior._applySelection.apply(this,arguments)},_focusedItemChanged:function(focusedItem,old){old&&old.setAttribute("tabindex","-1");if(focusedItem&&!focusedItem.hasAttribute("disabled")&&!this.disabled){focusedItem.setAttribute("tabindex","0");focusedItem.focus()}},_onIronItemsChanged:function(event){if(event.detail.addedNodes.length){this._resetTabindices()}},_onShiftTabDown:function(event){var oldTabIndex=this.getAttribute("tabindex");IronMenuBehaviorImpl._shiftTabPressed=!0;this._setFocusedItem(null);this.setAttribute("tabindex","-1");this.async(function(){this.setAttribute("tabindex",oldTabIndex);IronMenuBehaviorImpl._shiftTabPressed=!1},1)},_onFocus:function(event){if(IronMenuBehaviorImpl._shiftTabPressed){return}var rootTarget=dom(event).rootTarget;if(rootTarget!==this&&"undefined"!==typeof rootTarget.tabIndex&&!this.isLightDescendant(rootTarget)){return}this._defaultFocusAsync=this.async(function(){var selectedItem=this.multi?this.selectedItems&&this.selectedItems[0]:this.selectedItem;this._setFocusedItem(null);if(selectedItem){this._setFocusedItem(selectedItem)}else if(this.items[0]){this._focusNext()}})},_onUpKey:function(event){this._focusPrevious();event.detail.keyboardEvent.preventDefault()},_onDownKey:function(event){this._focusNext();event.detail.keyboardEvent.preventDefault()},_onEscKey:function(event){var focusedItem=this.focusedItem;if(focusedItem){focusedItem.blur()}},_onKeydown:function(event){if(!this.keyboardEventMatchesKeys(event,"up down esc")){this._focusWithKeyboardEvent(event)}event.stopPropagation()},_activateHandler:function(event){IronSelectableBehavior._activateHandler.call(this,event);event.stopPropagation()},_disabledChanged:function(disabled){if(disabled){this._previousTabIndex=this.hasAttribute("tabindex")?this.tabIndex:0;this.removeAttribute("tabindex")}else if(!this.hasAttribute("tabindex")){this.setAttribute("tabindex",this._previousTabIndex)}},_shiftTabPressed:!1},IronMenuBehavior=[IronMultiSelectableBehavior,IronA11yKeysBehavior,IronMenuBehaviorImpl];var ironMenuBehavior={IronMenuBehaviorImpl:IronMenuBehaviorImpl,IronMenuBehavior:IronMenuBehavior};Polymer({_template:html`
     <style>
       :host {
         display: block;
@@ -964,7 +983,11 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
     }
   </style>
 
-  <slot></slot>`;template$3.setAttribute("strip-whitespace","");Polymer({_template:template$3,is:"paper-button",behaviors:[PaperButtonBehavior],properties:{raised:{type:Boolean,reflectToAttribute:!0,value:!1,observer:"_calculateElevation"}},_calculateElevation:function(){if(!this.raised){this._setElevation(0)}else{PaperButtonBehaviorImpl._calculateElevation.apply(this)}}});const template$4=html`
+  <slot></slot>`;template$3.setAttribute("strip-whitespace","");Polymer({_template:template$3,is:"paper-button",behaviors:[PaperButtonBehavior],properties:{raised:{type:Boolean,reflectToAttribute:!0,value:!1,observer:"_calculateElevation"}},_calculateElevation:function(){if(!this.raised){this._setElevation(0)}else{PaperButtonBehaviorImpl._calculateElevation.apply(this)}}});const $_documentContainer=document.createElement("template");$_documentContainer.setAttribute("style","display: none;");$_documentContainer.innerHTML=`<iron-iconset-svg name="paper-dropdown-menu" size="24">
+<svg><defs>
+<g id="arrow-drop-down"><path d="M7 10l5 5 5-5z"></path></g>
+</defs></svg>
+</iron-iconset-svg>`;document.head.appendChild($_documentContainer.content);const template$4=html`
 <custom-style>
   <style is="custom-style">
     html {
@@ -1343,157 +1366,72 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
       --default-primary-color: var(--primary-color);
     }
   </style>
-</custom-style>`;template$5.setAttribute("style","display: none;");document.head.appendChild(template$5.content);const template$6=html`
-  <style include="paper-material-styles">
-    :host {
-      @apply --layout-vertical;
-      @apply --layout-center-center;
-
-      background: var(--paper-fab-background, var(--accent-color));
-      border-radius: 50%;
-      box-sizing: border-box;
-      color: var(--text-primary-color);
-      cursor: pointer;
-      height: 56px;
-      min-width: 0;
-      outline: none;
-      padding: 16px;
-      position: relative;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      -webkit-user-select: none;
-      user-select: none;
-      width: 56px;
-      z-index: 0;
-
-      /* NOTE: Both values are needed, since some phones require the value \`transparent\`. */
-      -webkit-tap-highlight-color: rgba(0,0,0,0);
-      -webkit-tap-highlight-color: transparent;
-
-      @apply --paper-fab;
-    }
-
-    [hidden] {
-      display: none !important;
-    }
-
-    :host([mini]) {
-      width: 40px;
-      height: 40px;
-      padding: 8px;
-
-      @apply --paper-fab-mini;
-    }
-
-    :host([disabled]) {
-      color: var(--paper-fab-disabled-text, var(--paper-grey-500));
-      background: var(--paper-fab-disabled-background, var(--paper-grey-300));
-
-      @apply --paper-fab-disabled;
-    }
-
-    iron-icon {
-      @apply --paper-fab-iron-icon;
-    }
-
-    span {
-      width: 100%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-
-      @apply --paper-fab-label;
-    }
-
-    :host(.keyboard-focus) {
-      background: var(--paper-fab-keyboard-focus-background, var(--paper-pink-900));
-    }
-
-    :host([elevation="1"]) {
-      @apply --paper-material-elevation-1;
-    }
-
-    :host([elevation="2"]) {
-      @apply --paper-material-elevation-2;
-    }
-
-    :host([elevation="3"]) {
-      @apply --paper-material-elevation-3;
-    }
-
-    :host([elevation="4"]) {
-      @apply --paper-material-elevation-4;
-    }
-
-    :host([elevation="5"]) {
-      @apply --paper-material-elevation-5;
-    }
-  </style>
-
-  <iron-icon id="icon" hidden\$="{{!_computeIsIconFab(icon, src)}}" src="[[src]]" icon="[[icon]]"></iron-icon>
-  <span hidden\$="{{_computeIsIconFab(icon, src)}}">{{label}}</span>
-`;template$6.setAttribute("strip-whitespace","");Polymer({_template:template$6,is:"paper-fab",behaviors:[PaperButtonBehavior],properties:{src:{type:String,value:""},icon:{type:String,value:""},mini:{type:Boolean,value:!1,reflectToAttribute:!0},label:{type:String,observer:"_labelChanged"}},_labelChanged:function(){this.setAttribute("aria-label",this.label)},_computeIsIconFab:function(icon,src){return 0<icon.length||0<src.length}});const template$7=html`
-<dom-module id="paper-icon-button">
-  <template strip-whitespace>
+</custom-style>`;template$5.setAttribute("style","display: none;");document.head.appendChild(template$5.content);const $_documentContainer$1=document.createElement("template");$_documentContainer$1.setAttribute("style","display: none;");$_documentContainer$1.innerHTML=`<dom-module id="paper-dropdown-menu-shared-styles">
+  <template>
     <style>
       :host {
         display: inline-block;
         position: relative;
-        padding: 8px;
-        outline: none;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        cursor: pointer;
-        z-index: 0;
-        line-height: 1;
+        text-align: left;
 
-        width: 40px;
-        height: 40px;
-
-        /* NOTE: Both values are needed, since some phones require the value to be \`transparent\`. */
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        /* NOTE(cdata): Both values are needed, since some phones require the
+         * value to be \`transparent\`.
+         */
+        -webkit-tap-highlight-color: rgba(0,0,0,0);
         -webkit-tap-highlight-color: transparent;
 
-        /* Because of polymer/2558, this style has lower specificity than * */
-        box-sizing: border-box !important;
+        --paper-input-container-input: {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          max-width: 100%;
+          box-sizing: border-box;
+          cursor: pointer;
+        };
 
-        @apply --paper-icon-button;
-      }
-
-      :host #ink {
-        color: var(--paper-icon-button-ink-color, var(--primary-text-color));
-        opacity: 0.6;
+        @apply --paper-dropdown-menu;
       }
 
       :host([disabled]) {
-        color: var(--paper-icon-button-disabled-text, var(--disabled-text-color));
-        pointer-events: none;
-        cursor: auto;
-
-        @apply --paper-icon-button-disabled;
+        @apply --paper-dropdown-menu-disabled;
       }
 
-      :host([hidden]) {
-        display: none !important;
+      :host([noink]) paper-ripple {
+        display: none;
       }
 
-      :host(:hover) {
-        @apply --paper-icon-button-hover;
+      :host([no-label-float]) paper-ripple {
+        top: 8px;
+      }
+
+      paper-ripple {
+        top: 12px;
+        left: 0px;
+        bottom: 8px;
+        right: 0px;
+
+        @apply --paper-dropdown-menu-ripple;
+      }
+
+      paper-menu-button {
+        display: block;
+        padding: 0;
+
+        @apply --paper-dropdown-menu-button;
+      }
+
+      paper-input {
+        @apply --paper-dropdown-menu-input;
       }
 
       iron-icon {
-        --iron-icon-width: 100%;
-        --iron-icon-height: 100%;
+        color: var(--disabled-text-color);
+
+        @apply --paper-dropdown-menu-icon;
       }
     </style>
-
-    <iron-icon id="icon" src="[[src]]" icon="[[icon]]" alt\$="[[alt]]"></iron-icon>
   </template>
-</dom-module>
-`;template$7.setAttribute("style","display: none;");document.body.appendChild(template$7.content);Polymer({is:"paper-icon-button",hostAttributes:{role:"button",tabindex:"0"},behaviors:[PaperInkyFocusBehavior],properties:{src:{type:String},icon:{type:String},alt:{type:String,observer:"_altChanged"}},_altChanged:function(newValue,oldValue){var label=this.getAttribute("aria-label");if(!label||oldValue==label){this.setAttribute("aria-label",newValue)}}});const PaperItemBehaviorImpl={hostAttributes:{role:"option",tabindex:"0"}},PaperItemBehavior=[IronButtonState,IronControlState,PaperItemBehaviorImpl];var paperItemBehavior={PaperItemBehaviorImpl:PaperItemBehaviorImpl,PaperItemBehavior:PaperItemBehavior};const template$8=html`<custom-style>
+</dom-module>`;document.head.appendChild($_documentContainer$1.content);const template$6=html`<custom-style>
   <style is="custom-style">
     html {
 
@@ -1649,86 +1587,416 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
     }
 
   </style>
-</custom-style>`;template$8.setAttribute("style","display: none;");document.head.appendChild(template$8.content);const $_documentContainer=document.createElement("template");$_documentContainer.setAttribute("style","display: none;");$_documentContainer.innerHTML=`<dom-module id="paper-item-shared-styles">
-  <template>
+</custom-style>`;template$6.setAttribute("style","display: none;");document.head.appendChild(template$6.content);const PaperInputAddonBehavior={attached:function(){this.fire("addon-attached")},update:function(state){}};var paperInputAddonBehavior={PaperInputAddonBehavior:PaperInputAddonBehavior};Polymer({_template:html`
     <style>
-      :host, .paper-item {
-        display: block;
-        position: relative;
-        min-height: var(--paper-item-min-height, 48px);
-        padding: 0px 16px;
+      :host {
+        display: inline-block;
+        float: right;
+
+        @apply --paper-font-caption;
+        @apply --paper-input-char-counter;
       }
 
-      .paper-item {
-        @apply --paper-font-subhead;
-        border:none;
-        outline: none;
-        background: white;
-        width: 100%;
-        text-align: left;
-      }
-
-      :host([hidden]), .paper-item[hidden] {
+      :host([hidden]) {
         display: none !important;
       }
 
-      :host(.iron-selected), .paper-item.iron-selected {
-        font-weight: var(--paper-item-selected-weight, bold);
-
-        @apply --paper-item-selected;
-      }
-
-      :host([disabled]), .paper-item[disabled] {
-        color: var(--paper-item-disabled-color, var(--disabled-text-color));
-
-        @apply --paper-item-disabled;
-      }
-
-      :host(:focus), .paper-item:focus {
-        position: relative;
-        outline: 0;
-
-        @apply --paper-item-focused;
-      }
-
-      :host(:focus):before, .paper-item:focus:before {
-        @apply --layout-fit;
-
-        background: currentColor;
-        content: '';
-        opacity: var(--dark-divider-opacity);
-        pointer-events: none;
-
-        @apply --paper-item-focused-before;
+      :host(:dir(rtl)) {
+        float: left;
       }
     </style>
-  </template>
-</dom-module>`;document.head.appendChild($_documentContainer.content);Polymer({_template:html`
-    <style include="paper-item-shared-styles">
-      :host {
-        @apply --layout-horizontal;
-        @apply --layout-center;
+
+    <span>[[_charCounterStr]]</span>
+`,is:"paper-input-char-counter",behaviors:[PaperInputAddonBehavior],properties:{_charCounterStr:{type:String,value:"0"}},update:function(state){if(!state.inputElement){return}state.value=state.value||"";var counter=state.value.toString().length.toString();if(state.inputElement.hasAttribute("maxlength")){counter+="/"+state.inputElement.getAttribute("maxlength")}this._charCounterStr=counter}});const template$7=html`
+<custom-style>
+  <style is="custom-style">
+    html {
+      --paper-input-container-shared-input-style: {
+        position: relative; /* to make a stacking context */
+        outline: none;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        background: transparent;
+        border: none;
+        color: var(--paper-input-container-input-color, var(--primary-text-color));
+        -webkit-appearance: none;
+        text-align: inherit;
+        vertical-align: var(--paper-input-container-input-align, bottom);
+
         @apply --paper-font-subhead;
-
-        @apply --paper-item;
-      }
-    </style>
-    <slot></slot>
-`,is:"paper-item",behaviors:[PaperItemBehavior]});Polymer({_template:html`
+      };
+    }
+  </style>
+</custom-style>
+`;template$7.setAttribute("style","display: none;");document.head.appendChild(template$7.content);Polymer({_template:html`
     <style>
       :host {
         display: block;
         padding: 8px 0;
+        @apply --paper-input-container;
+      }
 
-        background: var(--paper-listbox-background-color, var(--primary-background-color));
-        color: var(--paper-listbox-color, var(--primary-text-color));
+      :host([inline]) {
+        display: inline-block;
+      }
 
-        @apply --paper-listbox;
+      :host([disabled]) {
+        pointer-events: none;
+        opacity: 0.33;
+
+        @apply --paper-input-container-disabled;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      .floated-label-placeholder {
+        @apply --paper-font-caption;
+      }
+
+      .underline {
+        height: 2px;
+        position: relative;
+      }
+
+      .focused-line {
+        @apply --layout-fit;
+        border-bottom: 2px solid var(--paper-input-container-focus-color, var(--primary-color));
+
+        -webkit-transform-origin: center center;
+        transform-origin: center center;
+        -webkit-transform: scale3d(0,1,1);
+        transform: scale3d(0,1,1);
+
+        @apply --paper-input-container-underline-focus;
+      }
+
+      .underline.is-highlighted .focused-line {
+        -webkit-transform: none;
+        transform: none;
+        -webkit-transition: -webkit-transform 0.25s;
+        transition: transform 0.25s;
+
+        @apply --paper-transition-easing;
+      }
+
+      .underline.is-invalid .focused-line {
+        border-color: var(--paper-input-container-invalid-color, var(--error-color));
+        -webkit-transform: none;
+        transform: none;
+        -webkit-transition: -webkit-transform 0.25s;
+        transition: transform 0.25s;
+
+        @apply --paper-transition-easing;
+      }
+
+      .unfocused-line {
+        @apply --layout-fit;
+        border-bottom: 1px solid var(--paper-input-container-color, var(--secondary-text-color));
+        @apply --paper-input-container-underline;
+      }
+
+      :host([disabled]) .unfocused-line {
+        border-bottom: 1px dashed;
+        border-color: var(--paper-input-container-color, var(--secondary-text-color));
+        @apply --paper-input-container-underline-disabled;
+      }
+
+      .input-wrapper {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        position: relative;
+      }
+
+      .input-content {
+        @apply --layout-flex-auto;
+        @apply --layout-relative;
+        max-width: 100%;
+      }
+
+      .input-content ::slotted(label),
+      .input-content ::slotted(.paper-input-label) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        font: inherit;
+        color: var(--paper-input-container-color, var(--secondary-text-color));
+        -webkit-transition: -webkit-transform 0.25s, width 0.25s;
+        transition: transform 0.25s, width 0.25s;
+        -webkit-transform-origin: left top;
+        transform-origin: left top;
+        /* Fix for safari not focusing 0-height date/time inputs with -webkit-apperance: none; */
+        min-height: 1px;
+
+        @apply --paper-font-common-nowrap;
+        @apply --paper-font-subhead;
+        @apply --paper-input-container-label;
+        @apply --paper-transition-easing;
+      }
+
+      .input-content.label-is-floating ::slotted(label),
+      .input-content.label-is-floating ::slotted(.paper-input-label) {
+        -webkit-transform: translateY(-75%) scale(0.75);
+        transform: translateY(-75%) scale(0.75);
+
+        /* Since we scale to 75/100 of the size, we actually have 100/75 of the
+        original space now available */
+        width: 133%;
+
+        @apply --paper-input-container-label-floating;
+      }
+
+      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(label),
+      :host(:dir(rtl)) .input-content.label-is-floating ::slotted(.paper-input-label) {
+        right: 0;
+        left: auto;
+        -webkit-transform-origin: right top;
+        transform-origin: right top;
+      }
+
+      .input-content.label-is-highlighted ::slotted(label),
+      .input-content.label-is-highlighted ::slotted(.paper-input-label) {
+        color: var(--paper-input-container-focus-color, var(--primary-color));
+
+        @apply --paper-input-container-label-focus;
+      }
+
+      .input-content.is-invalid ::slotted(label),
+      .input-content.is-invalid ::slotted(.paper-input-label) {
+        color: var(--paper-input-container-invalid-color, var(--error-color));
+      }
+
+      .input-content.label-is-hidden ::slotted(label),
+      .input-content.label-is-hidden ::slotted(.paper-input-label) {
+        visibility: hidden;
+      }
+
+      .input-content ::slotted(input),
+      .input-content ::slotted(iron-input),
+      .input-content ::slotted(textarea),
+      .input-content ::slotted(iron-autogrow-textarea),
+      .input-content ::slotted(.paper-input-input) {
+        @apply --paper-input-container-shared-input-style;
+        /* The apply shim doesn't apply the nested color custom property,
+          so we have to re-apply it here. */
+        color: var(--paper-input-container-input-color, var(--primary-text-color));
+        @apply --paper-input-container-input;
+      }
+
+      .input-content ::slotted(input)::-webkit-outer-spin-button,
+      .input-content ::slotted(input)::-webkit-inner-spin-button {
+        @apply --paper-input-container-input-webkit-spinner;
+      }
+
+      .input-content.focused ::slotted(input),
+      .input-content.focused ::slotted(iron-input),
+      .input-content.focused ::slotted(textarea),
+      .input-content.focused ::slotted(iron-autogrow-textarea),
+      .input-content.focused ::slotted(.paper-input-input) {
+        @apply --paper-input-container-input-focus;
+      }
+
+      .input-content.is-invalid ::slotted(input),
+      .input-content.is-invalid ::slotted(iron-input),
+      .input-content.is-invalid ::slotted(textarea),
+      .input-content.is-invalid ::slotted(iron-autogrow-textarea),
+      .input-content.is-invalid ::slotted(.paper-input-input) {
+        @apply --paper-input-container-input-invalid;
+      }
+
+      .prefix ::slotted(*) {
+        display: inline-block;
+        @apply --paper-font-subhead;
+        @apply --layout-flex-none;
+        @apply --paper-input-prefix;
+      }
+
+      .suffix ::slotted(*) {
+        display: inline-block;
+        @apply --paper-font-subhead;
+        @apply --layout-flex-none;
+
+        @apply --paper-input-suffix;
+      }
+
+      /* Firefox sets a min-width on the input, which can cause layout issues */
+      .input-content ::slotted(input) {
+        min-width: 0;
+      }
+
+      .input-content ::slotted(textarea) {
+        resize: none;
+      }
+
+      .add-on-content {
+        position: relative;
+      }
+
+      .add-on-content.is-invalid ::slotted(*) {
+        color: var(--paper-input-container-invalid-color, var(--error-color));
+      }
+
+      .add-on-content.is-highlighted ::slotted(*) {
+        color: var(--paper-input-container-focus-color, var(--primary-color));
       }
     </style>
 
+    <div class="floated-label-placeholder" aria-hidden="true" hidden="[[noLabelFloat]]">&nbsp;</div>
+
+    <div class="input-wrapper">
+      <span class="prefix"><slot name="prefix"></slot></span>
+
+      <div class\$="[[_computeInputContentClass(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent)]]" id="labelAndInputContainer">
+        <slot name="label"></slot>
+        <slot name="input"></slot>
+      </div>
+
+      <span class="suffix"><slot name="suffix"></slot></span>
+    </div>
+
+    <div class\$="[[_computeUnderlineClass(focused,invalid)]]">
+      <div class="unfocused-line"></div>
+      <div class="focused-line"></div>
+    </div>
+
+    <div class\$="[[_computeAddOnContentClass(focused,invalid)]]">
+      <slot name="add-on"></slot>
+    </div>
+`,is:"paper-input-container",properties:{noLabelFloat:{type:Boolean,value:!1},alwaysFloatLabel:{type:Boolean,value:!1},attrForValue:{type:String,value:"bind-value"},autoValidate:{type:Boolean,value:!1},invalid:{observer:"_invalidChanged",type:Boolean,value:!1},focused:{readOnly:!0,type:Boolean,value:!1,notify:!0},_addons:{type:Array},_inputHasContent:{type:Boolean,value:!1},_inputSelector:{type:String,value:"input,iron-input,textarea,.paper-input-input"},_boundOnFocus:{type:Function,value:function(){return this._onFocus.bind(this)}},_boundOnBlur:{type:Function,value:function(){return this._onBlur.bind(this)}},_boundOnInput:{type:Function,value:function(){return this._onInput.bind(this)}},_boundValueChanged:{type:Function,value:function(){return this._onValueChanged.bind(this)}}},listeners:{"addon-attached":"_onAddonAttached","iron-input-validate":"_onIronInputValidate"},get _valueChangedEvent(){return this.attrForValue+"-changed"},get _propertyForValue(){return dashToCamelCase(this.attrForValue)},get _inputElement(){return dom(this).querySelector(this._inputSelector)},get _inputElementValue(){return this._inputElement[this._propertyForValue]||this._inputElement.value},ready:function(){this.__isFirstValueUpdate=!0;if(!this._addons){this._addons=[]}this.addEventListener("focus",this._boundOnFocus,!0);this.addEventListener("blur",this._boundOnBlur,!0)},attached:function(){if(this.attrForValue){this._inputElement.addEventListener(this._valueChangedEvent,this._boundValueChanged)}else{this.addEventListener("input",this._onInput)}if(this._inputElementValue&&""!=this._inputElementValue){this._handleValueAndAutoValidate(this._inputElement)}else{this._handleValue(this._inputElement)}},_onAddonAttached:function(event){if(!this._addons){this._addons=[]}var target=event.target;if(-1===this._addons.indexOf(target)){this._addons.push(target);if(this.isAttached){this._handleValue(this._inputElement)}}},_onFocus:function(){this._setFocused(!0)},_onBlur:function(){this._setFocused(!1);this._handleValueAndAutoValidate(this._inputElement)},_onInput:function(event){this._handleValueAndAutoValidate(event.target)},_onValueChanged:function(event){var input=event.target;if(this.__isFirstValueUpdate){this.__isFirstValueUpdate=!1;if(input.value===void 0||""===input.value){return}}this._handleValueAndAutoValidate(event.target)},_handleValue:function(inputElement){var value=this._inputElementValue;if(value||0===value||"number"===inputElement.type&&!inputElement.checkValidity()){this._inputHasContent=!0}else{this._inputHasContent=!1}this.updateAddons({inputElement:inputElement,value:value,invalid:this.invalid})},_handleValueAndAutoValidate:function(inputElement){if(this.autoValidate&&inputElement){var valid;if(inputElement.validate){valid=inputElement.validate(this._inputElementValue)}else{valid=inputElement.checkValidity()}this.invalid=!valid}this._handleValue(inputElement)},_onIronInputValidate:function(event){this.invalid=this._inputElement.invalid},_invalidChanged:function(){if(this._addons){this.updateAddons({invalid:this.invalid})}},updateAddons:function(state){for(var addon,index=0;addon=this._addons[index];index++){addon.update(state)}},_computeInputContentClass:function(noLabelFloat,alwaysFloatLabel,focused,invalid,_inputHasContent){var cls="input-content";if(!noLabelFloat){var label=this.querySelector("label");if(alwaysFloatLabel||_inputHasContent){cls+=" label-is-floating";this.$.labelAndInputContainer.style.position="static";if(invalid){cls+=" is-invalid"}else if(focused){cls+=" label-is-highlighted"}}else{if(label){this.$.labelAndInputContainer.style.position="relative"}if(invalid){cls+=" is-invalid"}}}else{if(_inputHasContent){cls+=" label-is-hidden"}if(invalid){cls+=" is-invalid"}}if(focused){cls+=" focused"}return cls},_computeUnderlineClass:function(focused,invalid){var cls="underline";if(invalid){cls+=" is-invalid"}else if(focused){cls+=" is-highlighted"}return cls},_computeAddOnContentClass:function(focused,invalid){var cls="add-on-content";if(invalid){cls+=" is-invalid"}else if(focused){cls+=" is-highlighted"}return cls}});Polymer({_template:html`
+    <style>
+      :host {
+        display: inline-block;
+        visibility: hidden;
+
+        color: var(--paper-input-container-invalid-color, var(--error-color));
+
+        @apply --paper-font-caption;
+        @apply --paper-input-error;
+        position: absolute;
+        left:0;
+        right:0;
+      }
+
+      :host([invalid]) {
+        visibility: visible;
+      };
+    </style>
+
     <slot></slot>
-`,is:"paper-listbox",behaviors:[IronMenuBehavior],hostAttributes:{role:"listbox"}});Polymer({is:"paper-menu-grow-height-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),height=rect.height;this._effect=new KeyframeEffect(node,[{height:height/2+"px"},{height:height+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-grow-width-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),width=rect.width;this._effect=new KeyframeEffect(node,[{width:width/2+"px"},{width:width+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-shrink-width-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),width=rect.width;this._effect=new KeyframeEffect(node,[{width:width+"px"},{width:width-width/20+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-shrink-height-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),height=rect.height;this.setPrefixedProperty(node,"transformOrigin","0 0");this._effect=new KeyframeEffect(node,[{height:height+"px",transform:"translateY(0)"},{height:height/2+"px",transform:"translateY(-20px)"}],this.timingFromConfig(config));return this._effect}});var config={ANIMATION_CUBIC_BEZIER:"cubic-bezier(.3,.95,.5,1)",MAX_ANIMATION_TIME_MS:400};const PaperMenuButton=Polymer({_template:html`
+`,is:"paper-input-error",behaviors:[PaperInputAddonBehavior],properties:{invalid:{readOnly:!0,reflectToAttribute:!0,type:Boolean}},update:function(state){this._setInvalid(state.invalid)}});const PaperInputHelper={NextLabelID:1,NextAddonID:1,NextInputID:1},PaperInputBehaviorImpl={properties:{label:{type:String},value:{notify:!0,type:String},disabled:{type:Boolean,value:!1},invalid:{type:Boolean,value:!1,notify:!0},allowedPattern:{type:String},type:{type:String},list:{type:String},pattern:{type:String},required:{type:Boolean,value:!1},errorMessage:{type:String},charCounter:{type:Boolean,value:!1},noLabelFloat:{type:Boolean,value:!1},alwaysFloatLabel:{type:Boolean,value:!1},autoValidate:{type:Boolean,value:!1},validator:{type:String},autocomplete:{type:String,value:"off"},autofocus:{type:Boolean,observer:"_autofocusChanged"},inputmode:{type:String},minlength:{type:Number},maxlength:{type:Number},min:{type:String},max:{type:String},step:{type:String},name:{type:String},placeholder:{type:String,value:""},readonly:{type:Boolean,value:!1},size:{type:Number},autocapitalize:{type:String,value:"none"},autocorrect:{type:String,value:"off"},autosave:{type:String},results:{type:Number},accept:{type:String},multiple:{type:Boolean},_ariaDescribedBy:{type:String,value:""},_ariaLabelledBy:{type:String,value:""},_inputId:{type:String,value:""}},listeners:{"addon-attached":"_onAddonAttached"},keyBindings:{"shift+tab:keydown":"_onShiftTabDown"},hostAttributes:{tabindex:0},get inputElement(){if(!this.$){this.$={}}if(!this.$.input){this._generateInputId();this.$.input=this.$$("#"+this._inputId)}return this.$.input},get _focusableElement(){return this.inputElement},created:function(){this._typesThatHaveText=["date","datetime","datetime-local","month","time","week","file"]},attached:function(){this._updateAriaLabelledBy();if(!PolymerElement&&this.inputElement&&-1!==this._typesThatHaveText.indexOf(this.inputElement.type)){this.alwaysFloatLabel=!0}},_appendStringWithSpace:function(str,more){if(str){str=str+" "+more}else{str=more}return str},_onAddonAttached:function(event){var target=dom(event).rootTarget;if(target.id){this._ariaDescribedBy=this._appendStringWithSpace(this._ariaDescribedBy,target.id)}else{var id="paper-input-add-on-"+PaperInputHelper.NextAddonID++;target.id=id;this._ariaDescribedBy=this._appendStringWithSpace(this._ariaDescribedBy,id)}},validate:function(){return this.inputElement.validate()},_focusBlurHandler:function(event){IronControlState._focusBlurHandler.call(this,event);if(this.focused&&!this._shiftTabPressed&&this._focusableElement){this._focusableElement.focus()}},_onShiftTabDown:function(event){var oldTabIndex=this.getAttribute("tabindex");this._shiftTabPressed=!0;this.setAttribute("tabindex","-1");this.async(function(){this.setAttribute("tabindex",oldTabIndex);this._shiftTabPressed=!1},1)},_handleAutoValidate:function(){if(this.autoValidate)this.validate()},updateValueAndPreserveCaret:function(newValue){try{var start=this.inputElement.selectionStart;this.value=newValue;this.inputElement.selectionStart=start;this.inputElement.selectionEnd=start}catch(e){this.value=newValue}},_computeAlwaysFloatLabel:function(alwaysFloatLabel,placeholder){return placeholder||alwaysFloatLabel},_updateAriaLabelledBy:function(){var label=dom(this.root).querySelector("label");if(!label){this._ariaLabelledBy="";return}var labelledBy;if(label.id){labelledBy=label.id}else{labelledBy="paper-input-label-"+PaperInputHelper.NextLabelID++;label.id=labelledBy}this._ariaLabelledBy=labelledBy},_generateInputId:function(){if(!this._inputId||""===this._inputId){this._inputId="input-"+PaperInputHelper.NextInputID++}},_onChange:function(event){if(this.shadowRoot){this.fire(event.type,{sourceEvent:event},{node:this,bubbles:event.bubbles,cancelable:event.cancelable})}},_autofocusChanged:function(){if(this.autofocus&&this._focusableElement){var activeElement=document.activeElement,isActiveElementValid=activeElement instanceof HTMLElement,isSomeElementActive=isActiveElementValid&&activeElement!==document.body&&activeElement!==document.documentElement;if(!isSomeElementActive){this._focusableElement.focus()}}}},PaperInputBehavior=[IronControlState,IronA11yKeysBehavior,PaperInputBehaviorImpl];var paperInputBehavior={PaperInputHelper:PaperInputHelper,PaperInputBehaviorImpl:PaperInputBehaviorImpl,PaperInputBehavior:PaperInputBehavior};Polymer({is:"paper-input",_template:html`
+    <style>
+      :host {
+        display: block;
+      }
+
+      :host([focused]) {
+        outline: none;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+
+      input {
+        /* Firefox sets a min-width on the input, which can cause layout issues */
+        min-width: 0;
+      }
+
+      /* In 1.x, the <input> is distributed to paper-input-container, which styles it.
+      In 2.x the <iron-input> is distributed to paper-input-container, which styles
+      it, but in order for this to work correctly, we need to reset some
+      of the native input's properties to inherit (from the iron-input) */
+      iron-input > input {
+        @apply --paper-input-container-shared-input-style;
+        font-family: inherit;
+        font-weight: inherit;
+        font-size: inherit;
+        letter-spacing: inherit;
+        word-spacing: inherit;
+        line-height: inherit;
+        text-shadow: inherit;
+        color: inherit;
+        cursor: inherit;
+      }
+
+      input:disabled {
+        @apply --paper-input-container-input-disabled;
+      }
+
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        @apply --paper-input-container-input-webkit-spinner;
+      }
+
+      input::-webkit-clear-button {
+        @apply --paper-input-container-input-webkit-clear;
+      }
+
+      input::-webkit-calendar-picker-indicator {
+        @apply --paper-input-container-input-webkit-calendar-picker-indicator;
+      }
+
+      input::-webkit-input-placeholder {
+        color: var(--paper-input-container-color, var(--secondary-text-color));
+      }
+
+      input:-moz-placeholder {
+        color: var(--paper-input-container-color, var(--secondary-text-color));
+      }
+
+      input::-moz-placeholder {
+        color: var(--paper-input-container-color, var(--secondary-text-color));
+      }
+
+      input::-ms-clear {
+        @apply --paper-input-container-ms-clear;
+      }
+
+      input::-ms-reveal {
+        @apply --paper-input-container-ms-reveal;
+      }
+
+      input:-ms-input-placeholder {
+        color: var(--paper-input-container-color, var(--secondary-text-color));
+      }
+
+      label {
+        pointer-events: none;
+      }
+    </style>
+
+    <paper-input-container id="container" no-label-float="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate\$="[[autoValidate]]" disabled\$="[[disabled]]" invalid="[[invalid]]">
+
+      <slot name="prefix" slot="prefix"></slot>
+
+      <label hidden\$="[[!label]]" aria-hidden="true" for\$="[[_inputId]]" slot="label">[[label]]</label>
+
+      <!-- Need to bind maxlength so that the paper-input-char-counter works correctly -->
+      <iron-input bind-value="{{value}}" slot="input" class="input-element" id\$="[[_inputId]]" maxlength\$="[[maxlength]]" allowed-pattern="[[allowedPattern]]" invalid="{{invalid}}" validator="[[validator]]">
+        <input aria-labelledby\$="[[_ariaLabelledBy]]" aria-describedby\$="[[_ariaDescribedBy]]" disabled\$="[[disabled]]" title\$="[[title]]" type\$="[[type]]" pattern\$="[[pattern]]" required\$="[[required]]" autocomplete\$="[[autocomplete]]" autofocus\$="[[autofocus]]" inputmode\$="[[inputmode]]" minlength\$="[[minlength]]" maxlength\$="[[maxlength]]" min\$="[[min]]" max\$="[[max]]" step\$="[[step]]" name\$="[[name]]" placeholder\$="[[placeholder]]" readonly\$="[[readonly]]" list\$="[[list]]" size\$="[[size]]" autocapitalize\$="[[autocapitalize]]" autocorrect\$="[[autocorrect]]" on-change="_onChange" tabindex\$="[[tabIndex]]" autosave\$="[[autosave]]" results\$="[[results]]" accept\$="[[accept]]" multiple\$="[[multiple]]">
+      </iron-input>
+
+      <slot name="suffix" slot="suffix"></slot>
+
+      <template is="dom-if" if="[[errorMessage]]">
+        <paper-input-error aria-live="assertive" slot="add-on">[[errorMessage]]</paper-input-error>
+      </template>
+
+      <template is="dom-if" if="[[charCounter]]">
+        <paper-input-char-counter slot="add-on"></paper-input-char-counter>
+      </template>
+
+    </paper-input-container>
+  `,behaviors:[PaperInputBehavior,IronFormElementBehavior],properties:{value:{type:String}},get _focusableElement(){return this.inputElement._inputElement},listeners:{"iron-input-ready":"_onIronInputReady"},_onIronInputReady:function(){if(!this.$.nativeInput){this.$.nativeInput=this.$$("input")}if(this.inputElement&&-1!==this._typesThatHaveText.indexOf(this.$.nativeInput.type)){this.alwaysFloatLabel=!0}if(!!this.inputElement.bindValue){this.$.container._handleValueAndAutoValidate(this.inputElement)}}});Polymer({is:"paper-menu-grow-height-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),height=rect.height;this._effect=new KeyframeEffect(node,[{height:height/2+"px"},{height:height+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-grow-width-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),width=rect.width;this._effect=new KeyframeEffect(node,[{width:width/2+"px"},{width:width+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-shrink-width-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),width=rect.width;this._effect=new KeyframeEffect(node,[{width:width+"px"},{width:width-width/20+"px"}],this.timingFromConfig(config));return this._effect}});Polymer({is:"paper-menu-shrink-height-animation",behaviors:[NeonAnimationBehavior],configure:function(config){var node=config.node,rect=node.getBoundingClientRect(),height=rect.height;this.setPrefixedProperty(node,"transformOrigin","0 0");this._effect=new KeyframeEffect(node,[{height:height+"px",transform:"translateY(0)"},{height:height/2+"px",transform:"translateY(-20px)"}],this.timingFromConfig(config));return this._effect}});var config={ANIMATION_CUBIC_BEZIER:"cubic-bezier(.3,.95,.5,1)",MAX_ANIMATION_TIME_MS:400};const PaperMenuButton=Polymer({_template:html`
     <style>
       :host {
         display: inline-block;
@@ -1787,6 +2055,252 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
       </div>
     </iron-dropdown>
 `,is:"paper-menu-button",behaviors:[IronA11yKeysBehavior,IronControlState],properties:{opened:{type:Boolean,value:!1,notify:!0,observer:"_openedChanged"},horizontalAlign:{type:String,value:"left",reflectToAttribute:!0},verticalAlign:{type:String,value:"top",reflectToAttribute:!0},dynamicAlign:{type:Boolean},horizontalOffset:{type:Number,value:0,notify:!0},verticalOffset:{type:Number,value:0,notify:!0},noOverlap:{type:Boolean},noAnimations:{type:Boolean,value:!1},ignoreSelect:{type:Boolean,value:!1},closeOnActivate:{type:Boolean,value:!1},openAnimationConfig:{type:Object,value:function(){return[{name:"fade-in-animation",timing:{delay:100,duration:200}},{name:"paper-menu-grow-width-animation",timing:{delay:100,duration:150,easing:config.ANIMATION_CUBIC_BEZIER}},{name:"paper-menu-grow-height-animation",timing:{delay:100,duration:275,easing:config.ANIMATION_CUBIC_BEZIER}}]}},closeAnimationConfig:{type:Object,value:function(){return[{name:"fade-out-animation",timing:{duration:150}},{name:"paper-menu-shrink-width-animation",timing:{delay:100,duration:50,easing:config.ANIMATION_CUBIC_BEZIER}},{name:"paper-menu-shrink-height-animation",timing:{duration:200,easing:"ease-in"}}]}},allowOutsideScroll:{type:Boolean,value:!1},restoreFocusOnClose:{type:Boolean,value:!0},_dropdownContent:{type:Object}},hostAttributes:{role:"group","aria-haspopup":"true"},listeners:{"iron-activate":"_onIronActivate","iron-select":"_onIronSelect"},get contentElement(){for(var nodes=dom(this.$.content).getDistributedNodes(),i=0,l=nodes.length;i<l;i++){if(nodes[i].nodeType===Node.ELEMENT_NODE){return nodes[i]}}},toggle:function(){if(this.opened){this.close()}else{this.open()}},open:function(){if(this.disabled){return}this.$.dropdown.open()},close:function(){this.$.dropdown.close()},_onIronSelect:function(event){if(!this.ignoreSelect){this.close()}},_onIronActivate:function(event){if(this.closeOnActivate){this.close()}},_openedChanged:function(opened,oldOpened){if(opened){this._dropdownContent=this.contentElement;this.fire("paper-dropdown-open")}else if(null!=oldOpened){this.fire("paper-dropdown-close")}},_disabledChanged:function(disabled){IronControlState._disabledChanged.apply(this,arguments);if(disabled&&this.opened){this.close()}},__onIronOverlayCanceled:function(event){var uiEvent=event.detail,trigger=this.$.trigger,path=dom(uiEvent).path;if(-1<path.indexOf(trigger)){event.preventDefault()}}});Object.keys(config).forEach(function(key){PaperMenuButton[key]=config[key]});var paperMenuButton={PaperMenuButton:PaperMenuButton};Polymer({_template:html`
+    <style include="paper-dropdown-menu-shared-styles"></style>
+
+    <!-- this div fulfills an a11y requirement for combobox, do not remove -->
+    <span role="button"></span>
+    <paper-menu-button id="menuButton" vertical-align="[[verticalAlign]]" horizontal-align="[[horizontalAlign]]" dynamic-align="[[dynamicAlign]]" vertical-offset="[[_computeMenuVerticalOffset(noLabelFloat, verticalOffset)]]" disabled="[[disabled]]" no-animations="[[noAnimations]]" on-iron-select="_onIronSelect" on-iron-deselect="_onIronDeselect" opened="{{opened}}" close-on-activate allow-outside-scroll="[[allowOutsideScroll]]" restore-focus-on-close="[[restoreFocusOnClose]]">
+      <!-- support hybrid mode: user might be using paper-menu-button 1.x which distributes via <content> -->
+      <div class="dropdown-trigger" slot="dropdown-trigger">
+        <paper-ripple></paper-ripple>
+        <!-- paper-input has type="text" for a11y, do not remove -->
+        <paper-input type="text" invalid="[[invalid]]" readonly disabled="[[disabled]]" value="[[value]]" placeholder="[[placeholder]]" error-message="[[errorMessage]]" always-float-label="[[alwaysFloatLabel]]" no-label-float="[[noLabelFloat]]" label="[[label]]">
+          <!-- support hybrid mode: user might be using paper-input 1.x which distributes via <content> -->
+          <iron-icon icon="paper-dropdown-menu:arrow-drop-down" suffix slot="suffix"></iron-icon>
+        </paper-input>
+      </div>
+      <slot id="content" name="dropdown-content" slot="dropdown-content"></slot>
+    </paper-menu-button>
+`,is:"paper-dropdown-menu",behaviors:[IronButtonState,IronControlState,IronFormElementBehavior,IronValidatableBehavior],properties:{selectedItemLabel:{type:String,notify:!0,readOnly:!0},selectedItem:{type:Object,notify:!0,readOnly:!0},value:{type:String,notify:!0},label:{type:String},placeholder:{type:String},errorMessage:{type:String},opened:{type:Boolean,notify:!0,value:!1,observer:"_openedChanged"},allowOutsideScroll:{type:Boolean,value:!1},noLabelFloat:{type:Boolean,value:!1,reflectToAttribute:!0},alwaysFloatLabel:{type:Boolean,value:!1},noAnimations:{type:Boolean,value:!1},horizontalAlign:{type:String,value:"right"},verticalAlign:{type:String,value:"top"},verticalOffset:Number,dynamicAlign:{type:Boolean},restoreFocusOnClose:{type:Boolean,value:!0}},listeners:{tap:"_onTap"},keyBindings:{"up down":"open",esc:"close"},hostAttributes:{role:"combobox","aria-autocomplete":"none","aria-haspopup":"true"},observers:["_selectedItemChanged(selectedItem)"],attached:function(){var contentElement=this.contentElement;if(contentElement&&contentElement.selectedItem){this._setSelectedItem(contentElement.selectedItem)}},get contentElement(){for(var nodes=dom(this.$.content).getDistributedNodes(),i=0,l=nodes.length;i<l;i++){if(nodes[i].nodeType===Node.ELEMENT_NODE){return nodes[i]}}},open:function(){this.$.menuButton.open()},close:function(){this.$.menuButton.close()},_onIronSelect:function(event){this._setSelectedItem(event.detail.item)},_onIronDeselect:function(event){this._setSelectedItem(null)},_onTap:function(event){if(findOriginalTarget(event)===this){this.open()}},_selectedItemChanged:function(selectedItem){var value="";if(!selectedItem){value=""}else{value=selectedItem.label||selectedItem.getAttribute("label")||selectedItem.textContent.trim()}this.value=value;this._setSelectedItemLabel(value)},_computeMenuVerticalOffset:function(noLabelFloat,opt_verticalOffset){if(opt_verticalOffset){return opt_verticalOffset}return noLabelFloat?-4:8},_getValidity:function(_value){return this.disabled||!this.required||this.required&&!!this.value},_openedChanged:function(){var openState=this.opened?"true":"false",e=this.contentElement;if(e){e.setAttribute("aria-expanded",openState)}}});const template$8=html`
+  <style include="paper-material-styles">
+    :host {
+      @apply --layout-vertical;
+      @apply --layout-center-center;
+
+      background: var(--paper-fab-background, var(--accent-color));
+      border-radius: 50%;
+      box-sizing: border-box;
+      color: var(--text-primary-color);
+      cursor: pointer;
+      height: 56px;
+      min-width: 0;
+      outline: none;
+      padding: 16px;
+      position: relative;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -webkit-user-select: none;
+      user-select: none;
+      width: 56px;
+      z-index: 0;
+
+      /* NOTE: Both values are needed, since some phones require the value \`transparent\`. */
+      -webkit-tap-highlight-color: rgba(0,0,0,0);
+      -webkit-tap-highlight-color: transparent;
+
+      @apply --paper-fab;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    :host([mini]) {
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+
+      @apply --paper-fab-mini;
+    }
+
+    :host([disabled]) {
+      color: var(--paper-fab-disabled-text, var(--paper-grey-500));
+      background: var(--paper-fab-disabled-background, var(--paper-grey-300));
+
+      @apply --paper-fab-disabled;
+    }
+
+    iron-icon {
+      @apply --paper-fab-iron-icon;
+    }
+
+    span {
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+
+      @apply --paper-fab-label;
+    }
+
+    :host(.keyboard-focus) {
+      background: var(--paper-fab-keyboard-focus-background, var(--paper-pink-900));
+    }
+
+    :host([elevation="1"]) {
+      @apply --paper-material-elevation-1;
+    }
+
+    :host([elevation="2"]) {
+      @apply --paper-material-elevation-2;
+    }
+
+    :host([elevation="3"]) {
+      @apply --paper-material-elevation-3;
+    }
+
+    :host([elevation="4"]) {
+      @apply --paper-material-elevation-4;
+    }
+
+    :host([elevation="5"]) {
+      @apply --paper-material-elevation-5;
+    }
+  </style>
+
+  <iron-icon id="icon" hidden\$="{{!_computeIsIconFab(icon, src)}}" src="[[src]]" icon="[[icon]]"></iron-icon>
+  <span hidden\$="{{_computeIsIconFab(icon, src)}}">{{label}}</span>
+`;template$8.setAttribute("strip-whitespace","");Polymer({_template:template$8,is:"paper-fab",behaviors:[PaperButtonBehavior],properties:{src:{type:String,value:""},icon:{type:String,value:""},mini:{type:Boolean,value:!1,reflectToAttribute:!0},label:{type:String,observer:"_labelChanged"}},_labelChanged:function(){this.setAttribute("aria-label",this.label)},_computeIsIconFab:function(icon,src){return 0<icon.length||0<src.length}});const template$9=html`
+<dom-module id="paper-icon-button">
+  <template strip-whitespace>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+        padding: 8px;
+        outline: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        cursor: pointer;
+        z-index: 0;
+        line-height: 1;
+
+        width: 40px;
+        height: 40px;
+
+        /* NOTE: Both values are needed, since some phones require the value to be \`transparent\`. */
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        -webkit-tap-highlight-color: transparent;
+
+        /* Because of polymer/2558, this style has lower specificity than * */
+        box-sizing: border-box !important;
+
+        @apply --paper-icon-button;
+      }
+
+      :host #ink {
+        color: var(--paper-icon-button-ink-color, var(--primary-text-color));
+        opacity: 0.6;
+      }
+
+      :host([disabled]) {
+        color: var(--paper-icon-button-disabled-text, var(--disabled-text-color));
+        pointer-events: none;
+        cursor: auto;
+
+        @apply --paper-icon-button-disabled;
+      }
+
+      :host([hidden]) {
+        display: none !important;
+      }
+
+      :host(:hover) {
+        @apply --paper-icon-button-hover;
+      }
+
+      iron-icon {
+        --iron-icon-width: 100%;
+        --iron-icon-height: 100%;
+      }
+    </style>
+
+    <iron-icon id="icon" src="[[src]]" icon="[[icon]]" alt\$="[[alt]]"></iron-icon>
+  </template>
+</dom-module>
+`;template$9.setAttribute("style","display: none;");document.body.appendChild(template$9.content);Polymer({is:"paper-icon-button",hostAttributes:{role:"button",tabindex:"0"},behaviors:[PaperInkyFocusBehavior],properties:{src:{type:String},icon:{type:String},alt:{type:String,observer:"_altChanged"}},_altChanged:function(newValue,oldValue){var label=this.getAttribute("aria-label");if(!label||oldValue==label){this.setAttribute("aria-label",newValue)}}});const PaperItemBehaviorImpl={hostAttributes:{role:"option",tabindex:"0"}},PaperItemBehavior=[IronButtonState,IronControlState,PaperItemBehaviorImpl];var paperItemBehavior={PaperItemBehaviorImpl:PaperItemBehaviorImpl,PaperItemBehavior:PaperItemBehavior};const $_documentContainer$2=document.createElement("template");$_documentContainer$2.setAttribute("style","display: none;");$_documentContainer$2.innerHTML=`<dom-module id="paper-item-shared-styles">
+  <template>
+    <style>
+      :host, .paper-item {
+        display: block;
+        position: relative;
+        min-height: var(--paper-item-min-height, 48px);
+        padding: 0px 16px;
+      }
+
+      .paper-item {
+        @apply --paper-font-subhead;
+        border:none;
+        outline: none;
+        background: white;
+        width: 100%;
+        text-align: left;
+      }
+
+      :host([hidden]), .paper-item[hidden] {
+        display: none !important;
+      }
+
+      :host(.iron-selected), .paper-item.iron-selected {
+        font-weight: var(--paper-item-selected-weight, bold);
+
+        @apply --paper-item-selected;
+      }
+
+      :host([disabled]), .paper-item[disabled] {
+        color: var(--paper-item-disabled-color, var(--disabled-text-color));
+
+        @apply --paper-item-disabled;
+      }
+
+      :host(:focus), .paper-item:focus {
+        position: relative;
+        outline: 0;
+
+        @apply --paper-item-focused;
+      }
+
+      :host(:focus):before, .paper-item:focus:before {
+        @apply --layout-fit;
+
+        background: currentColor;
+        content: '';
+        opacity: var(--dark-divider-opacity);
+        pointer-events: none;
+
+        @apply --paper-item-focused-before;
+      }
+    </style>
+  </template>
+</dom-module>`;document.head.appendChild($_documentContainer$2.content);Polymer({_template:html`
+    <style include="paper-item-shared-styles">
+      :host {
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        @apply --paper-font-subhead;
+
+        @apply --paper-item;
+      }
+    </style>
+    <slot></slot>
+`,is:"paper-item",behaviors:[PaperItemBehavior]});Polymer({_template:html`
+    <style>
+      :host {
+        display: block;
+        padding: 8px 0;
+
+        background: var(--paper-listbox-background-color, var(--primary-background-color));
+        color: var(--paper-listbox-color, var(--primary-text-color));
+
+        @apply --paper-listbox;
+      }
+    </style>
+
+    <slot></slot>
+`,is:"paper-listbox",behaviors:[IronMenuBehavior],hostAttributes:{role:"listbox"}});Polymer({_template:html`
     <style>
       :host {
         display: block;
@@ -2003,22 +2517,26 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
         auto
         loading="{{loading}}"
         url="[[apiBase]]me"
+        headers="[[requestHeaders]]"
         handle-as="json"
         on-response="_handleResponse"
         debounce-duration="300">
-    `}static get properties(){return{apiBase:String,user:{type:Object,notify:!0,readOnly:!0},loading:{type:Boolean,notify:!0},loggedIn:{type:Boolean,notify:!0,readOnly:!0}}}_handleResponse(e){const data=e.target.lastResponse;if(!data||!data.loggedIn){this._setUser(void 0);this._setLoggedIn(!1)}else{this._setUser(data);this._setLoggedIn(!0)}}}window.customElements.define("user-data-factory",UserDataFactory);const $_documentContainer$1=document.createElement("template");$_documentContainer$1.innerHTML=`<iron-iconset-svg name="apic" size="24">
+    `}static get properties(){return{apiBase:String,user:{type:Object,notify:!0,readOnly:!0},loading:{type:Boolean,notify:!0},loggedIn:{type:Boolean,notify:!0,readOnly:!0},apiToken:{type:String,observer:"_tokenChanged"},requestHeaders:Object}}_handleResponse(e){const data=e.target.lastResponse;if(!data||!data.loggedIn){this._setUser(void 0);this._setLoggedIn(!1)}else{this._setUser(data);this._setLoggedIn(!0)}}_tokenChanged(token){if(!token){this.requestHeaders=void 0}else{this.requestHeaders={authorization:"Bearer "+token}}}}window.customElements.define("user-data-factory",UserDataFactory);const $_documentContainer$3=document.createElement("template");$_documentContainer$3.innerHTML=`<iron-iconset-svg name="apic" size="24">
   <svg>
     <defs>
     <g id="account-circle"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"></path></g>
     <g id="add"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></g>
     <g id="arrow-back"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></g>
+    <g id="content-copy"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path></g>
     <g id="delete"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></g>
     <g id="details"><path d="M3 4l9 16 9-16H3zm3.38 2h11.25L12 16 6.38 6z"></path></g>
     <g id="refresh"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></g>
     <g id="open-in-new"><path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path></g>
+    <g id="visibility"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></g>
+    <g id="visibility-off"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"></path></g>
     </defs>
   </svg>
-</iron-iconset-svg>`;document.head.appendChild($_documentContainer$1.content);setPassiveTouchGestures(!0);setRootPath(window.ApicCiStatus.rootPath);class ApicCiStatus extends PolymerElement{static get template(){return html`
+</iron-iconset-svg>`;document.head.appendChild($_documentContainer$3.content);setPassiveTouchGestures(!0);setRootPath(window.ApicCiStatus.rootPath);class ApicCiStatus extends PolymerElement{static get template(){return html`
       <style>
         :host {
           display: block;
@@ -2139,7 +2657,7 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
       <app-location id="loc" route="{{route}}" use-hash-as-path url-space-regex="^((?!/auth).)*$"></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
       <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
-      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}"></user-data-factory>
+      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}" api-token="[[apiToken]]"></user-data-factory>
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
@@ -2151,7 +2669,10 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
               <paper-menu-button horizontal-align="right">
                 <paper-icon-button src="[[user.imageUrl]]" icon="[[_computeUserIcon(user)]]" slot="dropdown-trigger" class="user-icon"></paper-icon-button>
                 <paper-listbox slot="dropdown-content">
-                  <a href="/auth/logout?return=%2Fstatus" target="_top">
+                  <a href="#/tokens">
+                    <paper-item>Tokens</paper-item>
+                  </a>
+                  <a href="/auth/logout?return=%2Fstatus">
                     <paper-item>Log out</paper-item>
                   </a>
                 </paper-listbox>
@@ -2171,7 +2692,9 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
           <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
             <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]"></arc-test-details>
-            <arc-add-test name="add-test" api-base="[[apiBase]]"></arc-add-test>
+            <arc-add-test name="add-test" api-base="[[apiBase]]" loading="{{loading}}"></arc-add-test>
+            <arc-tokens name="tokens" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-tokens>
+            <arc-add-token name="add-token" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-add-token>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
           <template is="dom-if" if="[[canCreate]]">
@@ -2179,7 +2702,7 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
           </template>
         </div>
       </app-header-layout>
-    `}static get properties(){return{page:{type:String,reflectToAttribute:!0,observer:"_pageChanged"},route:Object,routeData:Object,subroute:Object,forceNarrowLayout:{type:Boolean,value:!0},narrowLayout:{type:Boolean,value:!0},drawerOpened:Boolean,apiBase:String,loading:{type:Boolean},testsList:Array,componentsList:Array,hasMoreTests:Boolean,hasMoreComponents:Boolean,loggedIn:Boolean,user:Object,canCreate:{type:Boolean,computed:"_computeCanCreate(loggedIn, user.orgUser)"},isStatusPage:{type:Boolean,computed:"_computeIsStatusPage(page)"}}}static get observers(){return["_routePageChanged(routeData.page)"]}constructor(){super();this._navigateHandler=this._navigateHandler.bind(this)}connectedCallback(){super.connectedCallback();this.addEventListener("navigate",this._navigateHandler);if(!this.route.path||"/"===this.route.path){this.set("route.path","/status")}this.apiBase=window.ApicCiStatus.apiBase}disconnectedCallback(){super.disconnectedCallback();this.removeEventListener("navigate",this._navigateHandler)}_routePageChanged(page){if(!page){this.page="status"}else if(-1!==["status","test-details","add-test"].indexOf(page)){this.page=page}else{this.page="arc-404"}}_pageChanged(page){switch(page){case"status":import("./arc-status.js").then(bundle=>bundle&&bundle.$arcStatus||{});break;case"test-details":import("./arc-test-details.js").then(bundle=>bundle&&bundle.$arcTestDetails||{});break;case"add-test":if(!this.loggedIn){this.page="arc-404";return}import("./arc-add-test.js").then(bundle=>bundle&&bundle.$arcAddTest||{});break;case"arc-404":import("./arc-404.js").then(bundle=>bundle&&bundle.$arc$404||{});break;}gtag("config","UA-71458341-7",{page_path:"/"+page})}_computeUserIcon(user){return user&&user.imageUrl?void 0:"apic:account-circle"}_computeCanCreate(loggedIn,orgUser){return loggedIn&&orgUser}_createTestHandler(){if(!this.loggedIn||!this.user||!this.user.orgUser){return}this.$.loc.path="/add-test"}_computeIsStatusPage(page){return"status"===page}_navigateHandler(e){this.$.loc.path=e.detail.path}}window.customElements.define("apic-ci-status",ApicCiStatus);let cachedData=[],pageToken;class TestsDataFactory extends PolymerElement{static get template(){return html`
+    `}static get properties(){return{page:{type:String,reflectToAttribute:!0,observer:"_pageChanged"},route:Object,routeData:Object,subroute:Object,forceNarrowLayout:{type:Boolean,value:!0},narrowLayout:{type:Boolean,value:!0},drawerOpened:Boolean,apiBase:String,loading:{type:Boolean},testsList:Array,componentsList:Array,hasMoreTests:Boolean,hasMoreComponents:Boolean,loggedIn:Boolean,user:Object,canCreate:{type:Boolean,computed:"_computeCanCreate(loggedIn, user.orgUser)"},isStatusPage:{type:Boolean,computed:"_computeIsStatusPage(page)"},apiToken:{type:String}}}static get observers(){return["_routePageChanged(routeData.page)"]}constructor(){super();this._navigateHandler=this._navigateHandler.bind(this)}connectedCallback(){super.connectedCallback();this.addEventListener("navigate",this._navigateHandler);if(!this.route.path||"/"===this.route.path){this.set("route.path","/status")}this.apiBase=window.ApicCiStatus.apiBase}disconnectedCallback(){super.disconnectedCallback();this.removeEventListener("navigate",this._navigateHandler)}_routePageChanged(page){if(!page){this.page="status"}else if(-1!==["status","test-details","add-test","tokens","add-token"].indexOf(page)){this.page=page}else{this.page="arc-404"}}_pageChanged(page){switch(page){case"status":import("./arc-status.js").then(bundle=>bundle&&bundle.$arcStatus||{});break;case"test-details":import("./arc-test-details.js").then(bundle=>bundle&&bundle.$arcTestDetails||{});break;case"add-test":if(!this.loggedIn){this.page="arc-404";return}import("./arc-add-test.js").then(bundle=>bundle&&bundle.$arcAddTest||{});break;case"tokens":if(!this.loggedIn){this.page="arc-404";return}import("./arc-tokens.js").then(bundle=>bundle&&bundle.$arcTokens||{});break;case"add-token":if(!this.loggedIn){this.page="arc-404";return}import("./arc-add-token.js").then(bundle=>bundle&&bundle.$arcAddToken||{});break;case"arc-404":import("./arc-404.js").then(bundle=>bundle&&bundle.$arc$404||{});break;}gtag("config","UA-71458341-7",{page_path:"/"+page})}_computeUserIcon(user){return user&&user.imageUrl?void 0:"apic:account-circle"}_computeCanCreate(loggedIn,orgUser){return loggedIn&&orgUser}_createTestHandler(){if(!this.loggedIn||!this.user||!this.user.orgUser){return}this.$.loc.path="/add-test"}_computeIsStatusPage(page){return"status"===page}_navigateHandler(e){this.$.loc.path=e.detail.path}}window.customElements.define("apic-ci-status",ApicCiStatus);let cachedData=[],pageToken;class TestsDataFactory extends PolymerElement{static get template(){return html`
       <style>
       :host {display: none !important;}
       </style>
@@ -2191,4 +2714,4 @@ and this string can then be deleted`;function elementIsScrollLocked(element){var
         params="[[requestParams]]"
         on-response="_handleResponse"
         debounce-duration="300">
-    `}static get properties(){return{apiBase:String,list:{type:Array,notify:!0},hasMore:{type:Boolean,value:!0,notify:!0},loading:{type:Boolean,notify:!0},requestParams:Object}}constructor(){super();this._syncHandled=this._syncHandled.bind(this)}connectedCallback(){super.connectedCallback();window.addEventListener("tests-model-sync",this._syncHandled);if(cachedData&&cachedData.length){this.list=cachedData}if(!(this.list&&this.list.length)){this.loadNext()}}disconnectedCallback(){super.disconnectedCallback();window.removeEventListener("tests-model-sync",this._syncHandled)}clean(){pageToken=void 0;cachedData=[];this.list=void 0;this.hasMore=void 0;this._syncCache()}loadNext(){if(pageToken){this.requestParams={nextPageToken:pageToken}}else if(this.requestParams){this.requestParams=void 0}this.$.request.generateRequest()}_handleResponse(e){const data=e.target.lastResponse;pageToken=data.nextPageToken;if(pageToken&&!this.hasMore){this.hasMore=!0}else if(!pageToken&&this.hasMore){this.hasMore=!1}if(!this.list){cachedData=data.items;this.list=data.items}else{cachedData=cachedData.concat(data.items);this.list=this.list.concat(data.items)}this._dispatchSync()}refreshTest(id){if(!id){return}const url=this.apiBase+"tests/"+id;return fetch(url).then(response=>{if(!response.ok){throw new Error("Unable to refresh test data.")}return response.json()}).then(resource=>{if(!this.list){this.list=[resource];cachedData=[resource]}else{let updated=!1;for(let i=0,len=cachedData.length;i<len;i++){if(cachedData[i].id===id){cachedData[i]=resource;this.set(`list.${i}`,resource);updated=!0;break}}if(!updated){cachedData.push(resource);this.push("list",resource)}}this._dispatchSync()})}_dispatchSync(){this.dispatchEvent(new CustomEvent("tests-model-sync",{bubbles:!0,composed:!0}))}_syncHandled(e){const target=e.composedPath()[0];if(target===this){return}this._syncCache()}_syncCache(){const list=this.list||[];if(list.length!==cachedData.length){this.set("list",cachedData)}for(let i=0,len=cachedData.length;i<len;i++){if(cachedData[i]!==list[i]){this.set(`list.${i}`,cachedData[i])}}}}window.customElements.define("tests-data-factory",TestsDataFactory);export{appLayoutBehavior as $appLayoutBehavior,appScrollEffectsBehavior as $appScrollEffectsBehavior,helpers as $helpers,appRouteConverterBehavior as $appRouteConverterBehavior,ironA11yAnnouncer as $ironA11yAnnouncer,ironA11yKeysBehavior as $ironA11yKeysBehavior,ironButtonState as $ironButtonState,ironControlState as $ironControlState,ironFitBehavior as $ironFitBehavior,ironMenuBehavior as $ironMenuBehavior,ironMeta as $ironMeta,ironFocusablesHelper as $ironFocusablesHelper,ironOverlayBehavior as $ironOverlayBehavior,ironOverlayManager as $ironOverlayManager,ironScrollManager as $ironScrollManager,ironRangeBehavior as $ironRangeBehavior,ironResizableBehavior as $ironResizableBehavior,ironScrollTargetBehavior as $ironScrollTargetBehavior,ironMultiSelectable as $ironMultiSelectable,ironSelectable as $ironSelectable,ironSelection as $ironSelection,neonAnimatableBehavior as $neonAnimatableBehavior,neonAnimationBehavior as $neonAnimationBehavior,neonAnimationRunnerBehavior as $neonAnimationRunnerBehavior,paperButtonBehavior as $paperButtonBehavior,paperInkyFocusBehavior as $paperInkyFocusBehavior,paperRippleBehavior as $paperRippleBehavior,paperItemBehavior as $paperItemBehavior,paperMenuButton as $paperMenuButton,arraySelector as $arraySelector,customStyle as $customStyle,domBind as $domBind,domIf as $domIf,domModule as $domModule,domRepeat as $domRepeat,_class as $class,legacyElementMixin as $legacyElementMixin,mutableDataBehavior as $mutableDataBehavior,polymerFn as $polymerFn,polymer_dom as $polymerDom,templatizerBehavior as $templatizerBehavior,dirMixin as $dirMixin,elementMixin as $elementMixin,gestureEventListeners as $gestureEventListeners,mutableData as $mutableData,propertiesChanged as $propertiesChanged,propertiesMixin as $propertiesMixin,propertyAccessors as $propertyAccessors,propertyEffects as $propertyEffects,templateStamp as $templateStamp,arraySplice as $arraySplice,async as $async,caseMap$1 as $caseMap,debounce as $debounce,flattenedNodesObserver as $flattenedNodesObserver,flush$2 as $flush,gestures$0 as $gestures,htmlTag as $htmlTag,mixin as $mixin,path as $path,renderStatus as $renderStatus,resolveUrl$1 as $resolveUrl,settings as $settings,styleGather as $styleGather,templatize$1 as $templatize,polymerElement as $polymerElement,polymerLegacy as $polymerLegacy,applyShimUtils as $applyShimUtils,applyShim as $applyShim$1,commonRegex as $commonRegex,commonUtils as $commonUtils,cssParse as $cssParse,customStyleInterface as $customStyleInterface$1,documentWait$1 as $documentWait,styleSettings as $styleSettings,styleUtil as $styleUtil,templateMap$1 as $templateMap,unscopedStyleHandler as $unscopedStyleHandler,AppLayoutBehavior,AppScrollEffectsBehavior,_scrollEffects,_scrollTimer,scrollTimingFunction,registerEffect,queryAllRoot,scroll,AppRouteConverterBehavior,IronA11yAnnouncer,IronA11yKeysBehavior,IronButtonStateImpl,IronButtonState,IronControlState,IronFitBehavior,IronMenuBehaviorImpl,IronMenuBehavior,IronMeta,IronFocusablesHelper,IronOverlayBehaviorImpl,IronOverlayBehavior,IronOverlayManagerClass,IronOverlayManager,currentLockingElement,elementIsScrollLocked,pushScrollLock,removeScrollLock,_lockingElements,_lockedElementCache,_unlockedElementCache,_hasCachedLockedElement,_hasCachedUnlockedElement,_composedTreeContains,_scrollInteractionHandler,_boundScrollHandler,_lockScrollInteractions,_unlockScrollInteractions,_shouldPreventScrolling,_getScrollableNodes,_getScrollingNode,_getScrollInfo,IronRangeBehavior,IronResizableBehavior,IronScrollTargetBehavior,IronMultiSelectableBehaviorImpl,IronMultiSelectableBehavior,IronSelectableBehavior,IronSelection,NeonAnimatableBehavior,NeonAnimationBehavior,NeonAnimationRunnerBehaviorImpl,NeonAnimationRunnerBehavior,PaperButtonBehaviorImpl,PaperButtonBehavior,PaperInkyFocusBehaviorImpl,PaperInkyFocusBehavior,PaperRippleBehavior,PaperItemBehaviorImpl,PaperItemBehavior,PaperMenuButton,ArraySelectorMixin,ArraySelector,CustomStyle,DomBind,DomIf,DomModule,DomRepeat,mixinBehaviors,Class,LegacyElementMixin,MutableDataBehavior,OptionalMutableDataBehavior,Polymer,matchesSelector,DomApi,dom,flush$1 as flush,enqueueDebouncer as addDebouncer,Templatizer,DirMixin,ElementMixin,instanceCount,registrations,register,dumpRegistrations,updateStyles,GestureEventListeners,MutableData,OptionalMutableData,PropertiesChanged,PropertiesMixin,PropertyAccessors,PropertyEffects,TemplateStamp,calculateSplices,timeOut,animationFrame,idlePeriod,microTask,dashToCamelCase,camelToDashCase,Debouncer,FlattenedNodesObserver,enqueueDebouncer,flush$1,gestures,recognizers,deepTargetFind,addListener,removeListener,register$1,setTouchAction,prevent,resetMouseCanceller,findOriginalTarget,add,remove,html as html$1,htmlLiteral,dedupingMixin,isPath,root,isAncestor,isDescendant,translate,matches,normalize,split,get,set,isDeep,beforeNextRender,afterNextRender,flush as flush$2,resolveUrl,resolveCss,pathFromUrl,useShadow,useNativeCSSProperties,useNativeCustomElements,rootPath,setRootPath,sanitizeDOMValue,setSanitizeDOMValue,passiveTouchGestures,setPassiveTouchGestures,stylesFromModules,stylesFromModule,stylesFromTemplate,stylesFromModuleImports,cssFromModules,cssFromModule,cssFromTemplate,cssFromModuleImports,templatize,modelForElement,TemplateInstanceBase,html,PolymerElement,Polymer as Polymer$1,html as html$2,Base,invalidate,invalidateTemplate,isValid,templateIsValid,isValidating,templateIsValidating,startValidating,startValidatingTemplate,elementsAreInvalid,ApplyShim as $applyShimDefault,VAR_ASSIGN,MIXIN_MATCH,VAR_CONSUMED,ANIMATION_MATCH,MEDIA_MATCH,IS_VAR,BRACKETED,HOST_PREFIX,HOST_SUFFIX,updateNativeProperties,getComputedStyleValue,detectMixin,StyleNode,parse,stringify,removeCustomPropAssignment,types,CustomStyleProvider,CustomStyleInterface as $customStyleInterfaceDefault,CustomStyleInterfaceInterface,documentWait as $documentWaitDefault,nativeShadow,nativeCssVariables,toCssText,rulesForStyle,isKeyframesSelector,forEachRule,applyCss,createScopeStyle,applyStylePlaceHolder,applyStyle,isTargetedBuild,findMatchingParen,processVariableAndFallback,setElementClassRaw,getIsExtends,gatherStyleText,splitSelectorList,getCssBuild,elementHasBuiltCss,getBuildComment,templateMap as $templateMapDefault,scopingAttribute,processUnscopedStyle,isUnscopedStyle};
+    `}static get properties(){return{apiBase:String,list:{type:Array,notify:!0},hasMore:{type:Boolean,value:!0,notify:!0},loading:{type:Boolean,notify:!0},requestParams:Object}}constructor(){super();this._syncHandled=this._syncHandled.bind(this)}connectedCallback(){super.connectedCallback();window.addEventListener("tests-model-sync",this._syncHandled);if(cachedData&&cachedData.length){this.list=cachedData}if(!(this.list&&this.list.length)){this.loadNext()}}disconnectedCallback(){super.disconnectedCallback();window.removeEventListener("tests-model-sync",this._syncHandled)}clean(){pageToken=void 0;cachedData=[];this.list=void 0;this.hasMore=void 0;this._syncCache()}loadNext(){if(pageToken){this.requestParams={nextPageToken:pageToken}}else if(this.requestParams){this.requestParams=void 0}this.$.request.generateRequest()}_handleResponse(e){const data=e.target.lastResponse;pageToken=data.nextPageToken;if(pageToken&&!this.hasMore){this.hasMore=!0}else if(!pageToken&&this.hasMore){this.hasMore=!1}if(!this.list){cachedData=data.items;this.list=data.items}else{cachedData=cachedData.concat(data.items);this.list=this.list.concat(data.items)}this._dispatchSync()}refreshTest(id){if(!id){return}const url=this.apiBase+"tests/"+id;return fetch(url).then(response=>{if(!response.ok){throw new Error("Unable to refresh test data.")}return response.json()}).then(resource=>{if(!this.list){this.list=[resource];cachedData=[resource]}else{let updated=!1;for(let i=0,len=cachedData.length;i<len;i++){if(cachedData[i].id===id){cachedData[i]=resource;this.set(`list.${i}`,resource);updated=!0;break}}if(!updated){cachedData.push(resource);this.push("list",resource)}}this._dispatchSync()})}_dispatchSync(){this.dispatchEvent(new CustomEvent("tests-model-sync",{bubbles:!0,composed:!0}))}_syncHandled(e){const target=e.composedPath()[0];if(target===this){return}this._syncCache()}_syncCache(){const list=this.list||[];if(list.length!==cachedData.length){this.set("list",cachedData)}for(let i=0,len=cachedData.length;i<len;i++){if(cachedData[i]!==list[i]){this.set(`list.${i}`,cachedData[i])}}}}window.customElements.define("tests-data-factory",TestsDataFactory);export{appLayoutBehavior as $appLayoutBehavior,appScrollEffectsBehavior as $appScrollEffectsBehavior,helpers as $helpers,appRouteConverterBehavior as $appRouteConverterBehavior,ironA11yAnnouncer as $ironA11yAnnouncer,ironA11yKeysBehavior as $ironA11yKeysBehavior,ironButtonState as $ironButtonState,ironControlState as $ironControlState,ironFitBehavior as $ironFitBehavior,ironFormElementBehavior as $ironFormElementBehavior,ironMenuBehavior as $ironMenuBehavior,ironMeta as $ironMeta,ironFocusablesHelper as $ironFocusablesHelper,ironOverlayBehavior as $ironOverlayBehavior,ironOverlayManager as $ironOverlayManager,ironScrollManager as $ironScrollManager,ironRangeBehavior as $ironRangeBehavior,ironResizableBehavior as $ironResizableBehavior,ironScrollTargetBehavior as $ironScrollTargetBehavior,ironMultiSelectable as $ironMultiSelectable,ironSelectable as $ironSelectable,ironSelection as $ironSelection,ironValidatableBehavior as $ironValidatableBehavior,neonAnimatableBehavior as $neonAnimatableBehavior,neonAnimationBehavior as $neonAnimationBehavior,neonAnimationRunnerBehavior as $neonAnimationRunnerBehavior,paperButtonBehavior as $paperButtonBehavior,paperInkyFocusBehavior as $paperInkyFocusBehavior,paperRippleBehavior as $paperRippleBehavior,paperInputAddonBehavior as $paperInputAddonBehavior,paperInputBehavior as $paperInputBehavior,paperItemBehavior as $paperItemBehavior,paperMenuButton as $paperMenuButton,arraySelector as $arraySelector,customStyle as $customStyle,domBind as $domBind,domIf as $domIf,domModule as $domModule,domRepeat as $domRepeat,_class as $class,legacyElementMixin as $legacyElementMixin,mutableDataBehavior as $mutableDataBehavior,polymerFn as $polymerFn,polymer_dom as $polymerDom,templatizerBehavior as $templatizerBehavior,dirMixin as $dirMixin,elementMixin as $elementMixin,gestureEventListeners as $gestureEventListeners,mutableData as $mutableData,propertiesChanged as $propertiesChanged,propertiesMixin as $propertiesMixin,propertyAccessors as $propertyAccessors,propertyEffects as $propertyEffects,templateStamp as $templateStamp,arraySplice as $arraySplice,async as $async,caseMap$1 as $caseMap,debounce as $debounce,flattenedNodesObserver as $flattenedNodesObserver,flush$2 as $flush,gestures$0 as $gestures,htmlTag as $htmlTag,mixin as $mixin,path as $path,renderStatus as $renderStatus,resolveUrl$1 as $resolveUrl,settings as $settings,styleGather as $styleGather,templatize$1 as $templatize,polymerElement as $polymerElement,polymerLegacy as $polymerLegacy,applyShimUtils as $applyShimUtils,applyShim as $applyShim$1,commonRegex as $commonRegex,commonUtils as $commonUtils,cssParse as $cssParse,customStyleInterface as $customStyleInterface$1,documentWait$1 as $documentWait,styleSettings as $styleSettings,styleUtil as $styleUtil,templateMap$1 as $templateMap,unscopedStyleHandler as $unscopedStyleHandler,AppLayoutBehavior,AppScrollEffectsBehavior,_scrollEffects,_scrollTimer,scrollTimingFunction,registerEffect,queryAllRoot,scroll,AppRouteConverterBehavior,IronA11yAnnouncer,IronA11yKeysBehavior,IronButtonStateImpl,IronButtonState,IronControlState,IronFitBehavior,IronFormElementBehavior,IronMenuBehaviorImpl,IronMenuBehavior,IronMeta,IronFocusablesHelper,IronOverlayBehaviorImpl,IronOverlayBehavior,IronOverlayManagerClass,IronOverlayManager,currentLockingElement,elementIsScrollLocked,pushScrollLock,removeScrollLock,_lockingElements,_lockedElementCache,_unlockedElementCache,_hasCachedLockedElement,_hasCachedUnlockedElement,_composedTreeContains,_scrollInteractionHandler,_boundScrollHandler,_lockScrollInteractions,_unlockScrollInteractions,_shouldPreventScrolling,_getScrollableNodes,_getScrollingNode,_getScrollInfo,IronRangeBehavior,IronResizableBehavior,IronScrollTargetBehavior,IronMultiSelectableBehaviorImpl,IronMultiSelectableBehavior,IronSelectableBehavior,IronSelection,IronValidatableBehaviorMeta,IronValidatableBehavior,NeonAnimatableBehavior,NeonAnimationBehavior,NeonAnimationRunnerBehaviorImpl,NeonAnimationRunnerBehavior,PaperButtonBehaviorImpl,PaperButtonBehavior,PaperInkyFocusBehaviorImpl,PaperInkyFocusBehavior,PaperRippleBehavior,PaperInputAddonBehavior,PaperInputHelper,PaperInputBehaviorImpl,PaperInputBehavior,PaperItemBehaviorImpl,PaperItemBehavior,PaperMenuButton,ArraySelectorMixin,ArraySelector,CustomStyle,DomBind,DomIf,DomModule,DomRepeat,mixinBehaviors,Class,LegacyElementMixin,MutableDataBehavior,OptionalMutableDataBehavior,Polymer,matchesSelector,DomApi,dom,flush$1 as flush,enqueueDebouncer as addDebouncer,Templatizer,DirMixin,ElementMixin,instanceCount,registrations,register,dumpRegistrations,updateStyles,GestureEventListeners,MutableData,OptionalMutableData,PropertiesChanged,PropertiesMixin,PropertyAccessors,PropertyEffects,TemplateStamp,calculateSplices,timeOut,animationFrame,idlePeriod,microTask,dashToCamelCase,camelToDashCase,Debouncer,FlattenedNodesObserver,enqueueDebouncer,flush$1,gestures,recognizers,deepTargetFind,addListener,removeListener,register$1,setTouchAction,prevent,resetMouseCanceller,findOriginalTarget,add,remove,html as html$1,htmlLiteral,dedupingMixin,isPath,root,isAncestor,isDescendant,translate,matches,normalize,split,get,set,isDeep,beforeNextRender,afterNextRender,flush as flush$2,resolveUrl,resolveCss,pathFromUrl,useShadow,useNativeCSSProperties,useNativeCustomElements,rootPath,setRootPath,sanitizeDOMValue,setSanitizeDOMValue,passiveTouchGestures,setPassiveTouchGestures,stylesFromModules,stylesFromModule,stylesFromTemplate,stylesFromModuleImports,cssFromModules,cssFromModule,cssFromTemplate,cssFromModuleImports,templatize,modelForElement,TemplateInstanceBase,html,PolymerElement,Polymer as Polymer$1,html as html$2,Base,invalidate,invalidateTemplate,isValid,templateIsValid,isValidating,templateIsValidating,startValidating,startValidatingTemplate,elementsAreInvalid,ApplyShim as $applyShimDefault,VAR_ASSIGN,MIXIN_MATCH,VAR_CONSUMED,ANIMATION_MATCH,MEDIA_MATCH,IS_VAR,BRACKETED,HOST_PREFIX,HOST_SUFFIX,updateNativeProperties,getComputedStyleValue,detectMixin,StyleNode,parse,stringify,removeCustomPropAssignment,types,CustomStyleProvider,CustomStyleInterface as $customStyleInterfaceDefault,CustomStyleInterfaceInterface,documentWait as $documentWaitDefault,nativeShadow,nativeCssVariables,toCssText,rulesForStyle,isKeyframesSelector,forEachRule,applyCss,createScopeStyle,applyStylePlaceHolder,applyStyle,isTargetedBuild,findMatchingParen,processVariableAndFallback,setElementClassRaw,getIsExtends,gatherStyleText,splitSelectorList,getCssBuild,elementHasBuiltCss,getBuildComment,templateMap as $templateMapDefault,scopingAttribute,processUnscopedStyle,isUnscopedStyle};

@@ -12,6 +12,7 @@ class UserDataFactory extends PolymerElement {
         auto
         loading="{{loading}}"
         url="[[apiBase]]me"
+        headers="[[requestHeaders]]"
         handle-as="json"
         on-response="_handleResponse"
         debounce-duration="300">
@@ -39,7 +40,9 @@ class UserDataFactory extends PolymerElement {
       /**
        * A flag determining if the user is logged in.
        */
-      loggedIn: {type: Boolean, notify: true, readOnly: true}
+      loggedIn: {type: Boolean, notify: true, readOnly: true},
+      apiToken: {type: String, observer: '_tokenChanged'},
+      requestHeaders: Object
     };
   }
 
@@ -51,6 +54,14 @@ class UserDataFactory extends PolymerElement {
     } else {
       this._setUser(data);
       this._setLoggedIn(true);
+    }
+  }
+
+  _tokenChanged(token) {
+    if (!token) {
+      this.requestHeaders = undefined;
+    } else {
+      this.requestHeaders = {'authorization': 'Bearer ' + token};
     }
   }
 }

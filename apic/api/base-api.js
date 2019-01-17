@@ -55,7 +55,7 @@ class BaseApi {
     return this.tokenModel.find(token)
     .catch(() => {})
     .then((token) => {
-      if (!token) {
+      if (!token || token.revoked) {
         return false;
       }
       req.user = {
@@ -67,12 +67,12 @@ class BaseApi {
   }
 
   processCors(req, callback) {
-    const whitelist = ['http://localhost:8080', 'http://localhost:8081'];
+    const whitelist = ['http://localhost:8080', 'http://localhost:8081', 'http://127.0.0.1:8081'];
     const origin = req.header('Origin');
     let corsOptions;
     if (!origin) {
       corsOptions = {origin: false};
-    } else if (origin.indexOf('http://localhost:') === 0) {
+    } else if (origin.indexOf('http://localhost:') === 0 || origin.indexOf('http://127.0.0.1:') === 0) {
       corsOptions = {origin: true};
     } else if (whitelist.indexOf(origin) !== -1) {
       corsOptions = {origin: true};

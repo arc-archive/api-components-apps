@@ -150,7 +150,7 @@ class TestListItem extends PolymerElement {
 
   static get properties() {
     return {
-      item: String,
+      item: Object,
       isAmfBuild: {type: Boolean, computed: '_computeIsAmfBuid(item.type)'},
       isFinished: {type: Boolean, value: false, computed: '_computeIsFinished(item.status)'},
       failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},

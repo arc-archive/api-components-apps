@@ -151,7 +151,7 @@ class ApicCiStatus extends PolymerElement {
       <app-location id="loc" route="{{route}}" use-hash-as-path url-space-regex="^((?!/auth).)*$"></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
       <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
-      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}"></user-data-factory>
+      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}" api-token="[[apiToken]]"></user-data-factory>
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
@@ -186,8 +186,9 @@ class ApicCiStatus extends PolymerElement {
           <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
             <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]"></arc-test-details>
-            <arc-add-test name="add-test" api-base="[[apiBase]]"></arc-add-test>
-            <arc-tokens name="tokens" api-base="[[apiBase]]"></arc-tokens>
+            <arc-add-test name="add-test" api-base="[[apiBase]]" loading="{{loading}}"></arc-add-test>
+            <arc-tokens name="tokens" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-tokens>
+            <arc-add-token name="add-token" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-add-token>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
           <template is="dom-if" if="[[canCreate]]">
@@ -234,6 +235,9 @@ class ApicCiStatus extends PolymerElement {
       isStatusPage: {
         type: Boolean,
         computed: '_computeIsStatusPage(page)'
+      },
+      apiToken: {
+        type: String
       }
     };
   }
@@ -256,16 +260,6 @@ class ApicCiStatus extends PolymerElement {
       this.set('route.path', '/status');
     }
     this.apiBase = window.ApicCiStatus.apiBase;
-    // setTimeout(() => {
-    //   this.user = {
-    //     displayName: 'Paweł Psztyć',
-    //     imageUrl: 'https://lh6.googleusercontent.com/-veehGFoGpso/AAAAAAAAAAI/AAAAAAACr8Y/YmMhVu8Ol-I/photo.jpg?sz=50',
-    //     loggedIn: true,
-    //     orgUser: true,
-    //     superUser: true
-    //   };
-    //   this.loggedIn = true;
-    // }, 500);
   }
 
   disconnectedCallback() {
@@ -276,7 +270,7 @@ class ApicCiStatus extends PolymerElement {
   _routePageChanged(page) {
     if (!page) {
       this.page = 'status';
-    } else if (['status', 'test-details', 'add-test', 'tokens'].indexOf(page) !== -1) {
+    } else if (['status', 'test-details', 'add-test', 'tokens', 'add-token'].indexOf(page) !== -1) {
       this.page = page;
     } else {
       this.page = 'arc-404';
@@ -303,7 +297,18 @@ class ApicCiStatus extends PolymerElement {
         import('./arc-add-test.js');
         break;
       case 'tokens':
+        if (!this.loggedIn) {
+          this.page = 'arc-404';
+          return;
+        }
         import('./arc-tokens.js');
+        break;
+      case 'add-token':
+        if (!this.loggedIn) {
+          this.page = 'arc-404';
+          return;
+        }
+        import('./arc-add-token.js');
         break;
       case 'arc-404':
         import('./arc-404.js');

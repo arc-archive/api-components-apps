@@ -13,6 +13,7 @@
     "@polymer/iron-pages": "^3.0.1",
     "@polymer/iron-selector": "^3.0.1",
     "@polymer/paper-button": "^3.0.1",
+    "@polymer/paper-checkbox": "^3.1.0",
     "@polymer/paper-dropdown-menu": "^3.0.1",
     "@polymer/paper-fab": "^3.0.1",
     "@polymer/paper-icon-button": "^3.0.1",
@@ -23,6 +24,7 @@
     "@polymer/paper-progress": "github:PolymerElements/paper-progress",
     "@polymer/paper-tabs": "^3.0.1",
     "@polymer/paper-toast": "^3.0.1",
+    "@polymer/paper-toggle-button": "^3.0.1",
     "@polymer/polymer": "^3.0.0",
     "time-elements": "^1.2.0"
   },

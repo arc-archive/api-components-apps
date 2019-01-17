@@ -16,6 +16,10 @@ class UserModel extends BaseModel {
     return ['displayName', 'orgUser', 'superUser', 'imageUrl'];
   }
 
+  get excludedIndexesToken() {
+    return ['name', 'expires', 'issuer', 'scopes', 'revoked'];
+  }
+
   get suEmails() {
     return ['jarrodek@gmail.com', 'pawel.psztyc@gmail.com', 'ppsztyc@salesforce.com'];
   }
@@ -56,7 +60,11 @@ class UserModel extends BaseModel {
       ]
     });
   }
-
+  /**
+   * Lookups and returns user object.
+   * @param {String} id User ID.
+   * @return {Promise<Object>} User object or undefined if not found.
+   */
   getUser(id) {
     const key = this.createUserKey(id);
     return this.store.get(key)
@@ -197,6 +205,9 @@ class UserModel extends BaseModel {
     const ancestorKey = this.createUserKey(userId);
     let query = this.store.createQuery(this.namespace, this.tokenKind).hasAncestor(ancestorKey);
     query = query.limit(limit);
+    query = query.order('created', {
+      descending: true
+    });
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
@@ -207,7 +218,12 @@ class UserModel extends BaseModel {
       return [entities, hasMore];
     });
   }
-
+  /**
+   * Lookups and returns user token
+   * @param {String} userId Owner id
+   * @param {String} tokenId Token id
+   * @return {Promise<Object>} A promise resolved to the token value or undefined.
+   */
   getToken(userId, tokenId) {
     const key = this.createUserTokenKey(userId, tokenId);
     return this.store.get(key)
@@ -217,15 +233,19 @@ class UserModel extends BaseModel {
       }
     });
   }
-
-  insertUserToken(user, tokenInfo, token) {
+  /**
+   * Creates new user token.
+   * @param {Object} user Session user
+   * @param {Object} tokenInfo Decrypted token info
+   * @param {String} token The token
+   * @param {?String} name Optional name for the token
+   * @return {Promise<Object>} Promise resolved to the token object.
+   */
+  insertUserToken(user, tokenInfo, token, name) {
     const id = uuidv4();
     const key = this.createUserTokenKey(user.id, id);
+
     const results = [{
-      name: 'expires',
-      value: tokenInfo.exp,
-      excludeFromIndexes: true
-    }, {
       name: 'token',
       value: token,
       excludeFromIndexes: false
@@ -237,10 +257,28 @@ class UserModel extends BaseModel {
       name: 'issuer',
       value: {
         id: user.id,
-        displayName: user.displayName
+        displayName: user.displayName || ''
       },
       excludeFromIndexes: true
+    }, {
+      name: 'created',
+      value: Date.now(),
+      excludeFromIndexes: false
     }];
+    if (tokenInfo.exp) {
+      results[results.length] = {
+        name: 'expires',
+        value: tokenInfo.exp * 1000,
+        excludeFromIndexes: true
+      };
+    }
+    if (name) {
+      results[results.length] = {
+        name: 'name',
+        value: name,
+        excludeFromIndexes: true
+      };
+    }
     const entity = {
       key,
       data: results
@@ -248,6 +286,32 @@ class UserModel extends BaseModel {
     return this.store.upsert(entity)
     .then(() => {
       return this.getToken(user.id, id);
+    });
+  }
+  /**
+   * Sets `revoked` status on a token.
+   * @param {String} userId Owner id
+   * @param {String} tokenId Token id
+   * @return {Promise}
+   */
+  revokeUserToken(userId, tokenId) {
+    const transaction = this.store.transaction();
+    const key = this.createUserTokenKey(userId, tokenId);
+    return transaction.run()
+    .then(() => transaction.get(key))
+    .then((data) => {
+      const [token] = data;
+      token.revoked = true;
+      transaction.save({
+        key,
+        data: token,
+        excludeFromIndexes: this.excludedIndexesToken
+      });
+      return transaction.commit();
+    })
+    .catch((cause) => {
+      transaction.rollback();
+      return Promise.reject(cause);
     });
   }
 
