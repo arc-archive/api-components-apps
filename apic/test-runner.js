@@ -21,7 +21,6 @@ class ApicTestRunner extends EventEmitter {
     this.entryId = id;
     this.config = testConfig;
     this.result = {};
-    this.workingDir = '/opt/apic-test/builds';
     this.catalogModel = new CatalogModel();
     this.testsModel = new TestsModel();
     this.testsComponentModel = new TestsComponentModel();
