@@ -132,13 +132,23 @@ class ApicTestRunner extends EventEmitter {
     }
     logging.verbose(`Preparing ${name} component to run in test`);
     return prepareComponent(this.workingDir, name)
+    .catch((cause) => {
+      logging.error('Unable to process component sources   ' + name);
+      logging.error(cause);
+      throw cause;
+    })
     .then(() => this.updateModels(name))
     .then(() => {
       if (this.abort) {
         return;
       }
       const dm = new DependendenciesManager(path.join(this.workingDir, name));
-      return dm.installDependencies();
+      return dm.installDependencies()
+      .catch((cause) => {
+        logging.error('Cannot Install dependencies for   ' + name);
+        logging.error(cause);
+        throw cause;
+      });
     })
     .then(() => {
       if (this.abort) {
@@ -155,6 +165,11 @@ class ApicTestRunner extends EventEmitter {
     logging.verbose('Generating API models for ' + name);
     const updater = new AmfModelGenerator(this.workingDir, name);
     return updater.generate()
+    .catch((cause) => {
+      logging.error('Cannot generate AMF model for  ' + name);
+      logging.error(cause);
+      throw cause;
+    })
     .then(() => {
       if (this.abort) {
         return;
