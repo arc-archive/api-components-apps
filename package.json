@@ -12,7 +12,8 @@
     "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci",
     "deploy-frontend": "kubectl create -f app-frontend-datastore.yaml",
     "deploy-backend": "kubectl create -f app-worker-datastore.yaml",
-    "deploy-service": "kubectl create -f apic-tests-service.yaml"
+    "deploy-service": "kubectl create -f apic-tests-service.yaml",
+    "update-image": "kubectl set image deployment/apic-ci-frontend apic-ci=gcr.io/advancedrestclient-1155/api-components-autotest-ci"
   },
   "author": "Pawel Psztyc",
   "license": "SEE LICENSE IN LICENSE.md",
