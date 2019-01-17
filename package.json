@@ -4,7 +4,7 @@
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
-    "start": "node --inspect=9228 ${SCRIPT:-app.js}",
+    "start": "node ${SCRIPT:-app.js}",
     "start-worker": "xvfb-run node --inspect=9227 worker.js --PORT=8082",
     "start-mac": "node --inspect=9228 app.js",
     "test": "mocha test/*.test.js",
