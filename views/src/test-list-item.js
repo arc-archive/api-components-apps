@@ -45,27 +45,11 @@ class TestListItem extends PolymerElement {
         display: block;
       }
 
-      .item.numbers {
-        width: 70px;
-      }
-
-      .ration-counter,
-      .failed-counter,
-      .size-counter,
-      .passed-counter {
-        font-size: 18px;
-      }
-
-      .passed-counter {
+      .result-status {
         color: #2E7D32;
       }
 
-      :host([queued]) .passed-counter,
-      :host([queued]) .failed-counter {
-        color: currentColor;
-      }
-
-      :host([failed]) .failed-counter {
+      :host([failed]) .result-status {
         color: #F44336;
       }
 
@@ -108,23 +92,8 @@ class TestListItem extends PolymerElement {
         </div>
 
         <div class="item">
-          <label>Passed:</label>
-          <span class="passed-counter">[[_computePassed(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Failed:</label>
-          <span class="failed-counter">[[_computeFailed(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Tested:</label>
-          <span class="size-counter">[[_computeSize(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Ratio:</label>
-          <span class="ration-counter">[[_computePassRatio(item.*)]]%</span>
+          <label>Result:</label>
+          <span class="result-status">[[resultLabel]]</span>
         </div>
 
         <div class="item max">
@@ -154,8 +123,19 @@ class TestListItem extends PolymerElement {
       isAmfBuild: {type: Boolean, computed: '_computeIsAmfBuid(item.type)'},
       isFinished: {type: Boolean, value: false, computed: '_computeIsFinished(item.status)'},
       failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},
-      queued: {type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)'}
+      queued: {type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)'},
+      resultLabel: {
+        type: String,
+        computed: '_computeResultLabel(queued, failed)'
+      }
     };
+  }
+
+  _computeResultLabel(queued, failed) {
+    if (queued) {
+      return 'n/a';
+    }
+    return failed ? 'Failed' : 'Success';
   }
 
   _computeIsAmfBuid(type) {

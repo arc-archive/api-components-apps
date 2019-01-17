@@ -37,27 +37,11 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         display: block;
       }
 
-      .item.numbers {
-        width: 70px;
-      }
-
-      .ration-counter,
-      .failed-counter,
-      .size-counter,
-      .passed-counter {
-        font-size: 18px;
-      }
-
-      .passed-counter {
+      .result-status {
         color: #2E7D32;
       }
 
-      :host([queued]) .passed-counter,
-      :host([queued]) .failed-counter {
-        color: currentColor;
-      }
-
-      :host([failed]) .failed-counter {
+      :host([failed]) .result-status {
         color: #F44336;
       }
 
@@ -100,23 +84,8 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
         </div>
 
         <div class="item">
-          <label>Passed:</label>
-          <span class="passed-counter">[[_computePassed(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Failed:</label>
-          <span class="failed-counter">[[_computeFailed(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Tested:</label>
-          <span class="size-counter">[[_computeSize(item.*)]]</span>
-        </div>
-
-        <div class="item numbers">
-          <label>Ratio:</label>
-          <span class="ration-counter">[[_computePassRatio(item.*)]]%</span>
+          <label>Result:</label>
+          <span class="result-status">[[resultLabel]]</span>
         </div>
 
         <div class="item max">
@@ -137,7 +106,7 @@ import{PolymerElement,html}from"./apic-ci-status.js";class TestListItem extends 
           <paper-button>Details</paper-button>
         </a>
       </div>
-    `}static get properties(){return{item:Object,isAmfBuild:{type:Boolean,computed:"_computeIsAmfBuid(item.type)"},isFinished:{type:Boolean,value:!1,computed:"_computeIsFinished(item.status)"},failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"},queued:{type:Boolean,reflectToAttribute:!0,computed:"_computeIsQueued(item.status)"}}}_computeIsAmfBuid(type){return"amf-build"===type}_computeIsFinished(status){return"finished"===status}_computeIsQueued(status){return"queued"===status}_computeIsFailed(item){if(!item){return!1}if("finished"!==item.status){return!1}if(item.failed&&0<item.failed){return!0}return!1}computeIsoDate(time){if(!time||isNaN(time)){return}const d=new Date(+time);return d.toISOString()}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computeSize(record){const item=record&&record.base,size=item&&item.size||0;return size}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,size=item&&item.size||0;if(!passed||!size){return 0}return Math.round(100*(passed/size))}}window.customElements.define("test-list-item",TestListItem);class ArcStatus extends PolymerElement{static get template(){return html`
+    `}static get properties(){return{item:Object,isAmfBuild:{type:Boolean,computed:"_computeIsAmfBuid(item.type)"},isFinished:{type:Boolean,value:!1,computed:"_computeIsFinished(item.status)"},failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"},queued:{type:Boolean,reflectToAttribute:!0,computed:"_computeIsQueued(item.status)"},resultLabel:{type:String,computed:"_computeResultLabel(queued, failed)"}}}_computeResultLabel(queued,failed){if(queued){return"n/a"}return failed?"Failed":"Success"}_computeIsAmfBuid(type){return"amf-build"===type}_computeIsFinished(status){return"finished"===status}_computeIsQueued(status){return"queued"===status}_computeIsFailed(item){if(!item){return!1}if("finished"!==item.status){return!1}if(item.failed&&0<item.failed){return!0}return!1}computeIsoDate(time){if(!time||isNaN(time)){return}const d=new Date(+time);return d.toISOString()}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computeSize(record){const item=record&&record.base,size=item&&item.size||0;return size}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,size=item&&item.size||0;if(!passed||!size){return 0}return Math.round(100*(passed/size))}}window.customElements.define("test-list-item",TestListItem);class ArcStatus extends PolymerElement{static get template(){return html`
       <style>
       :host {
         display: block;

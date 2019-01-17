@@ -86,7 +86,7 @@ class ArcTestDetails extends PolymerElement {
 
       .graph-line {
         flex: 1;
-        height: 16px;
+        height: 4px;
         border: 4px #E0E0E0 solid;
         margin: 0 24px;
       }
@@ -107,6 +107,15 @@ class ArcTestDetails extends PolymerElement {
       .error-toast {
         background-color: #FF5722;
         color: #fff;
+      }
+
+      .reset-test-container {
+        margin: 12px 0;
+      }
+
+      .restart-button {
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
       }
       </style>
       <header>
@@ -136,13 +145,19 @@ class ArcTestDetails extends PolymerElement {
             AMF: <span class="branch-value">[[testDetail.branch]]</span>
           </div>
         </template>
-
         <template is="dom-if" if="[[!isAmfTest]]">
           <div class="desc type">
             [[testDetail.component]]: <span class="branch-value">[[testDetail.branch]]</span>
           </div>
         </template>
       <div>
+
+      <template is="dom-if" if="[[canCreate]]">
+        <div class="reset-test-container">
+          <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
+        </div>
+      </template>
+
       <template is="dom-repeat" items="[[componentsList]]">
         <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
       </template>
@@ -152,6 +167,16 @@ class ArcTestDetails extends PolymerElement {
           <div class="circle ready">Queued</div>
           <div class="graph-line"></div>
           <div class="circle">Executed</div>
+          <div class="graph-line"></div>
+          <div class="circle">Results</div>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[startedRunning]]">
+        <div class="queue-empty-state">
+          <div class="circle ready">Queued</div>
+          <div class="graph-line"></div>
+          <div class="circle ready">Executed</div>
           <div class="graph-line"></div>
           <div class="circle">Results</div>
         </div>
@@ -176,6 +201,7 @@ class ArcTestDetails extends PolymerElement {
       testsList: Array,
       componentsList: Array,
       loading: {type: Boolean, notify: true},
+      apiToken: String,
       testDetail: {
         type: Object,
         computed: '_computeTestDetail(testsList, testId, opened)',
@@ -198,7 +224,15 @@ class ArcTestDetails extends PolymerElement {
         type: Boolean,
         computed: '_computeTestQueued(testDetail.status)'
       },
-      canCreate: Boolean
+      isRunning: {
+        type: Boolean,
+        computed: '_computeTestRunning(testDetail.status)'
+      },
+      canCreate: Boolean,
+      startedRunning: {
+        type: Boolean,
+        computed: '_computeStartedRunning(isRunning, componentsList)'
+      }
     };
   }
 
@@ -249,6 +283,14 @@ class ArcTestDetails extends PolymerElement {
     return status === 'queued';
   }
 
+  _computeTestRunning(status) {
+    return status === 'running';
+  }
+
+  _computeStartedRunning(isRunning, testsList) {
+    return !!(isRunning && (!testsList || !testsList.length));
+  }
+
   refresh() {
     this.$.request.clean();
     this.$.request.loadNext();
@@ -265,6 +307,9 @@ class ArcTestDetails extends PolymerElement {
     const init = {
       method: 'DELETE'
     };
+    if (this.apiToken) {
+      init.headers = [['authorization', 'bearer ' + this.apiToken]];
+    }
     return fetch(url, init)
     .then((response) => {
       if (!response.ok) {
@@ -283,6 +328,32 @@ class ArcTestDetails extends PolymerElement {
     .catch((cause) => {
       this._renderError('Unable to remove test.');
       console.error(cause);
+    });
+  }
+
+  restartTest() {
+    const url = this.apiBase + 'tests/' + this.testId + '/restart';
+    const init = {
+      method: 'PUT'
+    };
+    if (this.apiToken) {
+      init.headers = [['authorization', 'bearer ' + this.apiToken]];
+    }
+    return fetch(url, init)
+    .then((response) => {
+      if (response.status === 204) {
+        this.refresh();
+      } else {
+        return response.json();
+      }
+    })
+    .then((error) => {
+      if (error) {
+        this._renderError(error.message || 'Request to the API failed.');
+      }
+    })
+    .catch((cause) => {
+      this._renderError(cause.message || 'Unable to connect to the API.');
     });
   }
 }

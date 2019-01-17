@@ -309,7 +309,7 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
 
       .graph-line {
         flex: 1;
-        height: 16px;
+        height: 4px;
         border: 4px #E0E0E0 solid;
         margin: 0 24px;
       }
@@ -330,6 +330,15 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
       .error-toast {
         background-color: #FF5722;
         color: #fff;
+      }
+
+      .reset-test-container {
+        margin: 12px 0;
+      }
+
+      .restart-button {
+        background-color: var(--accent-color);
+        color: var(--accent-text-color);
       }
       </style>
       <header>
@@ -359,13 +368,19 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
             AMF: <span class="branch-value">[[testDetail.branch]]</span>
           </div>
         </template>
-
         <template is="dom-if" if="[[!isAmfTest]]">
           <div class="desc type">
             [[testDetail.component]]: <span class="branch-value">[[testDetail.branch]]</span>
           </div>
         </template>
       <div>
+
+      <template is="dom-if" if="[[canCreate]]">
+        <div class="reset-test-container">
+          <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
+        </div>
+      </template>
+
       <template is="dom-repeat" items="[[componentsList]]">
         <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
       </template>
@@ -380,6 +395,16 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         </div>
       </template>
 
+      <template is="dom-if" if="[[startedRunning]]">
+        <div class="queue-empty-state">
+          <div class="circle ready">Queued</div>
+          <div class="graph-line"></div>
+          <div class="circle ready">Executed</div>
+          <div class="graph-line"></div>
+          <div class="circle">Results</div>
+        </div>
+      </template>
+
       <tests-data-factory id="testFactory" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}"></tests-data-factory>
       <test-components-data-factory
         id="request"
@@ -388,4 +413,4 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         list="{{componentsList}}"
         loading="{{loading}}"></test-components-data-factory>
       <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
-    `}static get properties(){return{apiBase:String,testId:String,opened:Boolean,testsList:Array,componentsList:Array,loading:{type:Boolean,notify:!0},testDetail:{type:Object,computed:"_computeTestDetail(testsList, testId, opened)",notify:!0},testPassed:{type:Boolean,computed:"_computeTestPassed(testFinished, testDetail)"},testFinished:{type:Boolean,computed:"_computeTestFinished(testDetail.status)"},isAmfTest:{type:Boolean,computed:"_computeIsAmf(testDetail.type)"},hasMore:Boolean,isQueued:{type:Boolean,computed:"_computeTestQueued(testDetail.status)"},canCreate:Boolean}}static get observers(){return["_requestDataObserver(opened, hasMore, testId)"]}_computeTestDetail(testsList,testId,opened){if(!opened||!testsList||!testsList.length||!testId){return}return testsList.find(item=>item.id===testId)}_requestDataObserver(opened,hasMore,testId){if(!opened||!1===hasMore||!testId||this.loading){return}afterNextRender(this,()=>{if(!this.componentsList&&!this.loading){this.$.request.loadNext()}})}_computeTestPassed(testFinished,test){if(!testFinished||!test){return!0}return 0===test.failed&&0<test.passed}_computeTestResult(testPassed){return testPassed?"Passed":"Failed"}_computeIsAmf(type){return"amf-build"===type}_computeTestFinished(status){return"finished"===status}_computeTestQueued(status){return"queued"===status}refresh(){this.$.request.clean();this.$.request.loadNext();this.$.testFactory.refreshTest(this.testId)}_renderError(message){this.$.err.text=message;this.$.err.opened=!0}removeTest(){const url=this.apiBase+"tests/"+this.testId,init={method:"DELETE"};return fetch(url,init).then(response=>{if(!response.ok){this._renderError("Unable to remove test.")}else{this.$.testFactory.clean();this.dispatchEvent(new CustomEvent("navigate",{composed:!0,bubbles:!0,detail:{path:"/status"}}))}}).catch(cause=>{this._renderError("Unable to remove test.");console.error(cause)})}}window.customElements.define("arc-test-details",ArcTestDetails);
+    `}static get properties(){return{apiBase:String,testId:String,opened:Boolean,testsList:Array,componentsList:Array,loading:{type:Boolean,notify:!0},apiToken:String,testDetail:{type:Object,computed:"_computeTestDetail(testsList, testId, opened)",notify:!0},testPassed:{type:Boolean,computed:"_computeTestPassed(testFinished, testDetail)"},testFinished:{type:Boolean,computed:"_computeTestFinished(testDetail.status)"},isAmfTest:{type:Boolean,computed:"_computeIsAmf(testDetail.type)"},hasMore:Boolean,isQueued:{type:Boolean,computed:"_computeTestQueued(testDetail.status)"},isRunning:{type:Boolean,computed:"_computeTestRunning(testDetail.status)"},canCreate:Boolean,startedRunning:{type:Boolean,computed:"_computeStartedRunning(isRunning, componentsList)"}}}static get observers(){return["_requestDataObserver(opened, hasMore, testId)"]}_computeTestDetail(testsList,testId,opened){if(!opened||!testsList||!testsList.length||!testId){return}return testsList.find(item=>item.id===testId)}_requestDataObserver(opened,hasMore,testId){if(!opened||!1===hasMore||!testId||this.loading){return}afterNextRender(this,()=>{if(!this.componentsList&&!this.loading){this.$.request.loadNext()}})}_computeTestPassed(testFinished,test){if(!testFinished||!test){return!0}return 0===test.failed&&0<test.passed}_computeTestResult(testPassed){return testPassed?"Passed":"Failed"}_computeIsAmf(type){return"amf-build"===type}_computeTestFinished(status){return"finished"===status}_computeTestQueued(status){return"queued"===status}_computeTestRunning(status){return"running"===status}_computeStartedRunning(isRunning,testsList){return!!(isRunning&&(!testsList||!testsList.length))}refresh(){this.$.request.clean();this.$.request.loadNext();this.$.testFactory.refreshTest(this.testId)}_renderError(message){this.$.err.text=message;this.$.err.opened=!0}removeTest(){const url=this.apiBase+"tests/"+this.testId,init={method:"DELETE"};if(this.apiToken){init.headers=[["authorization","bearer "+this.apiToken]]}return fetch(url,init).then(response=>{if(!response.ok){this._renderError("Unable to remove test.")}else{this.$.testFactory.clean();this.dispatchEvent(new CustomEvent("navigate",{composed:!0,bubbles:!0,detail:{path:"/status"}}))}}).catch(cause=>{this._renderError("Unable to remove test.");console.error(cause)})}restartTest(){const url=this.apiBase+"tests/"+this.testId+"/restart",init={method:"PUT"};if(this.apiToken){init.headers=[["authorization","bearer "+this.apiToken]]}return fetch(url,init).then(response=>{if(204===response.status){this.refresh()}else{return response.json()}}).then(error=>{if(error){this._renderError(error.message||"Request to the API failed.")}}).catch(cause=>{this._renderError(cause.message||"Unable to connect to the API.")})}}window.customElements.define("arc-test-details",ArcTestDetails);

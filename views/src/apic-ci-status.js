@@ -138,7 +138,7 @@ class ApicCiStatus extends PolymerElement {
         }
 
         .status-add-test[away] {
-          transform: translateX(88px);
+          transform: translateX(110px);
         }
 
         @media all and (max-width: 740px) {
@@ -184,7 +184,7 @@ class ApicCiStatus extends PolymerElement {
         <div class="content">
           <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
-            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]"></arc-test-details>
+            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]" api-token="[[apiToken]]"></arc-test-details>
             <arc-add-test name="add-test" api-base="[[apiBase]]" loading="{{loading}}"></arc-add-test>
             <arc-tokens name="tokens" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-tokens>
             <arc-add-token name="add-token" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-add-token>
