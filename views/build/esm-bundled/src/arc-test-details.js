@@ -399,7 +399,7 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         <div class="queue-empty-state">
           <div class="circle ready">Queued</div>
           <div class="graph-line"></div>
-          <div class="circle ready">Executed</div>
+          <div class="circle ready">Executing</div>
           <div class="graph-line"></div>
           <div class="circle">Results</div>
         </div>

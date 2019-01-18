@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# set -eu
+set -e
 
 # This script is mean to be executed in a container as root.
 # It will fail without running this as root.
@@ -10,6 +10,8 @@ BRANCH=$2
 COMMIT_SHA=$3
 
 AMF_DIR="${BUILD_DIR}/amf/"
+
+echo "Building AMF library in $AMF_DIR"
 
 mkdir ${AMF_DIR}
 mkdir "${AMF_DIR}/src/"
@@ -28,6 +30,7 @@ fi
 
 echo "Building AMF client library."
 sbt clientJS/fullOptJS
+echo "Executing buildjs.sh from AMF project"
 ./amf-client/js/build-scripts/buildjs.sh
 
 echo "Copying AMF library to the working location."
@@ -37,11 +40,6 @@ cp src/amf-client/js/amf.js lib/
 cp src/amf-client/js/package.json lib/
 cp src/amf-client/js/bin/amf lib/bin/
 
-echo "Installing project dependencies"
+echo "Installing AMF project dependencies"
 cd lib/
 npm i
-
-# echo "Linking global library".
-# cd lib/
-# npm link
-#sudo chown -R $USER $BUILD_DIR/lib

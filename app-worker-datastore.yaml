@@ -31,14 +31,23 @@ spec:
         app: apic-ci
         tier: worker
     spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
         # This setting makes nodes pull the docker image every time before
         # starting the pod. This is useful when debugging, but should be turned
         # off in production.
         imagePullPolicy: Always
         env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
           - name: SCRIPT
             value: worker.js
           - name: PROJECT_ID

@@ -6,13 +6,14 @@
   "scripts": {
     "start": "node ${SCRIPT:-app.js}",
     "start-worker": "xvfb-run node --inspect=9227 worker.js --PORT=8082",
-    "start-mac": "node --inspect=9228 app.js",
+    "start-mac": "node --inspect=9227 worker.js --PORT=8082",
     "test": "mocha test/*.test.js",
-    "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci .",
-    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1 .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1",
     "deploy-frontend": "kubectl create -f app-frontend-datastore.yaml",
     "deploy-backend": "kubectl create -f app-worker-datastore.yaml",
     "deploy-service": "kubectl create -f apic-tests-service.yaml",
+    "deploy-ingress": "kubectl create -f apic-ci-ingress.yaml",
     "update-image": "kubectl set image deployment/apic-ci-frontend apic-ci=gcr.io/advancedrestclient-1155/api-components-autotest-ci"
   },
   "author": "Pawel Psztyc",

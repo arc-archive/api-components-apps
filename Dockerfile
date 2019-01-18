@@ -73,6 +73,10 @@ rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 RUN \
 apt-get install -y xvfb
 
+# Install global npm packages used by the app.
+RUN \
+npm install -g polymer-cli istanbul wct-istanbub --unsafe-perm
+
 COPY . /app/
 
 # You have to specify "--unsafe-perm" with npm install

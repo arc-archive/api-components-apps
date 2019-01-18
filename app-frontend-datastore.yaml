@@ -31,9 +31,16 @@ spec:
         app: apic-ci
         tier: frontend
     spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
         # This setting makes nodes pull the docker image every time before
         # starting the pod. This is useful when debugging, but should be turned
         # off in production.
@@ -43,9 +50,11 @@ spec:
         - name: http-server
           containerPort: 8080
         env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
           - name: PROJECT_ID
             value: advancedrestclient-1155
           - name: OAUTH2_CALLBACK
-            value: http://ci.advancedrestclient.com/auth/callback
+            value: https://ci.advancedrestclient.com/auth/callback
           - name: OAUTH2_CLIENT_ID
             value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
