@@ -24,7 +24,7 @@ metadata:
 # For more info about Pods see:
 #   https://cloud.google.com/container-engine/docs/pods/
 spec:
-  replicas: 1
+  replicas: 3
   template:
     metadata:
       labels:
@@ -37,7 +37,7 @@ spec:
           secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.1
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
@@ -58,3 +58,5 @@ spec:
             value: https://ci.advancedrestclient.com/auth/callback
           - name: OAUTH2_CLIENT_ID
             value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
+          - name: MEMCACHE_URL
+            value: 35.233.153.23:11211

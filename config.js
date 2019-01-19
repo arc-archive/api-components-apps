@@ -18,15 +18,13 @@ nconf
     'SUBSCRIPTION_NAME',
     'INSTANCE_CONNECTION_NAME',
     'TOPIC_NAME',
-    'CI_API_SECRET'
+    'CI_API_SECRET',
+    'MEMCACHE_URL'
   ])
   // 3. Config file
   .file({file: path.join(__dirname, 'config.json')})
   // 4. Defaults
   .defaults({
-    // Typically you will create a bucket with the same name as your project ID.
-    // CLOUD_BUCKET: '',
-
     // This is the id of your project in the Google Cloud Developers Console.
     GCLOUD_PROJECT: '',
 
