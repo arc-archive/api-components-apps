@@ -104,13 +104,25 @@ class ComponentTestRunner {
     const opts = this.getWctOptions();
     return wctTest(opts)
     .catch(() => {})
-    .then(() => {
-      logging.verbose('Selenium tests finished ' + this.component);
-      this._processResults();
-      const report = this.generateReport();
-      this.report = report;
-      return report;
-    });
+    .then(() => this._finalize());
+  }
+
+  _finalize() {
+    logging.verbose('Selenium tests finished ' + this.component);
+    if (this._shouldRetry()) {
+      this.retry++;
+      this.results = {};
+      logging.verbose(`Retrying ${this.component} due to the error.`);
+      return this.run();
+    }
+    const result = this._processResults();
+    if (result) {
+      // retry the test to reduce false-positives from selenium
+      return result;
+    }
+    const report = this.generateReport();
+    this.report = report;
+    return report;
   }
 
   _createResult() {
@@ -134,21 +146,64 @@ class ComponentTestRunner {
     }
     return data;
   }
+  /**
+   * Checks if the retry condition has been meet.
+   * @return {Boolean} False when `retry` value is >= 2.
+   */
+  _retryCondition() {
+    return this.retry < 2;
+  }
+  /**
+   * Checks if the test should be performed once more.
+   * The test should be restarted when there was selenium error (which is quite often)
+   * which produces false-positive result. To reduce reported errors this script
+   * retries the test twice and then gives up.
+   * @return {Boolean} True if the test should be re-run.
+   */
+  _shouldRetry() {
+    const results = this.results;
+    if (!results) {
+      return this._retryCondition();
+    }
+    const keys = Object.keys(results);
+    if (!keys.length) {
+      return this._retryCondition();
+    }
+    let hasError = false;
+    for (let i = 0, len = keys.length; i < len; i++) {
+      const id = keys[i];
+      if (results[id].status === 'failed') {
+        hasError = true;
+        break;
+      }
+      if (!results[id].logs || !results[id].logs.length) {
+        hasError = true;
+        break;
+      }
+    }
+    if (!hasError) {
+      return false;
+    }
+    return this._retryCondition();
+  }
 
+  /**
+   * Processes data collected by WCT.
+   *
+   * This method sets `passing` amd `results` property with generated log data.
+   */
   _processResults() {
     const results = this.results;
     const keys = Object.keys(results);
-    const hasResults = keys.some((key) => results[key].logs.length);
-    const hasFailure = keys.some((key) => results[key].status !== 'passed');
-    if (!hasResults) {
-      if (this.retry === 0) {
-        this.retry++;
-        this.results = {};
-        logging.verbose(`Retrying ${this.component} due missing results.`);
-        return this.run();
+    let passing = true;
+    for (let i = 0, len = keys.length; i < len; i++) {
+      const id = keys[i];
+      if (results[id].status === 'failed') {
+        passing = false;
+        break;
       }
     }
-    this.passing = !hasFailure;
+    this.passing = passing;
     this.results = this._createResult();
   }
 

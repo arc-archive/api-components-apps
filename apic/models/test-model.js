@@ -24,6 +24,9 @@ class TestsModel extends BaseModel {
     }
     let query = this.store.createQuery(this.namespace, this.testKind);
     query = query.limit(limit);
+    query = query.order('created', {
+      descending: true
+    });
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
