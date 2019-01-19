@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ${SCRIPT:-app.js}",
     "start-worker": "xvfb-run node --inspect=9227 worker.js --PORT=8082",
+    "start-worker2": "xvfb-run node --inspect=9226 worker.js --PORT=8082",
     "start-mac": "node --inspect=9227 worker.js --PORT=8082",
     "test": "mocha test/*.test.js",
     "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci:rc-1 .",
@@ -44,5 +45,8 @@
     "uuid": "^3.3.2",
     "web-component-tester": "^6.9.2",
     "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "express-http-proxy": "^1.5.1"
   }
 }

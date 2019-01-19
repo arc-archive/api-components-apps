@@ -4,7 +4,7 @@ import '@polymer/iron-ajax/iron-ajax';
 let cachedData = [];
 let pageToken;
 
-class TestsDataFactory extends PolymerElement {
+class TestsModel extends PolymerElement {
   static get template() {
     return html`
       <style>
@@ -33,14 +33,18 @@ class TestsDataFactory extends PolymerElement {
 
   constructor() {
     super();
-    this._syncHandled = this._syncHandled.bind(this);
+    this._testDeletedHandler = this._testDeletedHandler.bind(this);
+    this._testUpdatedHandler = this._testUpdatedHandler.bind(this);
+    this._testAddedHandler = this._testAddedHandler.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
-    window.addEventListener('tests-model-sync', this._syncHandled);
+    window.addEventListener('test-deleted', this._testDeletedHandler);
+    window.addEventListener('test-updated', this._testUpdatedHandler);
+    window.addEventListener('test-added', this._testAddedHandler);
     if (cachedData && cachedData.length) {
-      this.list = cachedData;
+      this.list = Array.from(cachedData);
     }
     if (!(this.list && this.list.length)) {
       this.loadNext();
@@ -49,7 +53,9 @@ class TestsDataFactory extends PolymerElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener('tests-model-sync', this._syncHandled);
+    window.removeEventListener('test-deleted', this._testDeletedHandler);
+    window.removeEventListener('test-updated', this._testUpdatedHandler);
+    window.removeEventListener('test-added', this._testAddedHandler);
   }
 
   clean() {
@@ -57,7 +63,6 @@ class TestsDataFactory extends PolymerElement {
     cachedData = [];
     this.list = undefined;
     this.hasMore = undefined;
-    this._syncCache();
   }
 
   loadNext() {
@@ -81,12 +86,11 @@ class TestsDataFactory extends PolymerElement {
     }
     if (!this.list) {
       cachedData = data.items;
-      this.list = data.items;
+      this.list = Array.from(data.items);
     } else {
       cachedData = cachedData.concat(data.items);
       this.list = this.list.concat(data.items);
     }
-    this._dispatchSync();
   }
 
   refreshTest(id) {
@@ -120,36 +124,29 @@ class TestsDataFactory extends PolymerElement {
           this.push('list', resource);
         }
       }
-      this._dispatchSync();
     });
   }
 
-  _dispatchSync() {
-    this.dispatchEvent(new CustomEvent('tests-model-sync', {
-      bubbles: true,
-      composed: true
-    }));
-  }
-
-  _syncHandled(e) {
-    const target = e.composedPath()[0];
-    if (target === this) {
-      return;
-    }
-
-    this._syncCache();
-  }
-
-  _syncCache() {
+  _testDeletedHandler(e) {
+    const {id} = e.detail;
     const list = this.list || [];
-    if (list.length !== cachedData.length) {
-      this.set('list', cachedData);
-    }
-    for (let i = 0, len = cachedData.length; i < len; i++) {
-      if (cachedData[i] !== list[i]) {
-        this.set(`list.${i}`, cachedData[i]);
+    for (let i = 0, len = list.length; i < len; i++) {
+      if (list[i].id === id) {
+        this.splice('list', i, 1);
+        cachedData.splice(i, 1);
+        break;
       }
     }
   }
+
+  _testUpdatedHandler(e) {
+    const {id} = e.detail;
+    this.refreshTest(id);
+  }
+
+  _testAddedHandler() {
+    this.clean();
+    this.loadNext();
+  }
 }
-window.customElements.define('tests-data-factory', TestsDataFactory);
+window.customElements.define('tests-model', TestsModel);

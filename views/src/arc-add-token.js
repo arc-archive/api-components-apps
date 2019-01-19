@@ -9,7 +9,6 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
 import '@polymer/paper-checkbox/paper-checkbox.js';
 import '@polymer/paper-toggle-button/paper-toggle-button.js';
-import './tests-data-factory.js';
 import './apic-icons.js';
 
 class ArcAddToken extends PolymerElement {

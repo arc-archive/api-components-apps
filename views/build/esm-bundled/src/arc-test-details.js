@@ -1,4 +1,4 @@
-import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cachedData={},pageTokens={};class TestComponentsDataFactory extends PolymerElement{static get template(){return html`
+import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";class TestModel extends PolymerElement{static get properties(){return{apiBase:String,testId:String,loading:{type:Boolean,notify:!0},apiToken:String,result:{type:Object,notify:!0}}}static get observers(){return["_paramsChanged(apiBase, apiToken, testId)"]}_paramsChanged(){if(this.__paramsDebouncer){return}this.__paramsDebouncer=!0;setTimeout(()=>{this.__paramsDebouncer=!1;this.get()})}get(id){if(!id){id=this.testId}const{apiBase}=this;if(!id||!apiBase){return}const url=apiBase+"tests/"+id;return this._request(url).then(data=>{if(data){this.result=data;return data}else{this.result=void 0}})}delete(id){if(!id){id=this.testId}const{apiBase}=this;if(!id||!apiBase){return}const url=apiBase+"tests/"+id,init={method:"DELETE"};return fetch(url,init).then(response=>{if(204!==response.status){return response.json()}this.dispatchEvent(new CustomEvent("test-deleted",{composed:!0,bubbles:!0,detail:{id:this.testId}}))}).then(resp=>{if(resp){throw resp}}).catch(cause=>{this.dispatchEvent(new CustomEvent("error",{detail:cause}));throw cause})}restart(id){if(!id){id=this.testId}const{apiBase}=this;if(!id||!apiBase){return}const url=apiBase+"tests/"+id+"/restart",init={method:"PUT"};return fetch(url,init).then(response=>{if(204!==response.status){return response.json()}this.dispatchEvent(new CustomEvent("test-updated",{composed:!0,bubbles:!0,detail:{id:this.testId}}))}).then(resp=>{if(resp){throw resp}}).catch(cause=>{this.dispatchEvent(new CustomEvent("error",{detail:cause}));throw cause})}_request(url,init){let errored,code;if(this.apiToken){if(!init){init={}}init.headers=[["authorization","Bearer "+this.apiToken]]}return fetch(url,init).then(response=>{const ct=response.headers.get("content-type");if(!ct||0!==ct.indexOf("application/json")){throw new Error("Unable to get test data.")}errored=!response.ok;code=response.status;return response.json()}).then(resource=>{if(errored){throw resource}return resource}).catch(cause=>{if(cause instanceof Error){cause={message:cause.message,error:!0}}cause.code=code;this.dispatchEvent(new CustomEvent("error",{detail:cause}));throw cause})}}window.customElements.define("test-model",TestModel);const cachedData={},pageTokens={};class TestComponentsDataFactory extends PolymerElement{static get template(){return html`
       <style>
       :host {display: none !important;}
       </style>
@@ -124,9 +124,14 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         @apply --paper-font-body1;
       }
 
-      .item-container {
+      .item-container,
+      .data-container {
         @apply --layout-horizontal;
         @apply --layout-center;
+      }
+
+      .data-container {
+        @apply --layout-flex;
       }
 
       .item:first-child {
@@ -171,7 +176,8 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         color: #2E7D32;
       }
 
-      :host([failed]) .failed-counter {
+      :host([failed]) .failed-counter,
+      .error {
         color: #F44336;
       }
 
@@ -203,26 +209,78 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
       .viewer {
         margin: 0 8px;
       }
+
+      .item.narrow {
+        display: none;
+      }
+
+      @media (max-width: 760px) {
+        .component {
+          max-width: 180px;
+        }
+
+        .item {
+          @apply --layout-vertical;
+          margin: 4px 0;
+        }
+
+        .item.detail-result {
+          display: none !important;
+        }
+
+        .item.narrow {
+          @apply --layout-vertical;
+        }
+
+        .data-container {
+          @apply --layout-vertical;
+          @apply --layout-start;
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .component {
+          max-width: 220px;
+        }
+      }
       </style>
       <div class="item-container">
-        <div class="item max">
-          <label>Component:</label>
-          <span class="component">[[item.component]]</span>
-        </div>
 
-        <div class="item numbers">
-          <label>Passed:</label>
-          <span class="passed-counter">[[_computePassed(item.*)]]</span>
-        </div>
+        <div class="data-container">
+          <div class="item max">
+            <label>Component:</label>
+            <span class="component">[[item.component]]</span>
+          </div>
 
-        <div class="item numbers">
-          <label>Failed:</label>
-          <span class="failed-counter">[[_computeFailed(item.*)]]</span>
-        </div>
+          <template is="dom-if" if="[[item.error]]">
+            <div class="item numbers">
+              <label>Result:</label>
+              <span class="error">Test error</span>
+            </div>
+          </template>
 
-        <div class="item numbers">
-          <label>Ratio:</label>
-          <span class="ratio-counter">[[_computePassRatio(item.*)]]%</span>
+          <template is="dom-if" if="[[!item.error]]">
+            <div class="item narrow">
+              <label>Result:</label>
+              <span class="narrow-result">[[_computeResult(item.status)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Passed:</label>
+              <span class="passed-counter">[[_computePassed(item.*)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Failed:</label>
+              <span class="failed-counter">[[_computeFailed(item.*)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Ratio:</label>
+              <span class="ratio-counter">[[_computePassRatio(item.*)]]%</span>
+            </div>
+          </template>
         </div>
 
         <paper-icon-button icon="apic:details" on-click="toggleDetails" title="Toggle execution logs" class="toggle-button" opened$="[[detailsOpened]]"></paper-icon-button>
@@ -235,7 +293,7 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
           <component-logs-viewer test-id="[[testId]]" component-name="[[item.component]]" api-base="[[apiBase]]" class="viewer"></component-logs-viewer>
         </template>
       </template>
-    `}static get properties(){return{item:String,failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"},detailsOpened:Boolean,testId:String}}_computeIsFailed(item){if(!item){return!1}return"failed"===item.status}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,failed=item&&item.failed||0,size=passed+failed;if(!passed||!size){return 0}return Math.round(100*(passed/size))}toggleDetails(){this.detailsOpened=!this.detailsOpened}}window.customElements.define("test-component-list-item",TestComponentListItem);class ArcTestDetails extends PolymerElement{static get template(){return html`
+    `}static get properties(){return{item:String,failed:{type:Boolean,value:!1,reflectToAttribute:!0,computed:"_computeIsFailed(item)"},detailsOpened:Boolean,testId:String}}_computeIsFailed(item){if(!item){return!1}return"failed"===item.status}_computePassed(record){const item=record&&record.base,passed=item&&item.passed;return passed||"0"}_computeFailed(record){const item=record&&record.base,failed=item&&item.failed;return failed||"0"}_computePassRatio(record){const item=record&&record.base,passed=item&&item.passed||0,failed=item&&item.failed||0,size=passed+failed;if(!passed||!size){return 0}return Math.round(100*(passed/size))}toggleDetails(){this.detailsOpened=!this.detailsOpened}_computeResult(status){switch(status){case"passed":case"failed":return status;default:return"Unknown";}}}window.customElements.define("test-component-list-item",TestComponentListItem);class ArcTestDetails extends PolymerElement{static get template(){return html`
       <style>
       :host {
         display: block;
@@ -271,6 +329,10 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
 
       .result-value {
         margin-right: 8px;
+      }
+
+      .status-value {
+        text-transform: capitalize;
       }
 
       .desc {
@@ -340,16 +402,28 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         background-color: var(--accent-color);
         color: var(--accent-text-color);
       }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+          width: 100%:
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+          width: 100%:
+        };
+      }
       </style>
       <header>
         <a href="#/">
           <paper-icon-button icon="apic:arrow-back" title="Return to tests list"></paper-icon-button>
         </a>
         <h1>Test details</h1>
-        <template is="dom-if" if="[[isQueued]]">
-          <template is="dom-if" if="[[canCreate]]">
-            <paper-icon-button icon="apic:delete" title="Delete this test" on-click="removeTest"></paper-icon-button>
-          </template>
+        <template is="dom-if" if="[[canCreate]]">
+          <paper-icon-button icon="apic:delete" title="Delete this test" on-click="removeTest"></paper-icon-button>
         </template>
         <paper-icon-button icon="apic:refresh" title="Refresh the view" on-click="refresh"></paper-icon-button>
       </header>
@@ -358,9 +432,9 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         <div class="desc status">
           Status: <span class="status-value">[[testDetail.status]]</span>
         </div>
-        <template is="dom-if" if="[[testFinished]]">
+        <template is="dom-if" if="[[finished]]">
           <div class="desc result">
-            Result: <span class="result-value" passing$=[[testPassed]]>[[_computeTestResult(testPassed)]]</span> (<span class="passed-count">[[testDetail.passed]]</span>/<span class="failed-count">[[testDetail.failed]]</span>)
+            Result: <span class="result-value" passing$=[[testPassed]]>[[_computeTestResult(testPassed)]]</span> (<span class="passed-count">[[passed]]</span>/<span class="failed-count">[[failed]]</span>)
           </div>
         </template>
         <template is="dom-if" if="[[isAmfTest]]">
@@ -375,7 +449,7 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         </template>
       <div>
 
-      <template is="dom-if" if="[[canCreate]]">
+      <template is="dom-if" if="[[renderRestart]]">
         <div class="reset-test-container">
           <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
         </div>
@@ -383,6 +457,11 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
 
       <template is="dom-repeat" items="[[componentsList]]">
         <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
+      </template>
+      <template is="dom-if" if="[[hasMore]]">
+        <div class="more-container">
+          <paper-button on-click="loadNext" class="more-button" raised>Load more</paper-button>
+        </div>
       </template>
 
       <template is="dom-if" if="[[isQueued]]">
@@ -405,12 +484,13 @@ import{PolymerElement,html,afterNextRender}from"./apic-ci-status.js";const cache
         </div>
       </template>
 
-      <tests-data-factory id="testFactory" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}"></tests-data-factory>
+      <test-model id="testModel" api-base="[[apiBase]]" test-id="[[testId]]" api-token="[[apiToken]]" result="{{testDetail}}" on-error="_testFetchError"></test-model>
       <test-components-data-factory
         id="request"
         api-base="[[apiBase]]"
         test-id="[[testId]]"
         list="{{componentsList}}"
+        has-more="{{hasMore}}"
         loading="{{loading}}"></test-components-data-factory>
       <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
-    `}static get properties(){return{apiBase:String,testId:String,opened:Boolean,testsList:Array,componentsList:Array,loading:{type:Boolean,notify:!0},apiToken:String,testDetail:{type:Object,computed:"_computeTestDetail(testsList, testId, opened)",notify:!0},testPassed:{type:Boolean,computed:"_computeTestPassed(testFinished, testDetail)"},testFinished:{type:Boolean,computed:"_computeTestFinished(testDetail.status)"},isAmfTest:{type:Boolean,computed:"_computeIsAmf(testDetail.type)"},hasMore:Boolean,isQueued:{type:Boolean,computed:"_computeTestQueued(testDetail.status)"},isRunning:{type:Boolean,computed:"_computeTestRunning(testDetail.status)"},canCreate:Boolean,startedRunning:{type:Boolean,computed:"_computeStartedRunning(isRunning, componentsList)"}}}static get observers(){return["_requestDataObserver(opened, hasMore, testId)"]}_computeTestDetail(testsList,testId,opened){if(!opened||!testsList||!testsList.length||!testId){return}return testsList.find(item=>item.id===testId)}_requestDataObserver(opened,hasMore,testId){if(!opened||!1===hasMore||!testId||this.loading){return}afterNextRender(this,()=>{if(!this.componentsList&&!this.loading){this.$.request.loadNext()}})}_computeTestPassed(testFinished,test){if(!testFinished||!test){return!0}return 0===test.failed&&0<test.passed}_computeTestResult(testPassed){return testPassed?"Passed":"Failed"}_computeIsAmf(type){return"amf-build"===type}_computeTestFinished(status){return"finished"===status}_computeTestQueued(status){return"queued"===status}_computeTestRunning(status){return"running"===status}_computeStartedRunning(isRunning,testsList){return!!(isRunning&&(!testsList||!testsList.length))}refresh(){this.$.request.clean();this.$.request.loadNext();this.$.testFactory.refreshTest(this.testId)}_renderError(message){this.$.err.text=message;this.$.err.opened=!0}removeTest(){const url=this.apiBase+"tests/"+this.testId,init={method:"DELETE"};if(this.apiToken){init.headers=[["authorization","bearer "+this.apiToken]]}return fetch(url,init).then(response=>{if(!response.ok){this._renderError("Unable to remove test.")}else{this.$.testFactory.clean();this.dispatchEvent(new CustomEvent("navigate",{composed:!0,bubbles:!0,detail:{path:"/status"}}))}}).catch(cause=>{this._renderError("Unable to remove test.");console.error(cause)})}restartTest(){const url=this.apiBase+"tests/"+this.testId+"/restart",init={method:"PUT"};if(this.apiToken){init.headers=[["authorization","bearer "+this.apiToken]]}return fetch(url,init).then(response=>{if(204===response.status){this.refresh()}else{return response.json()}}).then(error=>{if(error){this._renderError(error.message||"Request to the API failed.")}}).catch(cause=>{this._renderError(cause.message||"Unable to connect to the API.")})}}window.customElements.define("arc-test-details",ArcTestDetails);
+    `}static get properties(){return{apiBase:String,testId:String,opened:Boolean,testsList:Array,componentsList:Array,loading:{type:Boolean,notify:!0},apiToken:String,testDetail:{type:Object},finished:{type:Boolean,computed:"_computeFinished(testDetail.status)"},isQueued:{type:Boolean,computed:"_computeTestQueued(testDetail.status)"},isRunning:{type:Boolean,computed:"_computeTestRunning(testDetail.status)"},testPassed:{type:Boolean,computed:"_computeTestPassed(finished, testDetail)"},isAmfTest:{type:Boolean,computed:"_computeIsAmf(testDetail.type)"},passed:{type:Number,computed:"_computeNumberValue(testDetail.passed)"},failed:{type:Number,computed:"_computeNumberValue(testDetail.failed)"},hasMore:Boolean,canCreate:Boolean,startedRunning:{type:Boolean,computed:"_computeStartedRunning(isRunning, componentsList)"},renderRestart:{type:Boolean,computed:"_computeRenderRestart(canCreate, finished)"}}}static get observers(){return["_requestDataObserver(opened, hasMore, testId)"]}_testFetchError(e){this._renderError(e.detail.message)}_requestDataObserver(opened,hasMore,testId){if(!opened||!1===hasMore||!testId||this.loading){return}afterNextRender(this,()=>{if(!this.componentsList&&!this.loading){this.$.request.loadNext()}})}_computeTestPassed(finished,test){if(!finished||!test){return!0}return 0===test.failed&&0<test.passed}_computeTestResult(testPassed){return testPassed?"Passed":"Failed"}_computeIsAmf(type){return"amf-build"===type}_computeFinished(status){return"finished"===status}_computeTestQueued(status){return"queued"===status}_computeTestRunning(status){return"running"===status}_computeStartedRunning(isRunning,testsList){return!!(isRunning&&(!testsList||!testsList.length))}_computeNumberValue(value){if(!value||isNaN(value)){return 0}return+value}_computeRenderRestart(canCreate,finished){return!!(canCreate&&finished)}refresh(){this.hasMore=!1;this.$.request.clean();this.$.request.loadNext();this.$.testModel.get()}loadNext(){this.$.request.loadNext()}_renderError(message){this.$.err.text=message;this.$.err.opened=!0}removeTest(){return this.$.testModel.delete().then(()=>{this.dispatchEvent(new CustomEvent("navigate",{composed:!0,bubbles:!0,detail:{path:"/status"}}))}).catch(()=>{})}restartTest(){return this.$.testModel.restart().then(()=>{this.componentsList=void 0;return this.$.testModel.get()}).catch(()=>{})}}window.customElements.define("arc-test-details",ArcTestDetails);

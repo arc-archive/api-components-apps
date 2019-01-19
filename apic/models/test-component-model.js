@@ -106,7 +106,6 @@ class TestsComponentModel extends BaseModel {
       return transaction.commit();
     })
     .catch((cause) => {
-      console.error(cause);
       logging.error(cause);
       transaction.rollback();
     });

@@ -3,9 +3,9 @@ import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-styles/shadow.js';
 import '@polymer/iron-ajax/iron-ajax.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
+import './models/tests-model.js';
+import './list-items/test-list-item.js';
 import './apic-icons.js';
-import './tests-data-factory.js';
-import './test-list-item.js';
 
 class ArcStatus extends PolymerElement {
   static get template() {
@@ -42,6 +42,54 @@ class ArcStatus extends PolymerElement {
       .li[queued] {
         border-left: 2px #9E9E9E solid;
       }
+
+      .no-data-container {
+        margin: 30% auto;
+        width: 50%;
+      }
+
+      .visual {
+        @apply --layout-horizontal;
+        background-color: #757575;
+        opacity: 0.7;
+      }
+
+      .item {
+        @apply --layout-flex;
+        height: 40px;
+        background-color: #B0BEC5;
+        margin: 6px;
+      }
+
+      .item.accent {
+        background-color: #4CAF50;
+      }
+
+      .empty-info {
+        text-align: center;
+        color: #616161;
+        font-size: 22px;
+      }
+
+      .empty-info2 {
+        text-align: center;
+        color: #9E9E9E;
+        font-size: 22px;
+      }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+          width: 100%:
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+          width: 100%:
+        };
+      }
       </style>
       <header>
         <h1>API components tests</h1>
@@ -50,12 +98,26 @@ class ArcStatus extends PolymerElement {
       <template is="dom-repeat" items="[[testsList]]">
         <test-list-item class="li" item="[[item]]"></test-list-item>
       </template>
-      <tests-data-factory
-        id="model"
-        api-base="[[apiBase]]"
-        list="{{testsList}}"
-        has-more="{{hasMore}}"
-        loading="{{loading}}"></tests-data-factory>
+      <template is="dom-if" if="[[hasMore]]">
+        <div class="more-container">
+          <paper-button on-click="loadNext" class="more-button" raised>Load more</paper-button>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[renderEmptyInfo]]">
+        <div class="no-data-container">
+          <div class="visual">
+            <div class="item"></div>
+            <div class="item accent"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+          </div>
+          <p class="empty-info">There are no tests to see.</p>
+          <p class="empty-info2">All tests results appear here when scheduled.</p>
+        </div>
+      </template>
+
+      <tests-model id="model" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}" loading="{{loading}}"></tests-model>
     `;
   }
 
@@ -65,12 +127,23 @@ class ArcStatus extends PolymerElement {
       apiBase: String,
       hasMore: {type: Boolean, value: true},
       loading: {type: Boolean, notify: true},
+      hasResults: {type: Boolean, computed: '_computeHasResults(testsList.*)'},
+      renderEmptyInfo: {type: Boolean, computed: '_computeRenderEmptyInfo(hasResults, loading)'}
     };
   }
 
   refresh() {
     this.$.model.clean();
     this.$.model.loadNext();
+  }
+
+  _computeHasResults(record) {
+    const value = record && record.base;
+    return !!(value && value.length);
+  }
+
+  _computeRenderEmptyInfo(hasResults, loading) {
+    return !hasResults && !loading;
   }
 }
 

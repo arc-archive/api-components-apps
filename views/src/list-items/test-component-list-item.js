@@ -4,8 +4,8 @@ import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
-import './apic-icons.js';
-import './component-logs-viewer.js';
+import '../apic-icons.js';
+import '../component-logs-viewer.js';
 class TestComponentListItem extends PolymerElement {
   static get template() {
     return html`
@@ -15,9 +15,14 @@ class TestComponentListItem extends PolymerElement {
         @apply --paper-font-body1;
       }
 
-      .item-container {
+      .item-container,
+      .data-container {
         @apply --layout-horizontal;
         @apply --layout-center;
+      }
+
+      .data-container {
+        @apply --layout-flex;
       }
 
       .item:first-child {
@@ -62,7 +67,8 @@ class TestComponentListItem extends PolymerElement {
         color: #2E7D32;
       }
 
-      :host([failed]) .failed-counter {
+      :host([failed]) .failed-counter,
+      .error {
         color: #F44336;
       }
 
@@ -94,26 +100,78 @@ class TestComponentListItem extends PolymerElement {
       .viewer {
         margin: 0 8px;
       }
+
+      .item.narrow {
+        display: none;
+      }
+
+      @media (max-width: 760px) {
+        .component {
+          max-width: 180px;
+        }
+
+        .item {
+          @apply --layout-vertical;
+          margin: 4px 0;
+        }
+
+        .item.detail-result {
+          display: none !important;
+        }
+
+        .item.narrow {
+          @apply --layout-vertical;
+        }
+
+        .data-container {
+          @apply --layout-vertical;
+          @apply --layout-start;
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .component {
+          max-width: 220px;
+        }
+      }
       </style>
       <div class="item-container">
-        <div class="item max">
-          <label>Component:</label>
-          <span class="component">[[item.component]]</span>
-        </div>
 
-        <div class="item numbers">
-          <label>Passed:</label>
-          <span class="passed-counter">[[_computePassed(item.*)]]</span>
-        </div>
+        <div class="data-container">
+          <div class="item max">
+            <label>Component:</label>
+            <span class="component">[[item.component]]</span>
+          </div>
 
-        <div class="item numbers">
-          <label>Failed:</label>
-          <span class="failed-counter">[[_computeFailed(item.*)]]</span>
-        </div>
+          <template is="dom-if" if="[[item.error]]">
+            <div class="item numbers">
+              <label>Result:</label>
+              <span class="error">Test error</span>
+            </div>
+          </template>
 
-        <div class="item numbers">
-          <label>Ratio:</label>
-          <span class="ratio-counter">[[_computePassRatio(item.*)]]%</span>
+          <template is="dom-if" if="[[!item.error]]">
+            <div class="item narrow">
+              <label>Result:</label>
+              <span class="narrow-result">[[_computeResult(item.status)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Passed:</label>
+              <span class="passed-counter">[[_computePassed(item.*)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Failed:</label>
+              <span class="failed-counter">[[_computeFailed(item.*)]]</span>
+            </div>
+
+            <div class="item numbers detail-result">
+              <label>Ratio:</label>
+              <span class="ratio-counter">[[_computePassRatio(item.*)]]%</span>
+            </div>
+          </template>
         </div>
 
         <paper-icon-button icon="apic:details" on-click="toggleDetails" title="Toggle execution logs" class="toggle-button" opened$="[[detailsOpened]]"></paper-icon-button>
@@ -170,6 +228,15 @@ class TestComponentListItem extends PolymerElement {
 
   toggleDetails() {
     this.detailsOpened = !this.detailsOpened;
+  }
+
+  _computeResult(status) {
+    switch (status) {
+      case 'passed':
+      case 'failed':
+        return status;
+      default: return 'Unknown';
+    }
   }
 }
 

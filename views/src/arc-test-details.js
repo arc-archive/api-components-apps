@@ -5,9 +5,9 @@ import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-toast/paper-toast.js';
 import 'time-elements/dist/time-elements.js';
-import './tests-data-factory.js';
+import './models/test-model.js';
 import './test-components-data-factory.js';
-import './test-component-list-item.js';
+import './list-items/test-component-list-item.js';
 import './apic-icons.js';
 
 class ArcTestDetails extends PolymerElement {
@@ -48,6 +48,10 @@ class ArcTestDetails extends PolymerElement {
 
       .result-value {
         margin-right: 8px;
+      }
+
+      .status-value {
+        text-transform: capitalize;
       }
 
       .desc {
@@ -117,16 +121,28 @@ class ArcTestDetails extends PolymerElement {
         background-color: var(--accent-color);
         color: var(--accent-text-color);
       }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+          width: 100%:
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+          width: 100%:
+        };
+      }
       </style>
       <header>
         <a href="#/">
           <paper-icon-button icon="apic:arrow-back" title="Return to tests list"></paper-icon-button>
         </a>
         <h1>Test details</h1>
-        <template is="dom-if" if="[[isQueued]]">
-          <template is="dom-if" if="[[canCreate]]">
-            <paper-icon-button icon="apic:delete" title="Delete this test" on-click="removeTest"></paper-icon-button>
-          </template>
+        <template is="dom-if" if="[[canCreate]]">
+          <paper-icon-button icon="apic:delete" title="Delete this test" on-click="removeTest"></paper-icon-button>
         </template>
         <paper-icon-button icon="apic:refresh" title="Refresh the view" on-click="refresh"></paper-icon-button>
       </header>
@@ -135,9 +151,9 @@ class ArcTestDetails extends PolymerElement {
         <div class="desc status">
           Status: <span class="status-value">[[testDetail.status]]</span>
         </div>
-        <template is="dom-if" if="[[testFinished]]">
+        <template is="dom-if" if="[[finished]]">
           <div class="desc result">
-            Result: <span class="result-value" passing$=[[testPassed]]>[[_computeTestResult(testPassed)]]</span> (<span class="passed-count">[[testDetail.passed]]</span>/<span class="failed-count">[[testDetail.failed]]</span>)
+            Result: <span class="result-value" passing$=[[testPassed]]>[[_computeTestResult(testPassed)]]</span> (<span class="passed-count">[[passed]]</span>/<span class="failed-count">[[failed]]</span>)
           </div>
         </template>
         <template is="dom-if" if="[[isAmfTest]]">
@@ -152,7 +168,7 @@ class ArcTestDetails extends PolymerElement {
         </template>
       <div>
 
-      <template is="dom-if" if="[[canCreate]]">
+      <template is="dom-if" if="[[renderRestart]]">
         <div class="reset-test-container">
           <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
         </div>
@@ -160,6 +176,11 @@ class ArcTestDetails extends PolymerElement {
 
       <template is="dom-repeat" items="[[componentsList]]">
         <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
+      </template>
+      <template is="dom-if" if="[[hasMore]]">
+        <div class="more-container">
+          <paper-button on-click="loadNext" class="more-button" raised>Load more</paper-button>
+        </div>
       </template>
 
       <template is="dom-if" if="[[isQueued]]">
@@ -182,12 +203,13 @@ class ArcTestDetails extends PolymerElement {
         </div>
       </template>
 
-      <tests-data-factory id="testFactory" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}"></tests-data-factory>
+      <test-model id="testModel" api-base="[[apiBase]]" test-id="[[testId]]" api-token="[[apiToken]]" result="{{testDetail}}" on-error="_testFetchError"></test-model>
       <test-components-data-factory
         id="request"
         api-base="[[apiBase]]"
         test-id="[[testId]]"
         list="{{componentsList}}"
+        has-more="{{hasMore}}"
         loading="{{loading}}"></test-components-data-factory>
       <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
     `;
@@ -203,23 +225,12 @@ class ArcTestDetails extends PolymerElement {
       loading: {type: Boolean, notify: true},
       apiToken: String,
       testDetail: {
-        type: Object,
-        computed: '_computeTestDetail(testsList, testId, opened)',
-        notify: true
+        type: Object
       },
-      testPassed: {
+      finished: {
         type: Boolean,
-        computed: '_computeTestPassed(testFinished, testDetail)'
+        computed: '_computeFinished(testDetail.status)'
       },
-      testFinished: {
-        type: Boolean,
-        computed: '_computeTestFinished(testDetail.status)'
-      },
-      isAmfTest: {
-        type: Boolean,
-        computed: '_computeIsAmf(testDetail.type)'
-      },
-      hasMore: Boolean,
       isQueued: {
         type: Boolean,
         computed: '_computeTestQueued(testDetail.status)'
@@ -228,10 +239,33 @@ class ArcTestDetails extends PolymerElement {
         type: Boolean,
         computed: '_computeTestRunning(testDetail.status)'
       },
+      testPassed: {
+        type: Boolean,
+        computed: '_computeTestPassed(finished, testDetail)'
+      },
+      isAmfTest: {
+        type: Boolean,
+        computed: '_computeIsAmf(testDetail.type)'
+      },
+      passed: {
+        type: Number,
+        computed: '_computeNumberValue(testDetail.passed)'
+      },
+      failed: {
+        type: Number,
+        computed: '_computeNumberValue(testDetail.failed)'
+      },
+      hasMore: Boolean,
+
       canCreate: Boolean,
       startedRunning: {
         type: Boolean,
         computed: '_computeStartedRunning(isRunning, componentsList)'
+      },
+
+      renderRestart: {
+        type: Boolean,
+        computed: '_computeRenderRestart(canCreate, finished)'
       }
     };
   }
@@ -242,11 +276,8 @@ class ArcTestDetails extends PolymerElement {
     ];
   }
 
-  _computeTestDetail(testsList, testId, opened) {
-    if (!opened || !testsList || !testsList.length || !testId) {
-      return;
-    }
-    return testsList.find((item) => item.id === testId);
+  _testFetchError(e) {
+    this._renderError(e.detail.message);
   }
 
   _requestDataObserver(opened, hasMore, testId) {
@@ -260,8 +291,8 @@ class ArcTestDetails extends PolymerElement {
     });
   }
 
-  _computeTestPassed(testFinished, test) {
-    if (!testFinished || !test) {
+  _computeTestPassed(finished, test) {
+    if (!finished || !test) {
       return true;
     }
     return test.failed === 0 && test.passed > 0;
@@ -275,7 +306,7 @@ class ArcTestDetails extends PolymerElement {
     return type === 'amf-build';
   }
 
-  _computeTestFinished(status) {
+  _computeFinished(status) {
     return status === 'finished';
   }
 
@@ -291,10 +322,26 @@ class ArcTestDetails extends PolymerElement {
     return !!(isRunning && (!testsList || !testsList.length));
   }
 
+  _computeNumberValue(value) {
+    if (!value || isNaN(value)) {
+      return 0;
+    }
+    return Number(value);
+  }
+
+  _computeRenderRestart(canCreate, finished) {
+    return !!(canCreate && finished);
+  }
+
   refresh() {
+    this.hasMore = false;
     this.$.request.clean();
     this.$.request.loadNext();
-    this.$.testFactory.refreshTest(this.testId);
+    this.$.testModel.get();
+  }
+
+  loadNext() {
+    this.$.request.loadNext();
   }
 
   _renderError(message) {
@@ -303,58 +350,26 @@ class ArcTestDetails extends PolymerElement {
   }
 
   removeTest() {
-    const url = this.apiBase + 'tests/' + this.testId;
-    const init = {
-      method: 'DELETE'
-    };
-    if (this.apiToken) {
-      init.headers = [['authorization', 'bearer ' + this.apiToken]];
-    }
-    return fetch(url, init)
-    .then((response) => {
-      if (!response.ok) {
-        this._renderError('Unable to remove test.');
-      } else {
-        this.$.testFactory.clean();
-        this.dispatchEvent(new CustomEvent('navigate', {
-          composed: true,
-          bubbles: true,
-          detail: {
-            path: '/status'
-          }
-        }));
-      }
+    return this.$.testModel.delete()
+    .then(() => {
+      this.dispatchEvent(new CustomEvent('navigate', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          path: '/status'
+        }
+      }));
     })
-    .catch((cause) => {
-      this._renderError('Unable to remove test.');
-      console.error(cause);
-    });
+    .catch(() => {});
   }
 
   restartTest() {
-    const url = this.apiBase + 'tests/' + this.testId + '/restart';
-    const init = {
-      method: 'PUT'
-    };
-    if (this.apiToken) {
-      init.headers = [['authorization', 'bearer ' + this.apiToken]];
-    }
-    return fetch(url, init)
-    .then((response) => {
-      if (response.status === 204) {
-        this.refresh();
-      } else {
-        return response.json();
-      }
+    return this.$.testModel.restart()
+    .then(() => {
+      this.componentsList = undefined;
+      return this.$.testModel.get();
     })
-    .then((error) => {
-      if (error) {
-        this._renderError(error.message || 'Request to the API failed.');
-      }
-    })
-    .catch((cause) => {
-      this._renderError(cause.message || 'Unable to connect to the API.');
-    });
+    .catch(() => {});
   }
 }
 window.customElements.define('arc-test-details', ArcTestDetails);

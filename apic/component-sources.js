@@ -3,7 +3,7 @@ const path = require('path');
 const logging = require('../lib/logging');
 
 function prepareComponent(workingDir, componentName) {
-  console.log('Preparing component sources', componentName);
+  logging.verbose('Preparing component sources', componentName);
   return new Promise((resolve, reject) => {
     const amf = spawn(path.join(__dirname, 'update-git-element.sh'), [workingDir, componentName]);
 

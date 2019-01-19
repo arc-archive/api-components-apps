@@ -1,6 +1,11 @@
 const path = require('path');
+const logging = require('../lib/logging');
+
 process.on('message', (data) => {
-  const amf = require(path.join(data.workingDir, 'amf', 'lib', 'amf.js'));
+  logging.verbose('AMF parser process received data');
+  const url = path.join(data.workingDir, 'amf', 'lib', 'amf.js');
+  logging.verbose('Using AMF parser located in ' + url);
+  const amf = require(url);
   const generator = amf.Core.generator('AMF Graph', 'application/ld+json');
   amf.plugins.document.WebApi.register();
   amf.plugins.document.Vocabularies.register();
@@ -11,7 +16,7 @@ process.on('message', (data) => {
     if (data.source.indexOf('http') !== 0) {
       data.source = `file://${data.source}`;
     }
-    console.log('Parsing AMF file: ', data.source);
+    logging.verbose('Parsing AMF file: ', data.source);
     let contentType;
     switch (data.type) {
       case 'RAML 1.0':
@@ -27,23 +32,23 @@ process.on('message', (data) => {
     return parser.parseFileAsync(data.source);
   })
   .then((doc) => {
-    console.log('API parsed. Resolving model...');
+    logging.verbose('API parsed. Resolving model...');
     const resolver = amf.Core.resolver(data.type);
     doc = resolver.resolve(doc, 'editing');
-    console.log('Model resolved. Generating model.');
+    logging.verbose('Model resolved. Generating model.');
     return generator.generateString(doc);
   })
   .then((result) => {
-    console.log('API model ready. Sending back to parent app..');
+    logging.verbose('API model ready. Sending back to parent app..');
     process.send({
       api: result,
       source: data.source
     });
   })
   .catch((cause) => {
-    console.error('Error: ', cause);
     let m = `AMF parser: Unable to parse the API.\n`;
-    m += cause.s$1 || cause.message;
+    m += cause.message || cause.toString();
+    logging.error(m);
     process.send({error: m});
   });
 });

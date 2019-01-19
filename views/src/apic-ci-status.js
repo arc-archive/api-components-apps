@@ -10,7 +10,7 @@ import '@polymer/iron-selector/iron-selector.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-progress/paper-progress.js';
-import '@polymer/paper-menu-button/paper-menu-button.js'
+import '@polymer/paper-menu-button/paper-menu-button.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
@@ -165,14 +165,14 @@ class ApicCiStatus extends PolymerElement {
                   <a href="#/tokens">
                     <paper-item>Tokens</paper-item>
                   </a>
-                  <a href="/auth/logout?return=%2Fstatus">
+                  <a href="/auth/logout?return=%2F">
                     <paper-item>Log out</paper-item>
                   </a>
                 </paper-listbox>
               </paper-menu-button>
             </template>
             <template is="dom-if" if="[[!loggedIn]]">
-              <a href="/auth/login?return=%2Fstatus">
+              <a href="/auth/login?return=%2F">
                 <paper-button class="login-button">Log in</paper-button>
               </a>
             </template>

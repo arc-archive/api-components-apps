@@ -135,13 +135,6 @@ class TestApiRoute extends BaseApi {
         };
         throw o;
       }
-      if (resource.status !== 'queued') {
-        const o = {
-          message: 'Test can be removed only when its state is queued',
-          status: 400
-        };
-        throw o;
-      }
       return this.testModel.deleteTest(testId);
     })
     .then(() => {

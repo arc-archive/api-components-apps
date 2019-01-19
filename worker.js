@@ -66,6 +66,9 @@ class ApiComponentsTestsWorker {
     const i = this.queue.findIndex((item) => item.entryId === id);
     if (i !== -1) {
       const instance = this.queue[i];
+      if (instance.running) {
+        this.isRunning = false;
+      }
       instance.abort = true;
       instance.removeAllListeners();
       this.queue.splice(i, 1);
@@ -87,6 +90,7 @@ class ApiComponentsTestsWorker {
   setupQueue(id, info) {
     const runner = new ApicTestRunner(id, info);
     this.queue.push(runner);
+    logging.verbose('Test ' + id + ' added to the queue.');
     runner.on('end', () => this.afterRun(runner));
     runner.on('error', (err) => this.testError(runner, err));
     this.run();

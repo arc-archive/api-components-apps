@@ -6,13 +6,14 @@ const logging = require('../lib/logging');
 class AmfModelGenerator {
   constructor(workingDir, component) {
     this.component = component;
-    this.startCwd = process.cwd();
     this.workingDir = workingDir;
     this.componentDir = this.workingDir + '/' + component;
-    process.chdir(this.componentDir);
   }
 
   generate() {
+    if (!fs.pathExistsSync(this.componentDir)) {
+      return Promise.reject(new Error(`The component ${this.component} do not exists.`));
+    }
     const models = this.getModelsList();
     if (!models) {
       return Promise.reject(new Error(`The component ${this.component} has no "models.json" file.`));
@@ -35,7 +36,12 @@ class AmfModelGenerator {
     for (let i = 0, len = locations.length; i < len; i++) {
       if (fs.pathExistsSync(locations[i][0])) {
         this.modeslDir = this.componentDir + '/' + locations[i][1];
-        return fs.readJsonSync(locations[i][0], {throws: false});
+        try {
+          return fs.readJsonSync(locations[i][0], {throws: false});
+        } catch (cause) {
+          logging.error('Failed to load model definitions.');
+          logging.error(cause);
+        }
       }
     }
   }
@@ -47,7 +53,7 @@ class AmfModelGenerator {
     const options = {
       execArgv: []
     };
-    this.amfProc = fork(`${__dirname}/amf-parser.js`, options);
+    this.amfProc = fork(`${__dirname}/amf-parser.js`, [], options);
     this.amfProc.on('message', (result) => {
       if (result.error) {
         this._resultError(result.error);
@@ -82,7 +88,6 @@ class AmfModelGenerator {
     if (typeof error === 'string') {
       error = new Error(error);
     }
-    process.chdir(this.startCwd);
     this._rejecter(error);
     this._resolver = undefined;
     this._rejecter = undefined;
@@ -92,7 +97,6 @@ class AmfModelGenerator {
     const api = Object.keys(this.models)[0];
     if (!api) {
       this._clearProcess();
-      process.chdir(this.startCwd);
       this._resolver();
       this._resolver = undefined;
       this._rejecter = undefined;

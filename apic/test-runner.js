@@ -26,6 +26,7 @@ class ApicTestRunner extends EventEmitter {
     this.testsComponentModel = new TestsComponentModel();
     this.testsLogsModel = new TestsLogsModel();
     this.abort = false;
+    this.running = false;
   }
 
   get skipComponents() {
@@ -36,6 +37,7 @@ class ApicTestRunner extends EventEmitter {
     if (this.abort) {
       return Promise.resolve();
     }
+    this.running = true;
     return this.testsModel.startTest(this.entryId)
     .then(() => this.createWorkingDir())
     .then(() => this.catalogModel.listApiComponents())
@@ -228,7 +230,10 @@ class ApicTestRunner extends EventEmitter {
     .catch((cause) => {
       logging.error(cause);
     })
-    .then(() => this.emit('end'));
+    .then(() => {
+      this.running = false;
+      this.emit('end');
+    });
   }
 
   finish(message) {
@@ -241,7 +246,10 @@ class ApicTestRunner extends EventEmitter {
     .catch((cause) => {
       logging.error(cause);
     })
-    .then(() => this.emit('end'));
+    .then(() => {
+      this.running = false;
+      this.emit('end');
+    });
   }
 }
 

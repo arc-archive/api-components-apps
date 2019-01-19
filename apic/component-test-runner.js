@@ -49,6 +49,7 @@ class ComponentTestRunner {
 
   _browserInitHook(browser) {
     const id = this._computeBrowserId(browser);
+    logging.verbose('WCT initializing browser ' + browser.browserName);
     this.results[id] = {
       status: 'init',
       browser: browser.browserName,
@@ -61,6 +62,7 @@ class ComponentTestRunner {
   _browserStartHook(browser) {
     const id = this._computeBrowserId(browser);
     this.results[id].status = 'running';
+    logging.verbose('WCT starting browser ' + this.results[id].browserName);
   }
 
   _testEndHook(browser, test) {
@@ -69,6 +71,7 @@ class ComponentTestRunner {
       path: test.test,
       state: test.state
     });
+    logging.verbose('WCT test executed with result ' + test.sate);
   }
 
   _browserEndHook(browser, error) {
@@ -77,7 +80,9 @@ class ComponentTestRunner {
     this.results[id].endTime = Date.now();
     if (error) {
       this.results[id].message = this._browserErrorMessage(error);
+      this.results[id].error = true;
     }
+    logging.verbose('WCT browser ' + this.results[id].browserName + ' ended with status ' + this.results[id].status);
   }
 
   _browserErrorMessage(error) {
@@ -95,11 +100,12 @@ class ComponentTestRunner {
   }
 
   run() {
-    logging.verbose('Running selenium tests ' + this.component);
+    logging.verbose('Running selenium tests for ' + this.component);
     const opts = this.getWctOptions();
     return wctTest(opts)
     .catch(() => {})
     .then(() => {
+      logging.verbose('Selenium tests finished ' + this.component);
       this._processResults();
       const report = this.generateReport();
       this.report = report;
@@ -130,10 +136,10 @@ class ComponentTestRunner {
   }
 
   _processResults() {
-    const keys = Object.keys(this.results);
-    const hasResults = keys.some((key) => this.results[key].logs.length);
-    const hasFailure = keys.some((key) => this.results[key].status !== 'passed');
-    this.passing = !hasFailure;
+    const results = this.results;
+    const keys = Object.keys(results);
+    const hasResults = keys.some((key) => results[key].logs.length);
+    const hasFailure = keys.some((key) => results[key].status !== 'passed');
     if (!hasResults) {
       if (this.retry === 0) {
         this.retry++;
@@ -142,6 +148,7 @@ class ComponentTestRunner {
         return this.run();
       }
     }
+    this.passing = !hasFailure;
     this.results = this._createResult();
   }
 
@@ -152,6 +159,9 @@ class ComponentTestRunner {
       const browser = this.results[i];
       passed += browser.passed;
       failed += browser.failed;
+      if (browser.error) {
+        failed++;
+      }
     }
     return {
       passing: this.passing,

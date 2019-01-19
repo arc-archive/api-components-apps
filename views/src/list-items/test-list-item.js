@@ -13,8 +13,13 @@ class TestListItem extends PolymerElement {
         @apply --paper-font-body1;
       }
 
-      .item-container {
+      .item-container,
+      .data-container {
         @apply --layout-horizontal;
+      }
+
+      .data-container {
+        @apply --layout-flex;
       }
 
       .item:first-child {
@@ -29,6 +34,7 @@ class TestListItem extends PolymerElement {
         @apply --layout-vertical;
         padding: 4px 8px;
         margin: 4px 24px;
+        width: 30%;
       }
 
       .item.max {
@@ -53,6 +59,10 @@ class TestListItem extends PolymerElement {
         color: #F44336;
       }
 
+      .test-status {
+        text-transform: capitalize;
+      }
+
       .source-commit {
         color: #9E9E9E;
         font-size: 12px;
@@ -73,42 +83,60 @@ class TestListItem extends PolymerElement {
         width: 120px;
         @apply --paper-font-common-nowrap;
       }
+
+      @media (max-width: 760px) {
+        .item {
+          @apply --layout-vertical;
+          margin: 4px 0;
+          width: 100%;
+        }
+
+        .item.detail-result {
+          display: none !important;
+        }
+
+        .item.narrow {
+          @apply --layout-vertical;
+        }
+
+        .data-container {
+          @apply --layout-vertical;
+          @apply --layout-start;
+          width: 100%;
+        }
+      }
       </style>
       <div class="item-container">
-        <div class="item time-item">
-          <template is="dom-if" if="[[!isFinished]]">
-            <label>Scheduled:</label>
-            <relative-time datetime$="[[computeIsoDate(item.startTime)]]"></relative-time>
-          </template>
-          <template is="dom-if" if="[[isFinished]]">
-            <label>Ended:</label>
-            <relative-time datetime$="[[computeIsoDate(item.endTime)]]"></relative-time>
-          </template>
-        </div>
-
-        <div class="item">
-          <label>Status:</label>
-          <span class="test-status">[[item.status]]</span>
-        </div>
-
-        <div class="item">
-          <label>Result:</label>
-          <span class="result-status">[[resultLabel]]</span>
-        </div>
-
-        <div class="item max">
-          <label>Branch:</label>
-          <span class="source-branch">[[item.branch]]</span>
-          <template is="dom-if" if="[[item.commit]]">
-            <span class="source-commit" title="Commit SHA">[[item.commit]]</span>
-          </template>
-        </div>
-        <template is="dom-if" if="[[item.component]]">
-          <div class="item max">
-            <label>Component:</label>
-            <span class="component">[[item.component]]</span>
+        <div class="data-container">
+          <div class="item time-item">
+            <label>[[_computeTimeLabel(item)]]:</label>
+            <relative-time datetime$="[[_computeTimeValue(item)]]"></relative-time>
           </div>
-        </template>
+
+          <div class="item">
+            <label>Status:</label>
+            <span class="test-status">[[item.status]]</span>
+          </div>
+
+          <div class="item">
+            <label>Result:</label>
+            <span class="result-status">[[resultLabel]]</span>
+          </div>
+
+          <div class="item max">
+            <label>Branch:</label>
+            <span class="source-branch">[[item.branch]]</span>
+            <template is="dom-if" if="[[item.commit]]">
+              <span class="source-commit" title="Commit SHA">[[item.commit]]</span>
+            </template>
+          </div>
+          <template is="dom-if" if="[[item.component]]">
+            <div class="item max">
+              <label>Component:</label>
+              <span class="component">[[item.component]]</span>
+            </div>
+          </template>
+        </div>
 
         <a href="#/test-details/[[item.id]]">
           <paper-button>Details</paper-button>
@@ -124,18 +152,52 @@ class TestListItem extends PolymerElement {
       isFinished: {type: Boolean, value: false, computed: '_computeIsFinished(item.status)'},
       failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},
       queued: {type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)'},
+      running: {type: Boolean, reflectToAttribute: true, computed: '_computeRunning(item.status)'},
       resultLabel: {
         type: String,
-        computed: '_computeResultLabel(queued, failed)'
+        computed: '_computeResultLabel(isFinished, failed)'
       }
     };
   }
 
-  _computeResultLabel(queued, failed) {
-    if (queued) {
+  _computeTimeLabel(item) {
+    if (!item) {
+      return '';
+    }
+    switch (item.status) {
+      case 'queued': return 'Scheduled';
+      case 'running': return 'Started';
+      case 'finished': return 'Ended';
+      default: return '';
+    }
+  }
+
+  _computeTimeValue(item) {
+    if (!item) {
+      return;
+    }
+    let time;
+    switch (item.status) {
+      case 'queued': time = item.created; break;
+      case 'running': time = item.startTime; break;
+      case 'finished': time = item.endTime; break;
+    }
+    if (!time || isNaN(time)) {
+      return;
+    }
+    const d = new Date(Number(time));
+    return d.toISOString();
+  }
+
+  _computeResultLabel(finished, failed) {
+    if (!finished) {
       return 'n/a';
     }
     return failed ? 'Failed' : 'Success';
+  }
+
+  _computeRunning() {
+    return status === 'running';
   }
 
   _computeIsAmfBuid(type) {
@@ -161,14 +223,6 @@ class TestListItem extends PolymerElement {
       return true;
     }
     return false;
-  }
-
-  computeIsoDate(time) {
-    if (!time || isNaN(time)) {
-      return;
-    }
-    const d = new Date(Number(time));
-    return d.toISOString();
   }
 
   _computePassed(record) {

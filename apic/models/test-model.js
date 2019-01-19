@@ -265,10 +265,37 @@ class TestsModel extends BaseModel {
   }
 
   deleteTest(id) {
+    background.dequeueTest(id);
+    const transaction = this.store.transaction();
     const key = this.createTestKey(id);
-    return this.store.delete(key)
+    return transaction.run()
+    .then(() => transaction.delete(key))
     .then(() => {
-      background.dequeueTest(id);
+      const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
+      return query.run();
+    })
+    .then((result) => {
+      const keys = result[0].map((item) => item[this.store.KEY]);
+      if (keys.length) {
+        transaction.delete(keys);
+      }
+    })
+    .then(() => {
+      const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
+      return query.run();
+    })
+    .then((result) => {
+      const keys = result[0].map((item) => item[this.store.KEY]);
+      if (keys.length) {
+        transaction.delete(keys);
+      }
+    })
+    .then(() => {
+      return transaction.commit();
+    })
+    .catch((cause) => {
+      transaction.rollback();
+      return Promise.reject(cause);
     });
   }
 }

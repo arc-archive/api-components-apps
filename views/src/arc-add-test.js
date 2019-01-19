@@ -7,7 +7,6 @@ import '@polymer/iron-form/iron-form.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
-import './tests-data-factory.js';
 import './apic-icons.js';
 
 class ArcAddTest extends PolymerElement {
@@ -59,15 +58,14 @@ class ArcAddTest extends PolymerElement {
               <paper-item>bottom-up</paper-item>
             </paper-listbox>
           </paper-dropdown-menu>
-          <template is="dom-if" if="[[isBottomUp]]">
-            <paper-input label="Source component" name="component" disabled="[[!isBottomUp]]" required auto-validate></paper-input>
+          <template is="dom-if" if="[[isBottomUp]]" restamp>
+            <paper-input label="Source component" name="component" required auto-validate></paper-input>
           </template>
           <paper-input label="Source branch" name="branch" required auto-validate></paper-input>
           <paper-input label="Commit sha (optional)" name="commit"></paper-input>
           <paper-button class="submit" on-click="submit" raised>Save</paper-button>
         </form>
       </iron-form>
-      <tests-data-factory id="model" api-base="[[apiBase]]"></tests-data-factory>
       <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
     `;
   }
@@ -114,9 +112,13 @@ class ArcAddTest extends PolymerElement {
       this._renderError('Something went wrong. Unexpected response.');
       return;
     }
-    this.$.model.refreshTest(id);
+    this.dispatchEvent(new CustomEvent('test-added', {
+      composed: true,
+      bubbles: true
+    }));
     this.loading = false;
     this.$.form.reset();
+    this.selectedType = -1;
     this.dispatchEvent(new CustomEvent('navigate', {
       composed: true,
       bubbles: true,

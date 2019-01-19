@@ -31,6 +31,7 @@ const fs = require('fs-extra');
 const app = express();
 
 app.disable('etag');
+app.disable('x-powered-by');
 app.set('trust proxy', true);
 app.use(logging.requestLogger);
 
@@ -89,7 +90,13 @@ app.get('/_ah/health', (req, res) => {
   res.status(200).send('ok');
 });
 
-app.use('/', express.static(path.join(__dirname, 'views', 'build', 'esm-bundled')));
+if (config.get('NODE_ENV') === 'production') {
+  app.use('/', express.static(path.join(__dirname, 'views', 'build', 'es6-bundled')));
+} else {
+  const proxy = require('express-http-proxy');
+  app.use('/', proxy('http://127.0.0.1:8081'));
+}
+
 
 // Redirect root to /status
 app.get('/status', (req, res) => {
@@ -108,7 +115,7 @@ app.use((req, res) => {
 
 // Render default page
 app.use((req, res) => {
-  const file = path.join(__dirname, 'public', 'build', 'esm-bundled', 'index.html');
+  const file = path.join(__dirname, 'views', 'build', 'es6-bundled');
   res.sendFile(file);
 });
 
