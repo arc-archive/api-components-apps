@@ -18,7 +18,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: apic-ci-frontend
+  name: apic-ci-worker
   labels:
     app: apic-ci
 # For more info about Pods see:
@@ -29,7 +29,7 @@ spec:
     metadata:
       labels:
         app: apic-ci
-        tier: frontend
+        tier: worker
     spec:
       volumes:
       - name: google-cloud-key
@@ -37,7 +37,7 @@ spec:
           secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.1
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.2
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
@@ -45,18 +45,12 @@ spec:
         # starting the pod. This is useful when debugging, but should be turned
         # off in production.
         imagePullPolicy: Always
-        # The app process listens on port 8080 for web traffic by default.
-        ports:
-        - name: http-server
-          containerPort: 8080
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: /var/secrets/google/key.json
+          - name: SCRIPT
+            value: worker.js
           - name: PROJECT_ID
             value: advancedrestclient-1155
-          - name: OAUTH2_CALLBACK
-            value: https://ci.advancedrestclient.com/auth/callback
-          - name: OAUTH2_CLIENT_ID
-            value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
           - name: MEMCACHE_URL
             value: 35.233.153.23:11211
