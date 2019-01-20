@@ -62,7 +62,7 @@ class ComponentTestRunner {
   _browserStartHook(browser) {
     const id = this._computeBrowserId(browser);
     this.results[id].status = 'running';
-    logging.verbose('WCT starting browser ' + this.results[id].browserName);
+    logging.verbose('WCT starting browser ' + this.results[id].browser);
   }
 
   _testEndHook(browser, test) {
@@ -71,7 +71,7 @@ class ComponentTestRunner {
       path: test.test,
       state: test.state
     });
-    logging.verbose('WCT test executed with result ' + test.sate);
+    logging.verbose('WCT test executed with result ' + test.state);
   }
 
   _browserEndHook(browser, error) {
@@ -82,7 +82,7 @@ class ComponentTestRunner {
       this.results[id].message = this._browserErrorMessage(error);
       this.results[id].error = true;
     }
-    logging.verbose('WCT browser ' + this.results[id].browserName + ' ended with status ' + this.results[id].status);
+    logging.verbose('WCT browser ' + this.results[id].browser + ' ended with status ' + this.results[id].status);
   }
 
   _browserErrorMessage(error) {
@@ -115,11 +115,7 @@ class ComponentTestRunner {
       logging.verbose(`Retrying ${this.component} due to the error.`);
       return this.run();
     }
-    const result = this._processResults();
-    if (result) {
-      // retry the test to reduce false-positives from selenium
-      return result;
-    }
+    this._processResults();
     const report = this.generateReport();
     this.report = report;
     return report;
