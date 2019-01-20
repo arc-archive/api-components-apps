@@ -30,7 +30,9 @@ class ApicTestRunner extends EventEmitter {
   }
 
   get skipComponents() {
-    return ['api-components-autotest', 'api-console-default-theme', 'api-console-ext-comm'];
+    return ['api-components-autotest', 'api-console-default-theme',
+      'api-console-ext-comm', 'api-candidates-dialog', 'api-form-mixin',
+      'api-property-form-item'];
   }
 
   run() {
