@@ -29,7 +29,9 @@ class AmfModelGenerator {
 
   getModelsList() {
     const locations = [
+      [this.componentDir + '/demo/apis.json', 'demo'],
       [this.componentDir + '/demo/models.json', 'demo'],
+      [this.componentDir + '/test/apis.json', 'test'],
       [this.componentDir + '/test/models.json', 'test']
     ];
 
