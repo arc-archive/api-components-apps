@@ -205,7 +205,7 @@ if (module === require.main) {
 }
 
 app.mocks = {
-  processAmfBranch: worker.processAmfBranch.bind(worker)
+  // processAmfBranch: worker.processAmfBranch.bind(worker)
 };
 
 // Proxyquire requires this *exact* line, hence the "app.mocks" above

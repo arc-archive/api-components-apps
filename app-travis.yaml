@@ -40,16 +40,19 @@ spec:
       - name: ci-agent-key
         secret:
           secretName: ci-gpg-key
+      - name: github-ssh-key
+        secret:
+          secretName: github-ssh-key
       containers:
       - name: travis-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.3
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.5
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
         - name: ci-agent-key
-          mountPath: /var/secrets/apic
+          mountPath: /var/secrets/apic/gpg
         - name: github-ssh-key
-          mountPath: /var/secrets/apic
+          mountPath: /var/secrets/apic/ssh
         imagePullPolicy: Always
         env:
           - name: GOOGLE_APPLICATION_CREDENTIALS
@@ -61,11 +64,11 @@ spec:
           - name: MEMCACHE_URL
             value: 35.233.153.23:11211
           - name: GPG_KEY
-            value: /var/secrets/apic/AE3F9FF03C5F6C7B
+            value: /var/secrets/apic/gpg/AE3F9FF03C5F6C7B
           - name: GITHUB_SSH_KEY
-            value: /var/secrets/apic/ssh-key
+            value: /var/secrets/apic/ssh/ssh-key
           - name: GITHUB_SSH_KEY_PUB
-            value: /var/secrets/apic/ssh-key-pub
+            value: /var/secrets/apic/ssh/ssh-key-pub
           - name: CI_EMAIL
             valueFrom:
               secretKeyRef:
@@ -86,3 +89,8 @@ spec:
               secretKeyRef:
                 name: github-ssh-key
                 key: key-pass
+          - name: WEBHOOK_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: github-webhook-secret
+                key: github-webhook-secret
