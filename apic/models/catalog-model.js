@@ -10,6 +10,61 @@ class CatalogModel extends BaseModel {
     super('api-components');
   }
 
+  get componentExcludeIndexes() {
+    return [
+      'name', 'version', 'versions', 'group'
+    ];
+  }
+
+  get versionExcludeIndexes() {
+    return [
+      'name', 'version', 'docs', 'changelog'
+    ];
+  }
+
+  _getGroupKey(name) {
+    return this.store.key({
+      namespace: this.namespace,
+      path: [
+        this.groupsKind,
+        this.slug(name)
+      ]
+    });
+  }
+
+  _createComponentKey(groupName, componentName) {
+    return this.store.key({
+      namespace: this.namespace,
+      path: [
+        this.groupsKind,
+        this.slug(groupName),
+        this.componentsKind,
+        this.slug(componentName)
+      ]
+    });
+  }
+
+  /**
+   * Creates datastore key for version object
+   * @param {String} version Component version
+   * @param {String} componentName Component name
+   * @param {String} groupName Component's group
+   * @return {Object}
+   */
+  _createVersionKey(version, componentName, groupName) {
+    return this.store.key({
+      namespace: this.namespace,
+      path: [
+        this.groupsKind,
+        this.slug(groupName),
+        this.componentsKind,
+        this.slug(componentName),
+        this.versionsKind,
+        version
+      ]
+    });
+  }
+
   listComponents() {
     const query = this.store.createQuery(this.namespace, this.componentsKind);
     return this.store.runQuery(query)
@@ -43,50 +98,24 @@ class CatalogModel extends BaseModel {
    * @param {String} componentName Component name
    * @param {String} groupName Component's group
    * @param {String} data Data to store
+   * @param {?String} changelog Changelog string to store with version
    * @return {Promise}
    */
-  addVersion(version, componentName, groupName, data) {
-    const entities = [];
-    return this._ensureGroup(groupName, entities)
-    .then(() =>
-      this._ensureComponent(version, componentName, groupName, entities))
-    .then((addVersion) => {
-      if (addVersion) {
-        return this._createVersion(version, componentName,
-          groupName, data, entities);
-      } else {
-        return this._replaceVersion(version, componentName,
-          groupName, data, entities);
-      }
-    })
-    .then((version) => {
-      entities.push(version);
-      return this.store.upsert(entities);
-    });
+  addVersion(version, componentName, groupName, data, changelog) {
+    return this._ensureGroup(groupName)
+    .then(() => this._ensureComponent(version, componentName, groupName))
+    .then(() => this._ensureVersion(version, componentName, groupName, data, changelog));
   }
   /**
-   * Creates a group of components if does not exists.
+   * Creates a group of components if it does not exist.
    *
    * @param {String} groupName Name of the group
-   * @param {Array} result Entity results array
    * @return {Promise}
    */
-  _ensureGroup(groupName, result) {
-    const key = this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.groupsKind,
-        this.slug(groupName)
-      ]
-    });
+  _ensureGroup(groupName) {
+    const key = this._getGroupKey(groupName);
     return this.store.get(key)
-    .catch(() => {})
-    .then((data) => {
-      if (!data || !data[0]) {
-        // console.log('Creating group entity');
-        result.push(this._createGroup(groupName, key));
-      }
-    });
+    .catch(() => this._createGroup(groupName, key));
   }
   /**
    * Creates a component group entity.
@@ -96,14 +125,20 @@ class CatalogModel extends BaseModel {
    * @return {Object} Generated model.
    */
   _createGroup(name, key) {
-    const data = {
-      key: key,
-      data: {
-        name: name,
-        ref: this.slug(name)
-      }
+    const data = [{
+      name: 'name',
+      value: name,
+      excludeFromIndexes: true
+    }, {
+      name: 'ref',
+      value: this.slug(name),
+      excludeFromIndexes: false
+    }];
+    const entity = {
+      key,
+      data
     };
-    return data;
+    return this.store.upsert(entity);
   }
   /**
    * Test if component data are already stored and creates a model if not.
@@ -111,40 +146,23 @@ class CatalogModel extends BaseModel {
    * @param {String} version Component version
    * @param {String} componentName Component name
    * @param {String} groupName Component's group
-   * @param {Array} result Entity results array
    * @return {Promise}
    */
-  _ensureComponent(version, componentName, groupName, result) {
-    const key = this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.groupsKind,
-        this.slug(groupName),
-        this.componentsKind,
-        this.slug(componentName)
-      ]
-    });
+  _ensureComponent(version, componentName, groupName) {
+    const key = this._createComponentKey(groupName, componentName);
     return this.store.get(key)
     .catch(() => {})
     .then((data) => {
       if (!data || !data[0]) {
-        // console.log('Creating component entity');
-        result.push(
-          this._createComponent(componentName, version, groupName, key));
-        return true;
+        return this._createComponent(componentName, version, groupName, key);
       } else {
-        const model = this._addComponentVersion(data[0], version);
-        if (model) {
-          result.push(model);
-          return true;
-        }
+        return this._addComponentVersion(data[0], version, key);
       }
-      return false;
     });
   }
 
   /**
-   * Creates a component entity.
+   * Creates a component.
    *
    * @param {String} name Name of the group
    * @param {String} version Component version
@@ -153,39 +171,41 @@ class CatalogModel extends BaseModel {
    * @return {Object} Generated model.
    */
   _createComponent(name, version, groupName, key) {
+    const data = [{
+      name: 'ref',
+      value: this.slug(name),
+      excludeFromIndexes: false
+    }, {
+      name: 'name',
+      value: name,
+      excludeFromIndexes: true
+    }, {
+      name: 'version',
+      value: version,
+      excludeFromIndexes: true
+    }, {
+      name: 'versions',
+      value: [version],
+      excludeFromIndexes: true
+    }, {
+      name: 'group',
+      value: groupName,
+      excludeFromIndexes: true
+    }];
     const entity = {
-      key: key,
-      data: [{
-        name: 'ref',
-        value: this.slug(name),
-        excludeFromIndexes: false
-      }, {
-        name: 'name',
-        value: name,
-        excludeFromIndexes: false
-      }, {
-        name: 'version',
-        value: version,
-        excludeFromIndexes: true
-      }, {
-        name: 'versions',
-        value: [version],
-        excludeFromIndexes: true
-      }, {
-        name: 'group',
-        value: groupName,
-        excludeFromIndexes: true
-      }]
+      key,
+      data
     };
-    return entity;
+    return this.store.upsert(entity);
   }
   /**
    * Adds a new version to the component model.
    * @param {Object} model Existing model
    * @param {String} version Version number
+   * @param {Object} key Datastore key
    * @return {Object} updated model
    */
-  _addComponentVersion(model, version) {
+  _addComponentVersion(model, version, key) {
     if (!model.versions) {
       model.versions = [];
     }
@@ -193,26 +213,46 @@ class CatalogModel extends BaseModel {
       return;
     }
     model.versions[model.versions.length] = version;
-    return model;
+    model.version = version;
+    const entity = {
+      key,
+      data: model,
+      excludeFromIndexes: this.componentExcludeIndexes
+    };
+    return this.store.update(entity);
   }
   /**
-   * Creates datastore key for version object
+   * Replaces/creates version in the datastroe
    * @param {String} version Component version
    * @param {String} componentName Component name
    * @param {String} groupName Component's group
-   * @return {Object}
+   * @param {Object} data Polymer analysis result
+   * @param {?String} changelog Version changelog
+   * @return {Promise}
    */
-  _getVersionKey(version, componentName, groupName) {
-    return this.store.key({
-      namespace: this.namespace,
-      path: [
-        this.groupsKind,
-        this.slug(groupName),
-        this.componentsKind,
-        this.slug(componentName),
-        this.versionsKind,
-        version
-      ]
+  _ensureVersion(version, componentName, groupName, data, changelog) {
+    const key = this._createVersionKey(version, componentName, groupName);
+    return this.store.get(key)
+    .catch(() => {})
+    .then((model) => {
+      if (!model || !model[0]) {
+        return this._createVersion(version, componentName, groupName, data, changelog);
+      } else {
+        model = model[0];
+        model.created = Date.now();
+        model.docs = JSON.stringify(data);
+        if (changelog) {
+          model.changelog = changelog;
+        } else if (model.changelog) {
+          delete model.changelog;
+        }
+        const entity = {
+          key,
+          data: model,
+          excludeFromIndexes: this.versionExcludeIndexes
+        };
+        return this.store.update(entity);
+      }
     });
   }
   /**
@@ -221,50 +261,41 @@ class CatalogModel extends BaseModel {
    * @param {String} version Component version
    * @param {String} componentName Component name
    * @param {String} groupName Component's group
-   * @param {Object} data Elmements
-   * @return {Object} Generated model.
+   * @param {Object} docs Polymer analysis result
+   * @param {?String} changelog
+   * @return {Promise}
    */
-  _createVersion(version, componentName, groupName, data) {
-    const key = this._getVersionKey(version, componentName, groupName);
-    const entity = {
-      key: key,
-      data: [{
-        name: 'name',
-        value: componentName,
-        excludeFromIndexes: false
-      }, {
-        name: 'version',
-        value: version,
-        excludeFromIndexes: false
-      }, {
-        name: 'docs',
-        value: JSON.stringify(data),
+  _createVersion(version, componentName, groupName, docs, changelog) {
+    const key = this._createVersionKey(version, componentName, groupName);
+    const data = [{
+      name: 'name',
+      value: componentName,
+      excludeFromIndexes: true
+    }, {
+      name: 'version',
+      value: version,
+      excludeFromIndexes: true
+    }, {
+      name: 'docs',
+      value: JSON.stringify(docs),
+      excludeFromIndexes: true
+    }, {
+      name: 'created',
+      value: Date.now(),
+      excludeFromIndexes: false
+    }];
+    if (changelog) {
+      data.push({
+        name: 'changelog',
+        value: changelog,
         excludeFromIndexes: true
-      }]
+      });
+    }
+    const entity = {
+      key,
+      data
     };
-    return entity;
-  }
-  /**
-   * Replaces data in existing version model.
-   * @param {String} version Component version
-   * @param {String} componentName Component name
-   * @param {String} groupName Component's group
-   * @param {Object} data Elmements
-   * @return {Object} A data model to be updated
-   */
-  _replaceVersion(version, componentName, groupName, data) {
-    const key = this._getVersionKey(version, componentName, groupName);
-    return this.store.get(key)
-    .catch(() => {})
-    .then((model) => {
-      if (!model || !model[0]) {
-        return this._createVersion(version, componentName, groupName, data);
-      } else {
-        model = model[0];
-        model.docs = JSON.stringify(data);
-        return model;
-      }
-    });
+    return this.store.upsert(entity);
   }
 }
 

@@ -33,6 +33,37 @@ class Changelog {
       throw cause;
     });
   }
+
+  get() {
+    logging.verbose('Reading changelog data...');
+    process.chdir(this.workingDir);
+    return fs.ensureFile(this.changelogFile)
+    .then(() => this._changelogString())
+    .then((result) => {
+      process.chdir(this.startDir);
+      return result;
+    })
+    .catch((cause) => {
+      process.chdir(this.startDir);
+      throw cause;
+    });
+  }
+  /**
+   * Get a stream from configured conventional releaser.
+   * @return {[type]} [description]
+   */
+  _getChangelogStreem() {
+    return conventionalChangelog({
+      preset: 'eslint',
+      pkg: {
+        path: 'package.json'
+      },
+      append: true,
+      releaseCount: 1,
+      warn: console.warn.bind(console),
+      // debug: console.debug.bind(console)
+    });
+  }
   /**
    * Executes changelog command.
    *
@@ -41,16 +72,7 @@ class Changelog {
   _runChangelog() {
     return new Promise((resolve, reject) => {
       logging.verbose('Running changelog release...');
-      const stream = conventionalChangelog({
-        preset: 'eslint',
-        pkg: {
-          path: 'package.json'
-        },
-        append: true,
-        releaseCount: 1,
-        warn: console.warn.bind(console),
-        // debug: console.debug.bind(console)
-      });
+      const stream = this._getChangelogStreem();
       stream.on('error', (err) => reject(err));
       stream
       .pipe(fs.createWriteStream(this.changelogFile, {
@@ -61,6 +83,21 @@ class Changelog {
       })
       .on('error', (err) => {
         reject(err);
+      });
+    });
+  }
+
+  _changelogString() {
+    return new Promise((resolve, reject) => {
+      logging.verbose('Running changelog release...');
+      const stream = this._getChangelogStreem();
+      stream.on('error', (err) => reject(err));
+      let result = '';
+      stream.on('data', (chunk) => {
+        result += chunk.toString();
+      })
+      .on('end', () => {
+        resolve(result.trim());
       });
     });
   }

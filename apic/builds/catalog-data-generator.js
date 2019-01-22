@@ -1,6 +1,7 @@
 const {Analyzer, FsUrlLoader, PackageUrlResolver, generateAnalysis} =
   require('polymer-analyzer');
 const {CatalogModel} = require('../models/catalog-model');
+const {Changelog} = require('./changelog');
 const fs = require('fs-extra');
 const path = require('path');
 /**
@@ -24,28 +25,6 @@ class CatalogDataGenerator {
       urlResolver: this.urlResolver,
     });
   }
-
-  get pkg() {
-    if (this.__pkg) {
-      return Promise.resolve(this.__pkg);
-    }
-    return fs.readJson(path.join(this.workingDir, 'package.json'), {throws: false})
-    .then((data) => {
-      this.__pkg = data;
-      return data;
-    });
-  }
-
-  get bower() {
-    if (this.__bower) {
-      return Promise.resolve(this.__bower);
-    }
-    return fs.readJson(path.join(this.workingDir, 'bower.json'), {throws: false})
-    .then((data) => {
-      this.__bower = data;
-      return data;
-    });
-  }
   /**
    * Generates documentation file for the component and tag.
    * Result is sent to the catalog www server.
@@ -64,9 +43,14 @@ class CatalogDataGenerator {
     .then(() => generateAnalysis(this.analysis, this.urlResolver, isNotTest))
     .then((result) => this._cleanStoreData(result))
     .then((result) => {
+      this.componentDocs = result;
+      return this.getChangelogData();
+    })
+    .then((cl) => {
       const group = this._getGroupName();
       const model = new CatalogModel();
-      return model.addVersion(this.version, this.component, group, result);
+      debugger;
+      return model.addVersion(this.version, this.component, group, this.componentDocs, cl);
     });
   }
   /**
@@ -197,6 +181,11 @@ class CatalogDataGenerator {
       return true;
     });
     return arr;
+  }
+
+  getChangelogData() {
+    const changelog = new Changelog(this.workingDir);
+    return changelog.get();
   }
 }
 module.exports.CatalogDataGenerator = CatalogDataGenerator;
