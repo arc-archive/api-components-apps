@@ -26,6 +26,14 @@ class BaseModel {
     return 'Component';
   }
 
+  get versionsKind() {
+    return 'Version';
+  }
+
+  get groupsKind() {
+    return 'Group';
+  }
+
   get testLogsKind() {
     return 'TestComponentLogs';
   }
@@ -38,12 +46,20 @@ class BaseModel {
     return 'Jwt';
   }
 
+  get buildKind() {
+    return 'Build';
+  }
+
   get apicUsersNamespace() {
     return 'api-components-users';
   }
 
   get apicTestsNamespace() {
     return 'api-components-tests';
+  }
+
+  get buildsNamespace() {
+    return 'api-components-builds';
   }
   /**
    * Creates a slug from a string.
@@ -119,6 +135,20 @@ class BaseModel {
         this.componentsKind,
         this.slug(componentName),
         this.testLogsKind,
+        id
+      ]
+    });
+  }
+  /**
+   * Creates a datastore key for a build.
+   * @param {String} id Build id
+   * @return {Object} Datastore key
+   */
+  createBuildKey(id) {
+    return this.store.key({
+      namespace: this.buildsNamespace,
+      path: [
+        this.buildKind,
         id
       ]
     });

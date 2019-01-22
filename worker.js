@@ -198,14 +198,14 @@ app.use(logging.errorLogger);
 if (module === require.main) {
   const server = app.listen(config.get('PORT'), () => {
     const port = server.address().port;
-    console.log(`App listening on port ${port}`);
+    console.log(`Worker listening on port ${port}`);
   });
   // worker.processMessages();
   worker.subscribe();
 }
 
 app.mocks = {
-  processAmfBranch: worker.processAmfBranch
+  processAmfBranch: worker.processAmfBranch.bind(worker)
 };
 
 // Proxyquire requires this *exact* line, hence the "app.mocks" above

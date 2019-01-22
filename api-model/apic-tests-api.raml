@@ -271,3 +271,10 @@ securitySchemes:
         body:
           displayName: Token is invalid.
           type: ErrorResource
+/travis:
+  description: |
+    This routes are reserved for Travis web hooks and build script calls.
+  /status:
+    post:
+      description: |
+        Called when commit status change

@@ -9,6 +9,8 @@ router.use('/tests', require('./tests-api'));
 router.use('/me', require('./me-api'));
 // JWT info route
 router.use('/tokeninfo', require('./token-api'));
+// Travis webhooks route
+router.use('/travis', require('./travis-api'));
 
 // Errors
 router.use((req, res) => {
