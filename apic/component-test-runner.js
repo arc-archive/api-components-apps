@@ -81,6 +81,7 @@ class ComponentTestRunner {
     if (error) {
       this.results[id].message = this._browserErrorMessage(error);
       this.results[id].error = true;
+      logging.error(error.stack || error.message || error);
     }
     logging.verbose('WCT browser ' + this.results[id].browser + ' ended with status ' + this.results[id].status);
   }
@@ -103,12 +104,16 @@ class ComponentTestRunner {
     logging.verbose('Running selenium tests for ' + this.component);
     const opts = this.getWctOptions();
     return wctTest(opts)
-    .catch(() => {})
+    .catch((cause) => {
+      console.log('UNHANDLED', cause);
+      logging.error('WTC ERROR');
+      logging.error(cause.stack || cause.message || cause);
+    })
     .then(() => this._finalize());
   }
 
   _finalize() {
-    logging.verbose('Selenium tests finished ' + this.component);
+    logging.verbose('Selenium tests finished for ' + this.component);
     if (this._shouldRetry()) {
       this.retry++;
       this.results = {};

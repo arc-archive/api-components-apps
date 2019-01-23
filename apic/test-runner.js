@@ -137,7 +137,7 @@ class ApicTestRunner extends EventEmitter {
     return prepareComponent(this.workingDir, name)
     .catch((cause) => {
       logging.error('Unable to process component sources   ' + name);
-      logging.error(cause);
+      logging.error(cause.stack || cause.message);
       throw cause;
     })
     .then(() => this.updateModels(name))
@@ -149,7 +149,7 @@ class ApicTestRunner extends EventEmitter {
       return dm.installDependencies()
       .catch((cause) => {
         logging.error('Cannot Install dependencies for   ' + name);
-        logging.error(cause);
+        logging.error(cause.stack || cause.message);
         throw cause;
       });
     })
@@ -170,7 +170,7 @@ class ApicTestRunner extends EventEmitter {
     return updater.generate()
     .catch((cause) => {
       logging.error('Cannot generate AMF model for  ' + name);
-      logging.error(cause);
+      logging.error(cause.stack || cause.message);
       throw cause;
     })
     .then(() => {
@@ -204,7 +204,7 @@ class ApicTestRunner extends EventEmitter {
       return Promise.resolve();
     }
     logging.verbose(`Component ${component} finished with error.`);
-    logging.error(err);
+    logging.error(err.stack || err.message);
     if (err.message) {
       err = err.message;
     }
@@ -220,7 +220,7 @@ class ApicTestRunner extends EventEmitter {
       return Promise.resolve();
     }
     logging.verbose('Test finished with error.');
-    logging.error(err);
+    logging.error(err.stack || err.message);
     if (err.message) {
       err = err.message;
     }
@@ -230,7 +230,7 @@ class ApicTestRunner extends EventEmitter {
     return this.testsModel.setTestError(this.entryId, err)
     .then(() => this.cleanup())
     .catch((cause) => {
-      logging.error(cause);
+      logging.error(cause.stack || cause.message);
     })
     .then(() => {
       this.running = false;
@@ -246,7 +246,7 @@ class ApicTestRunner extends EventEmitter {
     return this.testsModel.finishTest(this.entryId, message)
     .then(() => this.cleanup())
     .catch((cause) => {
-      logging.error(cause);
+      logging.error(cause.stack || cause.message);
     })
     .then(() => {
       this.running = false;
