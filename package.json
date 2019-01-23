@@ -1,6 +1,6 @@
 {
   "name": "api-components-autotest",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
@@ -10,8 +10,8 @@
     "start-worker2": "xvfb-run node --inspect=9226 worker.js --PORT=8082",
     "start-mac": "node --inspect=9227 worker.js --PORT=8082",
     "test": "mocha test/*.test.js",
-    "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.7 .",
-    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.7",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.8 .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.8",
     "deploy-config": "npm run deploy-frontend && npm run deploy-backend && npm run deploy-travis",
     "deploy-frontend": "kubectl apply -f app-frontend.yaml",
     "deploy-backend": "kubectl apply -f app-worker.yaml",
