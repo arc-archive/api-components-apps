@@ -43,6 +43,20 @@ class ArcAddTest extends PolymerElement {
         background-color: var(--accent-color);
         color: var(--accent-text-color);
       }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+          width: 100%;
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+          width: 100%;
+        };
+      }
       </style>
       <header>
         <a href="#/">

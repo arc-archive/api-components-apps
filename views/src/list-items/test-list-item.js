@@ -104,6 +104,10 @@ class TestListItem extends PolymerElement {
           @apply --layout-start;
           width: 100%;
         }
+
+        .item.max {
+          @apply --layout-flex-none;
+        }
       }
       </style>
       <div class="item-container">
@@ -218,6 +222,9 @@ class TestListItem extends PolymerElement {
     }
     if (item.status !== 'finished') {
       return false;
+    }
+    if (item.error) {
+      return true;
     }
     if (item.failed && item.failed > 0) {
       return true;

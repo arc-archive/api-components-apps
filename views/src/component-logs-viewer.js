@@ -43,8 +43,12 @@ class LogRenderer extends PolymerElement {
         color: #2E7D32;
       }
 
-      li[state="failed"]::before {
+      li[state="failing"]::before {
         content: '✖';
+        color: #F44336;
+      }
+
+      li[state="failing"] {
         color: #F44336;
       }
 

@@ -7,7 +7,7 @@ import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
 import 'time-elements/dist/time-elements.js';
 import './tokens-data-factory.js';
-import './token-list-item.js';
+import './list-items/token-list-item.js';
 
 class ArcTokens extends PolymerElement {
   static get template() {
@@ -83,6 +83,18 @@ class ArcTokens extends PolymerElement {
       .error-toast {
         background-color: #FF5722;
         color: #fff;
+      }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+        };
       }
       </style>
       <tokens-data-factory id="request" api-base="[[apiBase]]" list="{{tokens}}" has-more="{{hasMore}}" loading="{{loading}}" api-token="[[apiToken]]"></tokens-data-factory>

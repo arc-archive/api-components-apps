@@ -145,6 +145,10 @@ class ApicCiStatus extends PolymerElement {
           [main-title] {
             display: none !important;
           }
+
+          .status-add-test {
+            right: 20px;
+          }
         }
       </style>
       <app-location id="loc" route="{{route}}" use-hash-as-path url-space-regex="^((?!/auth).)*$"></app-location>

@@ -59,6 +59,18 @@ class ArcAddToken extends PolymerElement {
       .time-settings-row {
         @apply --layout-horizontal;
       }
+
+      @media (max-width: 1248px) {
+        :host {
+          margin: 0 24px 24px 24px;
+        };
+      }
+
+      @media (max-width: 420px) {
+        :host {
+          margin: 0 12px 12px 12px;
+        };
+      }
       </style>
       <header>
         <a href="#/tokens">

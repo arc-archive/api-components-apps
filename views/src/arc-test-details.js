@@ -46,6 +46,13 @@ class ArcTestDetails extends PolymerElement {
         color: #F44336;
       }
 
+      .error-message {
+        color: #F44336;
+        margin: 24px 0;
+        padding: 8px;
+        background-color: #ECEFF1;
+      }
+
       .result-value {
         margin-right: 8px;
       }
@@ -125,14 +132,22 @@ class ArcTestDetails extends PolymerElement {
       @media (max-width: 1248px) {
         :host {
           margin: 0 24px 24px 24px;
-          width: 100%:
+        };
+      }
+
+      @media (max-width: 762px) {
+        .queue-empty-state {
+          @apply --layout-vertical;
+        };
+
+        .graph-line {
+          margin: 8px 0;
         };
       }
 
       @media (max-width: 420px) {
         :host {
           margin: 0 12px 12px 12px;
-          width: 100%:
         };
       }
       </style>
@@ -167,6 +182,10 @@ class ArcTestDetails extends PolymerElement {
           </div>
         </template>
       <div>
+
+      <template is="dom-if" if="[[testDetail.error]]">
+        <p class="error-message">[[testDetail.message]]</p>
+      </template>
 
       <template is="dom-if" if="[[renderRestart]]">
         <div class="reset-test-container">
@@ -258,6 +277,7 @@ class ArcTestDetails extends PolymerElement {
       hasMore: Boolean,
 
       canCreate: Boolean,
+
       startedRunning: {
         type: Boolean,
         computed: '_computeStartedRunning(isRunning, componentsList)'

@@ -15,7 +15,8 @@ class TokenListItem extends PolymerElement {
         @apply --paper-font-body1;
       }
 
-      :host([expired]) {
+      :host([expired]),
+      :host([revoked]) {
         color: #9E9E9E;
       }
 
@@ -56,6 +57,13 @@ class TokenListItem extends PolymerElement {
         @apply --layout-flex;
         word-break: break-all;
         margin: 0 8px;
+      }
+
+      @media (max-width: 420px) {
+        .value {
+          font-size: 16px;
+          margin-bottom: 0.7em;
+        }
       }
       </style>
       <div class="details">
