@@ -7,40 +7,67 @@ FROM gcr.io/google_appengine/nodejs
 # version that satisfies it.
 RUN /usr/local/bin/install_node '>=8.12.0'
 
+RUN apt-get update
+
+# Install xvfb.
+RUN apt-get install -y xvfb fluxbox wget wmctrl
+
+#=========
+# Chrome
+#=========
+RUN apt-get install -y curl
+RUN curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google.list
+RUN apt-get update && apt-get install -y --no-install-recommends google-chrome-stable
+
+RUN CHROME_FILE=`whereis -b google-chrome | awk '{print $2}'` && \
+    cp $CHROME_FILE "$CHROME_FILE".old && \
+    cat "$CHROME_FILE".old | sed 's/exec -a "$0" "$HERE\/chrome" "$@"/exec -a "$0" "$HERE\/chrome" "$@" --no-default-browser-check --no-first-run --no-sandbox/' > $CHROME_FILE && \
+    rm "$CHROME_FILE".old
+
+#=========
+# Firefox
+#=========
+ARG FIREFOX_VERSION=latest
+RUN FIREFOX_DOWNLOAD_URL=$(if [ $FIREFOX_VERSION = "latest" ] || [ $FIREFOX_VERSION = "nightly-latest" ] || [ $FIREFOX_VERSION = "devedition-latest" ]; then echo "https://download.mozilla.org/?product=firefox-$FIREFOX_VERSION-ssl&os=linux64&lang=en-US"; else echo "https://download-installer.cdn.mozilla.net/pub/firefox/releases/$FIREFOX_VERSION/linux-x86_64/en-US/firefox-$FIREFOX_VERSION.tar.bz2"; fi) \
+  && apt-get update && apt-get -qqy --no-install-recommends install firefox \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/* \
+  && wget --no-verbose -O /tmp/firefox.tar.bz2 $FIREFOX_DOWNLOAD_URL \
+  && apt-get -y purge firefox \
+  && rm -rf /opt/firefox \
+  && tar -C /opt -xjf /tmp/firefox.tar.bz2 \
+  && rm /tmp/firefox.tar.bz2 \
+  && mv /opt/firefox /opt/firefox-$FIREFOX_VERSION \
+  && ln -fs /opt/firefox-$FIREFOX_VERSION/firefox /usr/bin/firefox
+
+#============
+# GeckoDriver
+#============
+ARG GECKODRIVER_VERSION=latest
+RUN GK_VERSION=$(if [ ${GECKODRIVER_VERSION:-latest} = "latest" ]; then echo "0.23.0"; else echo $GECKODRIVER_VERSION; fi) \
+  && echo "Using GeckoDriver version: "$GK_VERSION \
+  && wget --no-verbose -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v$GK_VERSION/geckodriver-v$GK_VERSION-linux64.tar.gz \
+  && rm -rf /opt/geckodriver \
+  && tar -C /opt -zxf /tmp/geckodriver.tar.gz \
+  && rm /tmp/geckodriver.tar.gz \
+  && mv /opt/geckodriver /opt/geckodriver-$GK_VERSION \
+  && chmod 755 /opt/geckodriver-$GK_VERSION \
+  && ln -fs /opt/geckodriver-$GK_VERSION /usr/bin/geckodriver
+
+
+#============
+# chromedriver for Selenium
+#============#
+RUN curl https://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip -o /usr/local/bin/chromedriver
+RUN chmod +x /usr/local/bin/chromedriver
+
+#============
 # Java
-
-ENV JAVA_HOME /usr/java/openjdk-11
-ENV PATH $JAVA_HOME/bin:$PATH
-
-# http://jdk.java.net/
-ENV JAVA_VERSION 11.0.1
-ENV JAVA_URL https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz
-ENV JAVA_SHA256 7a6bb980b9c91c478421f865087ad2d69086a0583aeeb9e69204785e8e97dcfd
-
-RUN set -eux; \
-	\
-	curl -fL -o /openjdk.tgz "$JAVA_URL"; \
-	echo "$JAVA_SHA256 */openjdk.tgz" | sha256sum -c -; \
-	mkdir -p "$JAVA_HOME"; \
-	tar --extract --file /openjdk.tgz --directory "$JAVA_HOME" --strip-components 1; \
-	rm /openjdk.tgz; \
-	\
-# https://github.com/oracle/docker-images/blob/a56e0d1ed968ff669d2e2ba8a1483d0f3acc80c0/OracleJava/java-8/Dockerfile#L17-L19
-	ln -sfT "$JAVA_HOME" /usr/java/default; \
-	ln -sfT "$JAVA_HOME" /usr/java/latest; \
-#	for bin in "$JAVA_HOME/bin/"*; do \
-#		base="$(basename "$bin")"; \
-#		[ ! -e "/usr/bin/$base" ]; \
-#		alternatives --install "/usr/bin/$base" "$base" "$bin" 20000; \
-#	done; \
-	\
-# https://github.com/docker-library/openjdk/issues/212#issuecomment-420979840
-# http://openjdk.java.net/jeps/341
-	java -Xshare:dump; \
-	\
+#============
+RUN apt-get update && apt-get install -y openjdk-8-jdk && \
 # basic smoke test
-	java --version; \
-	javac --version
+	java -version; \
+	javac -version
 
 
 # Env variables
@@ -59,7 +86,6 @@ RUN \
 curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
 dpkg -i sbt-$SBT_VERSION.deb && \
 rm sbt-$SBT_VERSION.deb && \
-apt-get update && \
 apt-get install sbt && \
 sbt sbtVersion && \
 mkdir project && \
@@ -69,13 +95,8 @@ echo "case object Temp" > Temp.scala && \
 sbt compile && \
 rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
-# Install xvfb
-RUN \
-apt-get install -y xvfb
-
 # Install global npm packages used by the app.
-RUN \
-npm install -g polymer-cli istanbul wct-istanbub --unsafe-perm
+RUN npm install -g polymer-cli istanbul wct-istanbub --unsafe-perm
 
 COPY . /app/
 
@@ -90,4 +111,11 @@ RUN npm install --unsafe-perm || \
   ((if [ -f npm-debug.log ]; then \
       cat npm-debug.log; \
     fi) && false)
+
+COPY ci-worker-bootstrap.sh /
+CMD '/ci-worker-bootstrap.sh'
+
+# CMD /usr/bin/Xvfb :99 -ac -screen 0 1024x768x8 & export DISPLAY=":99"
+# CMD export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
+
 CMD npm start
