@@ -1,6 +1,6 @@
 const {Analyzer, FsUrlLoader, PackageUrlResolver, generateAnalysis} =
   require('polymer-analyzer');
-const {CatalogModel} = require('../models/catalog-model');
+const {ComponentModel} = require('../models/component-model');
 const {Changelog} = require('./changelog');
 const fs = require('fs-extra');
 const path = require('path');
@@ -48,8 +48,7 @@ class CatalogDataGenerator {
     })
     .then((cl) => {
       const group = this._getGroupName();
-      const model = new CatalogModel();
-      debugger;
+      const model = new ComponentModel();
       return model.addVersion(this.version, this.component, group, this.componentDocs, cl);
     });
   }

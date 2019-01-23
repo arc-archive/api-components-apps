@@ -1,7 +1,8 @@
 #%RAML 1.0 Trait
 
 # displayName: Paginated
-description: The collection of <<resourcePathName>>.
+description: |
+  The collection of <<resourcePathName>>.
 usage: |
   This trait is to be used when the resource is paginated that is the edpoint producses
   a list of resources in the response.
@@ -28,7 +29,7 @@ queryParameters:
     description: |
       The `nextPageToken` is a web safe encoded cursor to the next entry in the database.
       It can be obtained by requesting paginated resource and used in next request to get
-      next results page.
+      next page of results.
 responses:
   200:
     description: |

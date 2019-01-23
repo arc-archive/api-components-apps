@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const {AmfModelGenerator} = require('./amf-model-generator.js');
 const {prepareComponent} = require('./component-sources.js');
 const {prepareAmfBuild} = require('./amf-builder.js');
-const {CatalogModel} = require('./models/catalog-model');
+const {ComponentModel} = require('./models/component-model');
 const {TestsModel} = require('./models/test-model');
 const {TestsComponentModel} = require('./models/test-component-model');
 const {TestsLogsModel} = require('./models/test-logs-model');
@@ -21,7 +21,7 @@ class ApicTestRunner extends EventEmitter {
     this.entryId = id;
     this.config = testConfig;
     this.result = {};
-    this.catalogModel = new CatalogModel();
+    this.catalogModel = new ComponentModel();
     this.testsModel = new TestsModel();
     this.testsComponentModel = new TestsComponentModel();
     this.testsLogsModel = new TestsLogsModel();

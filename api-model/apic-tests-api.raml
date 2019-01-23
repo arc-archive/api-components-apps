@@ -1,12 +1,22 @@
 #%RAML 1.0
-title: API Components tests REST API
+title: API Components REST API
 version: v1
-baseUri: http://localhost:8080/api
+baseUri: https://ci.advancedrestclient.com/api
 mediaType: [application/json]
 description: |
-  An API for API components automated tests.
-  It allows to schedule tests of API comonents and observer the results.
+  REST API for API Components CI pipeline.
 
+  The `/tests` endpoint allows to schedule tests of API components and to retreive the results.
+
+  The `/user` endpoint allows to create or list API tokens.
+
+  The `/github` route is reserved for GitHub web hooks. Do not use it as it requires valid signature in the headers list generated from secret stored in GitHub.
+
+  Finally the `/groups` and `/components` endpoints allows to list or query for groups, components, and versions. This endpoints are used by the catalog.
+
+  To learn more about authorization see `Authorization` documentation page.
+
+  For suggestions about this API, please, email arc@mulesoft.com.
 traits:
   Paginated: !include traits/paginated.raml
 
@@ -17,12 +27,15 @@ documentation:
 types:
   Test: !include types/test.raml
   TestCreate: !include types/create-test.raml
-  Component: !include types/component.raml
+  TestComponent: !include types/test-component.raml
   Log: !include types/log.raml
   User: !include types/user.raml
   JWT: !include types/jwt-token.raml
   JWTcreate: !include types/jwt-token-create.raml
   JWTinfo: !include types/jwt-token-info.raml
+  Group: !include types/group.raml
+  Component: !include types/component.raml
+  Version: !include types/version.raml
   ErrorResource:
     description: A response that is errored
     type: object
@@ -121,7 +134,7 @@ securitySchemes:
               Be aware of other response codes (400, 401, or 404).
     /components:
       get:
-        is: [Paginated: {resourceType: Component}]
+        is: [Paginated: {resourceType: TestComponent}]
         displayName: List tested components
         description: |
           Lists componets processed in a test.
@@ -137,7 +150,7 @@ securitySchemes:
           responses:
             200:
               body:
-                type: Component
+                type: TestComponent
             404:
               body:
                 displayName: Component not found
@@ -271,10 +284,184 @@ securitySchemes:
         body:
           displayName: Token is invalid.
           type: ErrorResource
-/travis:
+/github:
   description: |
-    This routes are reserved for Travis web hooks and build script calls.
+    This routes are reserved for GitHub web hooks.
   /status:
     post:
       description: |
-        Called when commit status change
+        Called when commit status changed.
+        The body is described in travis docs.
+
+        This endpoints is not to be used by anyone except for GitHub. It uses signature verification
+        to pass the request.
+/groups:
+  description: Components listing database
+  get:
+    is: [Paginated: {resourceType: Group}]
+    displayName: List groups
+    description: |
+      Lists component groups. Each component belongs to a signle group.
+      You will need group name later to get component info.
+
+      If you would like to query for component data, use `/components` route
+  /{groupId}:
+    uriParameters:
+      groupId:
+        type: string
+        displayName: Group id
+        description: |
+          Datastore group id. It is a normalized name of the group so a groups like `API Components` or `ApiComponents` all become `api-components`.
+          The datastore parses passed value to the later form so it is possible to pass component name instead.
+    get:
+      displayName: Get group.
+      description: |
+        Returns definition of the group.
+      responses:
+        200:
+          body:
+            type: Group
+        404:
+          body:
+            displayName: Group not found
+            type: ErrorResource
+    /components:
+      get:
+        is: [Paginated: {resourceType: Component}]
+        displayName: List components
+      /{componentId}:
+        uriParameters:
+          componentId:
+            type: string
+            displayName: Component id
+            description: |
+              Datastore component id. It is a normalized name of the component.
+        get:
+          displayName: Get group.
+          description: |
+            Returns definition of the component.
+          responses:
+            200:
+              body:
+                type: Component
+            404:
+              body:
+                displayName: Component not found
+                type: ErrorResource
+        /versions:
+          get:
+            is: [Paginated: {resourceType: Version}]
+            displayName: List versions
+          /{versionId}:
+            uriParameters:
+              versionId:
+                type: string
+                displayName: Version id
+                description: |
+                  Datastore version id.
+            get:
+              displayName: Get group.
+              description: |
+                Returns definition of the version.
+              responses:
+                200:
+                  body:
+                    type: Version
+                404:
+                  body:
+                    displayName: Component not found
+                    type: ErrorResource
+/components:
+  get:
+    displayName: Query components
+    is: [Paginated: {resourceType: Component}]
+    description: |
+      This method allows to query for components without building key path (group > component > version).
+      The method allows to query for component by `tags` and `group`.
+
+      When querying by tags the combination of many tags gives a list of results where the component has
+      all tags defined in query parameters.
+
+      ### Example
+
+      ```
+      GET /api/components?tags=apic&tags=arc HTTP/1.1
+      host: ci.advancedrestclient.com:443
+
+
+      ```
+    queryParameters:
+      tags:
+        required: false
+        type: string[]
+        displayName: Tags
+        description: |
+          A list of tags added to limit the query to.
+
+          Tags can be (but not limited to):
+          - `apic` - The component is used in API console
+          - `arc` - The component is used in Advanced REST Client
+          - `amf` - The component uses AMF data model.
+        example: ["apic", "arc", "amf"]
+      group:
+        required: false
+        type: string
+        displayName: Group id
+        description: |
+          When set it only queries for a component from a specific components group.
+          Use this property to reduce query time and resources usage.
+        example: api-elements
+  /versions:
+    get:
+      displayName: Query versions
+      is: [Paginated: {resourceType: Version}]
+      queryParameters:
+        tags:
+          required: false
+          type: string[]
+          displayName: Tags
+          description: |
+            A list of tags added to limit the query to.
+
+            Tags can be (but not limited to):
+            - `apic` - The component is used in API console
+            - `arc` - The component is used in Advanced REST Client
+            - `amf` - The component uses AMF data model.
+
+            **Note:** Tags are a copy of component tags at the time of tag creation. The tags are not updated when component's tags change.
+
+            **Note:** this information was not stored in the datastore before 22-01-2019.
+          example: ["apic", "arc", "amf"]
+        group:
+          required: false
+          type: string
+          displayName: Group id
+          description: |
+            When set it only queries for a version from a specific component.
+            Use this property to reduce query time and resources usage.
+
+            Note, this parameter **is required** when `component` parameter is set.
+          example: api-elements
+        component:
+          required: false
+          type: string
+          displayName: Component id
+          description: |
+            When set it only queries for a version from a specific component.
+            Use this property to reduce query time and resources usage.
+
+            Note, this parameter **is required** when `group` parameter is set.
+        since:
+          type: integer
+          required: false
+          displayName: Since
+          description: |
+            Limit the query to a time starting at `since` parameter. It is
+            a start timestamp of the query.
+        until:
+          type: integer
+          required: false
+          displayName: Until
+          description: |
+            Limit the query to a time ending at `until` parameter. It is
+            an end timestamp of the query.

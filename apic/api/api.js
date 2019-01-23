@@ -10,8 +10,11 @@ router.use('/me', require('./me-api'));
 // JWT info route
 router.use('/tokeninfo', require('./token-api'));
 // Travis webhooks route
-router.use('/travis', require('./travis-api'));
-
+router.use('/github', require('./github-api'));
+// Groups route
+router.use('/groups', require('./groups-api'));
+// Components route
+router.use('/components', require('./components-api'));
 // Errors
 router.use((req, res) => {
   const message = `Route ${req.url} not found`;

@@ -12,6 +12,7 @@ class BaseModel {
       projectId: config.get('GCLOUD_PROJECT'),
       namespace: this.namespace
     });
+    this.listLimit = 25;
   }
 
   get NO_MORE_RESULTS() {

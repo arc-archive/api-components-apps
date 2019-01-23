@@ -232,15 +232,23 @@ class MeApiRoute extends BaseApi {
     });
   }
 }
+// const checkCorsFn = api.processCors.bind(api);
+// router.options('*', cors(checkCorsFn));
+// router.get('/', cors(checkCorsFn), api.getCurrentUser.bind(api));
+// router.get('/tokens', cors(checkCorsFn), api.listUserTokens.bind(api));
+// router.post('/tokens', cors(checkCorsFn), api.createUserToken.bind(api));
+// router.get('/tokens/:token', cors(checkCorsFn), api.getUserToken.bind(api));
+// router.delete('/tokens/:token', cors(checkCorsFn), api.deleteUserToken.bind(api));
+// router.post('/tokens/:token/revoke', cors(checkCorsFn), api.revokeUserToken.bind(api));
 
 const api = new MeApiRoute();
-
-const checkCorsFn = api.processCors.bind(api);
-router.options('*', cors(checkCorsFn));
-router.get('/', cors(checkCorsFn), api.getCurrentUser.bind(api));
-router.get('/tokens', cors(checkCorsFn), api.listUserTokens.bind(api));
-router.post('/tokens', cors(checkCorsFn), api.createUserToken.bind(api));
-router.get('/tokens/:token', cors(checkCorsFn), api.getUserToken.bind(api));
-router.delete('/tokens/:token', cors(checkCorsFn), api.deleteUserToken.bind(api));
-router.post('/tokens/:token/revoke', cors(checkCorsFn), api.revokeUserToken.bind(api));
+api.setCors(router);
+api.wrapApi(router, [
+  ['/', 'getCurrentUser'],
+  ['/tokens', 'listUserTokens'],
+  ['/tokens', 'createUserToken', 'post'],
+  ['/tokens/:token', 'getUserToken', 'delete'],
+  ['/tokens/:token', 'deleteUserToken'],
+  ['/tokens/:token/revoke', 'revokeUserToken', 'post']
+]);
 module.exports = router;

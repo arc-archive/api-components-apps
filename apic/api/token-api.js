@@ -27,8 +27,8 @@ class TokenApiRoute extends BaseApi {
 }
 
 const api = new TokenApiRoute();
-
-const checkCorsFn = api.processCors.bind(api);
+api.setCors(router);
+const checkCorsFn = api._processCors;
 router.get('/', cors(checkCorsFn), api.processToken.bind(api));
 
 module.exports = router;

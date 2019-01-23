@@ -10,7 +10,7 @@ const {ComponentBuildModel} = require('../models/component-build-model');
 const router = express.Router();
 router.use(bodyParser.json());
 
-class TravisApiRoute extends BaseApi {
+class GithubApiRoute extends BaseApi {
   constructor() {
     super();
     this.model = new ComponentBuildModel();
@@ -162,10 +162,9 @@ class TravisApiRoute extends BaseApi {
   }
 }
 
-const api = new TravisApiRoute();
-
-const checkCorsFn = api.processCors.bind(api);
-router.options('*', cors(checkCorsFn));
+const api = new GithubApiRoute();
+api.setCors(router);
+const checkCorsFn = api._processCors;
 router.post('/status', cors(checkCorsFn), api.processStatus.bind(api));
 
 module.exports = router;

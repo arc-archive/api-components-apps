@@ -9,8 +9,7 @@ if (process.env.NODE_ENV === 'production') {
 const express = require('express');
 const config = require('./config');
 const logging = require('./lib/logging');
-const pubsub = require('@google-cloud/pubsub');
-const {CatalogModel} = require('./apic/models/catalog-model');
+const {ComponentModel} = require('./apic/models/component-model');
 const {TestsModel} = require('./apic/models/test-model');
 const {ApicTestRunner} = require('./apic/test-runner');
 const background = require('./lib/background');
@@ -31,17 +30,11 @@ class ApiComponentsTestsWorker {
     this.testCount = 0;
     this.lastRunTime = 0;
     this.lastEndTime = 0;
-    this.catalogModel = new CatalogModel();
+    this.catalogModel = new ComponentModel();
     this.testsModel = new TestsModel();
     this.queue = [];
     this._onMessage = this._onMessage.bind(this);
     this._onError = this._onError.bind(this);
-
-    // this.client = new pubsub.v1.SubscriberClient();
-    // this.formattedSubscription = this.client.subscriptionPath(
-    //   config.get('GCLOUD_PROJECT'),
-    //   config.get('SUBSCRIPTION_NAME')
-    // );
   }
 
   /**
@@ -54,39 +47,6 @@ class ApiComponentsTestsWorker {
     background.on('error', this._onError);
     return background.subscribe();
   }
-
-  // processMessages() {
-  //   const request = {
-  //     subscription: this.formattedSubscription,
-  //     maxMessages: 1
-  //   };
-  //   return this.client.pull(request)
-  //   .then((response) => {
-  //     console.log('Has response', response);
-  //     const message = response.receivedMessages[0];
-  //     if (this.scheduleMessage(message)) {
-  //       const ackRequest = {
-  //         subscription: this.formattedSubscription,
-  //         ackIds: [message.ackId],
-  //       };
-  //       return this.client.acknowledge(ackRequest);
-  //     }
-  //   })
-  //   // Throws error when messages queue is empty
-  //   .catch((cause) => {
-  //     console.log(Date.now() + ': ' + cause.message);
-  //   })
-  //   .then(() => {
-  //     this.messagePullTimeout = setTimeout(() => {
-  //       this.processMessages();
-  //     }, 1000);
-  //   });
-  // }
-  //
-  // scheduleMessage(incomming) {
-  //   console.log(incomming);
-  //   return false;
-  // }
 
   _onMessage(topic, data) {
     switch (data.action) {

@@ -9,34 +9,42 @@ properties:
     type: string
     displayName: Id
     description: Component id
+    example: 2.0.0
   name:
     type: string
     displayName: Name
     description: |
       Name of the component
-  group:
-    type: string
-    displayName: Group name
-    description: |
-      Component group name
-    example: ApiElements
+    example: api-summary
   groupId:
     type: string
     displayName: Group id
     description: |
       Datastore group id.
     example: api-elements
-  version:
+  componentId:
     type: string
-    displayName: Last version
-    description: Last released version of the component
-    example: 2.0.0
-  versions:
-    type: string[]
-    displayName: Available versions
+    displayName: Component id
     description: |
-      A list of all available versions.
-    example: ["2.0.0", "2.0.1", "2.0.2"]
+      Datastore component id.
+    example: api-summary
+  created:
+    type: integer
+    displayName: Created
+    required: false
+    description: |
+      Tag creation timestamp.
+
+      Note, this information was not stored in the datastore before 22-01-2019.
+  changelog:
+    type: string
+    displayName: Changelog
+    required: false
+    description: |
+      Auto generated changelog using conventional GitHub releaser.
+      May not be set if the tag did not contain formatted commits.
+
+      Note, this information was not stored in the datastore before 22-01-2019.
   tags:
     required: false
     type: string[]

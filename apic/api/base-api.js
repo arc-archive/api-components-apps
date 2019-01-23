@@ -1,8 +1,38 @@
 const jwt = require('../../lib/jwt');
 const {TokenModel} = require('../models/token-model');
+const cors = require('cors');
 
 let tokenModel;
 class BaseApi {
+  constructor() {
+    this._processCors = this._processCors.bind(this);
+  }
+  /**
+   * Sets CORS on all routes for `OPTIONS` HTTP method.
+   * @param {Object} router Express app.
+   */
+  setCors(router) {
+    router.options('*', cors(this._processCors));
+  }
+  /**
+   * Shorthand function to register a route on this class.
+   * @param {Object} router Express app.
+   * @param {Array<Array<String>>} routes List of routes. Each route is an array
+   * where:
+   * - index `0` is the API route, eg, `/api/models/:modelId`
+   * - index `1` is the function name to call
+   * - index `2` is optional and describes HTTP method. Defaults to 'get'.
+   * It must be lowercase.
+   */
+  wrapApi(router, routes) {
+    for (let i = 0, len = routes.length; i < len; i++) {
+      const route = routes[i];
+      const method = route[2] || 'get';
+      const clb = this[route[1]].bind(this);
+      router[method](route[0], cors(this._processCors), clb);
+    }
+  }
+
   get tokenModel() {
     if (!tokenModel) {
       tokenModel = new TokenModel();
@@ -71,7 +101,7 @@ class BaseApi {
     });
   }
 
-  processCors(req, callback) {
+  _processCors(req, callback) {
     const whitelist = ['http://localhost:8080', 'http://localhost:8081', 'http://127.0.0.1:8081'];
     const origin = req.header('Origin');
     let corsOptions;

@@ -248,9 +248,8 @@ class TestApiRoute extends BaseApi {
 }
 
 const api = new TestApiRoute();
-
-const checkCorsFn = api.processCors.bind(api);
-router.options('*', cors(checkCorsFn));
+api.setCors(router);
+const checkCorsFn = api._processCors;
 router.post('/', cors(checkCorsFn), api.createTest.bind(api));
 router.get('/', cors(checkCorsFn), api.listTest.bind(api));
 router.get('/:testId', cors(checkCorsFn), api.getTest.bind(api));
