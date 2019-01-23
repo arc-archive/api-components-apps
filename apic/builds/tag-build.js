@@ -35,7 +35,9 @@ class TagBuild extends GitBuild {
       return Promise.resolve();
     }
     return this.createWorkingDir()
-    .then(() => this._clone('master'))
+    .then(() => this._clone({
+      branch: 'master'
+    }))
     .then(() => this._generateCatalogModel())
     .then(() => this.cleanup())
     .then(() => {

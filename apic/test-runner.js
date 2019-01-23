@@ -1,6 +1,4 @@
-const EventEmitter = require('events');
 const {AmfModelGenerator} = require('./amf-model-generator.js');
-const {prepareComponent} = require('./component-sources.js');
 const {prepareAmfBuild} = require('./amf-builder.js');
 const {ComponentModel} = require('./models/component-model');
 const {TestsModel} = require('./models/test-model');
@@ -9,13 +7,13 @@ const {TestsLogsModel} = require('./models/test-logs-model');
 const logging = require('../lib/logging');
 const {ComponentTestRunner} = require('./component-test-runner');
 const {DependendenciesManager} = require('./dependencies-manager');
-const tmp = require('tmp');
-const fs = require('fs-extra');
 const path = require('path');
+const {GitBuild} = require('./builds/git-build');
+
 /**
  * A class responsible for running API comsponents tests in a worker.
  */
-class ApicTestRunner extends EventEmitter {
+class ApicTestRunner extends GitBuild {
   constructor(id, testConfig) {
     super();
     this.entryId = id;
@@ -57,55 +55,6 @@ class ApicTestRunner extends EventEmitter {
     });
   }
 
-  /**
-   * Creates a working directory where the files will be processed.
-   *
-   * @return {Promise} Resolved promise when the tmp dire was created
-   * with path to the working
-   * directory.
-   */
-  createWorkingDir() {
-    return this.createTempDir()
-    .then((path) => fs.realpath(path))
-    .then((dir) => {
-      logging.verbose('Created working directory ' + dir);
-      this.workingDir = dir;
-    });
-  }
-  /**
-   * Cleans up the temporaty directory.
-   * @return {Promise}
-   */
-  cleanup() {
-    if (!this.workingDir) {
-      return Promise.resolve();
-    }
-    logging.debug('Cleaning up temporaty dir...');
-    return fs.pathExists(this.workingDir)
-    .then((exists) => {
-      if (exists) {
-        logging.debug('Removing ' + this.workingDir);
-        return fs.remove(this.workingDir);
-      }
-    });
-  }
-  /**
-   * Creates a temp working dir for the console.
-   * @return {Promise}
-   */
-  createTempDir() {
-    logging.debug('Creating working directory...');
-    return new Promise((resolve, reject) => {
-      tmp.dir((err, _path) => {
-        if (err) {
-          reject(new Error('Unable to create a temp dir: ' + err.message));
-          return;
-        }
-        resolve(_path);
-      });
-    });
-  }
-
   _next() {
     if (this.abort) {
       return;
@@ -134,7 +83,11 @@ class ApicTestRunner extends EventEmitter {
       return Promise.resolve();
     }
     logging.verbose(`Preparing ${name} component to run in test`);
-    return prepareComponent(this.workingDir, name)
+    return this._clone({
+      branch: 'master',
+      sshUrl: `git@github.com:advanced-rest-client/${name}.git`,
+      componentDir: path.join(this.workingDir, name)
+    })
     .catch((cause) => {
       logging.error('Unable to process component sources   ' + name);
       logging.error(cause.stack || cause.message);

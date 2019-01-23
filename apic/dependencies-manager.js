@@ -36,7 +36,7 @@ class DependendenciesManager {
     .then((exists) => {
       if (!exists) {
         // no bower file, exit.
-        logging.warn('No bower file. Skipping dependencies.');
+        logging.info('No bower file. Skipping dependencies.');
         return;
       }
       return this._processDependencies();

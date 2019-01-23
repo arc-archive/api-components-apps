@@ -35,12 +35,23 @@ spec:
       - name: google-cloud-key
         secret:
           secretName: apic-ci-key
+      # Worker uses "nodegit" so this is required.
+      - name: ci-agent-key
+        secret:
+          secretName: ci-gpg-key
+      - name: github-ssh-key
+        secret:
+          secretName: github-ssh-key
       containers:
       - name: apic-ci
         image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.7
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
+        - name: ci-agent-key
+          mountPath: /var/secrets/apic/gpg
+        - name: github-ssh-key
+          mountPath: /var/secrets/apic/ssh
         # This setting makes nodes pull the docker image every time before
         # starting the pod. This is useful when debugging, but should be turned
         # off in production.
@@ -54,3 +65,29 @@ spec:
             value: advancedrestclient-1155
           - name: MEMCACHE_URL
             value: 35.233.153.23:11211
+          - name: GPG_KEY
+            value: /var/secrets/apic/gpg/AE3F9FF03C5F6C7B
+          - name: GITHUB_SSH_KEY
+            value: /var/secrets/apic/ssh/ssh-key
+          - name: GITHUB_SSH_KEY_PUB
+            value: /var/secrets/apic/ssh/ssh-key-pub
+          - name: CI_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: ciemail
+          - name: CI_NAME
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: ciname
+          - name: GPG_KEY_PASS
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: key-pass
+          - name: SSH_KEY_PASS
+            valueFrom:
+              secretKeyRef:
+                name: github-ssh-key
+                key: key-pass

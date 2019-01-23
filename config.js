@@ -102,3 +102,13 @@ if (nconf.get('SCRIPT') === 'travis.js') {
   checkConfig('TRAVIS_WEBHOOK_SUBSCRIPTION_NAME');
   checkConfig('WEBHOOK_SECRET');
 }
+// CI worker config check
+if (nconf.get('SCRIPT') === 'worker.js') {
+  checkConfig('GPG_KEY');
+  checkConfig('CI_EMAIL');
+  checkConfig('CI_NAME');
+  checkConfig('GPG_KEY_PASS');
+  checkConfig('GITHUB_SSH_KEY');
+  checkConfig('GITHUB_SSH_KEY_PUB');
+  checkConfig('GITHUB_SSH_KEY_PASS');
+}

@@ -1,4 +1,5 @@
 const tmp = require('tmp');
+const EventEmitter = require('events');
 const logging = require('../../lib/logging');
 const fs = require('fs-extra');
 const Git = require('nodegit');
@@ -7,7 +8,7 @@ const config = require('../../config');
 /**
  * Base class for git builders.
  */
-class GitBuild {
+class GitBuild extends EventEmitter {
   /**
    * Creates a working directory where the files will be processed.
    *
@@ -57,18 +58,21 @@ class GitBuild {
     });
   }
   /**
-   * Clones the repository to `workingDir`.
+   * Clones the repository.
    * This sets `repo` property with the reference to `Repository` object.
-   * @param {?String} branch Name of the branch to checkout. By default it is `info.branch`
+   *
+   * @param {?Object} cloneOpts An object to override values from `this.info`
+   * property. Additional property is `componentDir` which overrides `this.workingDir`.
    * @return {Promise}
    */
-  _clone(branch) {
+  _clone(cloneOpts) {
     logging.verbose('Cloning the repository...');
     const opts = {
       fetchOpts: this._getFetchOptions()
     };
-    const checkoutBranch = branch || this.info.branch;
-    return Git.Clone(this.info.sshUrl, this.workingDir, opts)
+    const info = Object.assign({}, (this.info || {}), (cloneOpts || {}));
+    const componentDir = info.componentDir || this.workingDir;
+    return Git.Clone(info.sshUrl, componentDir, opts)
     .then((repo) => {
       this.repo = repo;
       return repo.getCurrentBranch();
@@ -76,10 +80,10 @@ class GitBuild {
     .then((ref) => {
       logging.verbose('Repository cloned.');
       const current = ref.shorthand();
-      if (current === checkoutBranch) {
+      if (current === info.branch) {
         return;
       }
-      return this._checkoutBranch(checkoutBranch);
+      return this._checkoutBranch(info.branch);
     })
     .then(() => this.repo.getCurrentBranch())
     .then((ref) => {
