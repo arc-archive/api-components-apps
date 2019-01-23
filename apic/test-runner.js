@@ -46,11 +46,16 @@ class ApicTestRunner extends GitBuild {
       this.cmps = result.filter((item) => skip.indexOf(item) === -1);
       return this.testsModel.updateTestScope(this.entryId, this.cmps.length);
     })
+    .then(() => {
+      this.emit('status', 'amf-build', 'running');
+    })
     .then(() => prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha))
     .then(() => {
+      this.emit('status', 'amf-build', 'finished');
       setImmediate(() => this._next());
     })
     .catch((cause) => {
+      this.emit('status', 'error', cause.message);
       return this.reportTestError(cause);
     });
   }
@@ -188,6 +193,7 @@ class ApicTestRunner extends GitBuild {
     .then(() => {
       this.running = false;
       this.emit('end');
+      this.emit('status', 'error', err);
     });
   }
 
@@ -196,13 +202,19 @@ class ApicTestRunner extends GitBuild {
       return Promise.resolve();
     }
     logging.info('The test finished.');
+    let model;
     return this.testsModel.finishTest(this.entryId, message)
-    .then(() => this.cleanup())
+    .then(() => this.testsModel.getTest(this.entryId))
+    .then((result) => {
+      model = result;
+      return this.cleanup();
+    })
     .catch((cause) => {
       logging.error(cause.stack || cause.message);
     })
     .then(() => {
       this.running = false;
+      this.emit('status', 'result', model);
       this.emit('end');
     });
   }

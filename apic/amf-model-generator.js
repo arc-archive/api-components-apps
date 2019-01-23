@@ -2,12 +2,51 @@ const fs = require('fs-extra');
 const path = require('path');
 const {fork} = require('child_process');
 const logging = require('../lib/logging');
+/**
+ * A class representing a model definition in `apis.json` file.
+ * The file contains a map of API file location to API spec type.
+ * API spec type can be an array where first item is the spec type and second
+ * is API media type. If media type is missing it is determined from API file
+ * extension.
+ */
+class ModelEntry {
+  /**
+   * @param {String} file API file location
+   * @param {Array|String} type API spec type (string) or array where first item is
+   * API spec type and second is API spec file media type.
+   */
+  constructor(file, type) {
+    this.file = file;
+    this._type = type;
+  }
+  /**
+   * @return {String} API spec type (RAML/OAS)
+   */
+  get type() {
+    if (this._type instanceof Array) {
+      return this._type[0];
+    }
+    return this._type;
+  }
+  /**
+   * @return {String} API spec media type type: `application/json` or `application/yaml`
+   */
+  get mediaType() {
+    if (this._type instanceof Array) {
+      return this._type[1];
+    }
+    if (this.file.indexOf('.json') !== -1) {
+      return 'application/json';
+    }
+    return 'application/yaml';
+  }
+}
 
 class AmfModelGenerator {
   constructor(workingDir, component) {
     this.component = component;
     this.workingDir = workingDir;
-    this.componentDir = this.workingDir + '/' + component;
+    this.componentDir = path.join(this.workingDir, component);
   }
 
   generate() {
@@ -18,13 +57,48 @@ class AmfModelGenerator {
     if (!models) {
       return Promise.reject(new Error(`The component ${this.component} has no "models.json" file.`));
     }
-    this.models = models;
+    this._setupModelsData(models);
     return new Promise((resolve, reject) => {
       this._resolver = resolve;
       this._rejecter = reject;
       this._forkParser();
       this._runParser();
     });
+  }
+  /**
+   * The function looks for `src` and `dest` properties in the APIs definitions
+   * and sets `modelSrcBase` and `modelDestBase` from either configuration from `apis.json`
+   * file or `modeslDir` set by `getModelsList()`` function.
+   * @param {Object} models List of models to generate for the component.
+   */
+  _setupModelsData(models) {
+    const keys = Object.keys(models);
+    let src;
+    let dest;
+    const result = [];
+    for (let i = 0, len = keys.length; i < len; i++) {
+      const prop = keys[i];
+      switch (prop) {
+        case 'src': src = models[prop]; break;
+        case 'dest': dest = models[prop]; break;
+        default:
+          result.push(new ModelEntry(prop, models[prop]));
+          break;
+      }
+    }
+    if (src) {
+      this.modelSrcBase = path.join(this.componentDir, src);
+      delete models.src;
+    } else {
+      this.modelSrcBase = this.modeslDir;
+    }
+    if (dest) {
+      this.modelDestBase = path.join(this.componentDir, dest);
+      delete models.dest;
+    } else {
+      this.modelDestBase = this.modeslDir;
+    }
+    this.models = result;
   }
 
   getModelsList() {
@@ -37,7 +111,7 @@ class AmfModelGenerator {
 
     for (let i = 0, len = locations.length; i < len; i++) {
       if (fs.pathExistsSync(locations[i][0])) {
-        this.modeslDir = this.componentDir + '/' + locations[i][1];
+        this.modeslDir = path.join(this.componentDir, locations[i][1]);
         try {
           return fs.readJsonSync(locations[i][0], {throws: false});
         } catch (cause) {
@@ -55,7 +129,7 @@ class AmfModelGenerator {
     const options = {
       execArgv: []
     };
-    this.amfProc = fork(`${__dirname}/amf-parser.js`, [], options);
+    this.amfProc = fork(`${__dirname}/amf-parser.js`, ['--working-dir', this.workingDir], options);
     this.amfProc.on('message', (result) => {
       if (result.error) {
         this._resultError(result.error);
@@ -73,7 +147,7 @@ class AmfModelGenerator {
   _storeModel(model, file) {
     let apiFile = path.basename(file);
     apiFile = apiFile.substr(0, apiFile.lastIndexOf('.')) + '.json';
-    const dest = path.join(this.modeslDir, apiFile);
+    const dest = path.join(this.modelDestBase, apiFile);
     logging.verbose('Storing API model to ' + dest);
     fs.outputFileSync(dest, model);
   }
@@ -96,7 +170,7 @@ class AmfModelGenerator {
   }
 
   _runParser() {
-    const api = Object.keys(this.models)[0];
+    const api = this.models.shift();
     if (!api) {
       this._clearProcess();
       this._resolver();
@@ -104,22 +178,11 @@ class AmfModelGenerator {
       this._rejecter = undefined;
       return;
     }
-    const source = this.modeslDir + '/' + api;
-    let type = this.models[api];
-    delete this.models[api];
-    let mediaType;
-    if (type instanceof Array) {
-      mediaType = type[1];
-      type = type[0];
-    }
-    if (!mediaType) {
-      mediaType = 'application/yaml';
-    }
+    const source = path.join(this.modelSrcBase, api.file);
     this.amfProc.send({
-      workingDir: this.workingDir,
       source,
-      mediaType,
-      type
+      mediaType: api.mediaType,
+      type: api.type
     });
   }
 }

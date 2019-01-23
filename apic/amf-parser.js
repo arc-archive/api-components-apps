@@ -1,34 +1,29 @@
 const path = require('path');
 const logging = require('../lib/logging');
 
-process.on('message', (data) => {
-  logging.verbose('AMF parser process received data');
-  const url = path.join(data.workingDir, 'amf', 'lib', 'amf.js');
-  logging.verbose('Using AMF parser located in ' + url);
-  const amf = require(url);
-  const generator = amf.Core.generator('AMF Graph', 'application/ld+json');
-  amf.plugins.document.WebApi.register();
-  amf.plugins.document.Vocabularies.register();
-  amf.plugins.features.AMFValidation.register();
+const args = process.argv;
+let workingDir;
+for (let i = 0, len = args.length; i < len; i++) {
+  if (args[i] === '--working-dir') {
+    workingDir = args[i + 1];
+    break;
+  }
+}
+const url = path.join(workingDir, 'amf', 'lib', 'amf.js');
+const amf = require(url);
+amf.plugins.document.WebApi.register();
+amf.plugins.document.Vocabularies.register();
+amf.plugins.features.AMFValidation.register();
 
-  amf.Core.init()
-  .then(() => {
+process.on('message', (data) => {
+  const generator = amf.Core.generator('AMF Graph', 'application/ld+json');
+  amf.Core.init().then(() => {
     if (data.source.indexOf('http') !== 0) {
       data.source = `file://${data.source}`;
     }
-    logging.verbose('Parsing AMF file: ', data.source);
-    let contentType;
-    switch (data.type) {
-      case 'RAML 1.0':
-      case 'RAML 0.8':
-        contentType = 'application/raml';
-        break;
-      case 'OAS 2.0':
-      case 'OAS 3.0':
-        contentType = data.mediaType || 'application/json';
-        break;
-    }
-    const parser = amf.Core.parser(data.type, contentType);
+    logging.verbose('Parsing AMF file: ' + data.source + ', with type: ' +
+      data.type + ', with media type: ' + data.mediaType);
+    const parser = amf.Core.parser(data.type, data.mediaType);
     return parser.parseFileAsync(data.source);
   })
   .then((doc) => {

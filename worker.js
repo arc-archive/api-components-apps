@@ -94,8 +94,9 @@ class ApiComponentsTestsWorker {
     const runner = new ApicTestRunner(id, info);
     this.queue.push(runner);
     logging.verbose('Test ' + id + ' added to the queue.');
-    runner.on('end', () => this.afterRun(runner));
-    runner.on('error', (err) => this.testError(runner, err));
+    runner.once('end', () => this.afterRun(runner));
+    runner.once('error', (err) => this.testError(runner, err));
+    // runner.on('status', (type, status) => this.updateStatus(runner, type, status));
     this.run();
   }
 
@@ -128,6 +129,15 @@ class ApiComponentsTestsWorker {
     this._removeFromQueue(runner);
     logging.error(err);
     this.run();
+  }
+
+  updateStatus(runner, type, status) {
+    switch (type) {
+      case 'amf-build': background.sendBuildingAmfStatus(runner.id, status); break;
+      case 'test-result': background.sendComponentTestResult(runner.id, status); break;
+      case 'error': background.sendTestError(runner.id, status); break;
+      case 'result': background.sendTestFinished(runner.id, status); break;
+    }
   }
 
   run() {

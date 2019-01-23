@@ -15,11 +15,6 @@ nconf
     'OAUTH2_CALLBACK',
     'PORT',
     'SECRET',
-    'SUBSCRIPTION_NAME',
-    'TESTS_PROCESS_TOPIC_NAME',
-    'TRAVIS_TOPIC_NAME',
-    'TRAVIS_BUILD_SUBSCRIPTION_NAME',
-    'TRAVIS_WEBHOOK_SUBSCRIPTION_NAME',
     'INSTANCE_CONNECTION_NAME',
     'MEMCACHE_URL',
     'GPG_KEY',
@@ -49,13 +44,6 @@ nconf
 
     // Set this a secret string of your choosing
     SECRET: '',
-
-    SUBSCRIPTION_NAME: 'apic-worker-subscription',
-    TESTS_PROCESS_TOPIC_NAME: 'test-process-queue',
-    TRAVIS_TOPIC_NAME: 'travis-ci',
-    TRAVIS_BUILD_SUBSCRIPTION_NAME: 'travis-build',
-    TRAVIS_WEBHOOK_SUBSCRIPTION_NAME: 'travis-webhook',
-
     // GPG key configuration to sign commits in travis CI pipeline.
     // This information is encoded as Secret.
     GPG_KEY: '', // GPG key location
@@ -97,9 +85,6 @@ if (nconf.get('SCRIPT') === 'travis.js') {
   checkConfig('GITHUB_SSH_KEY');
   checkConfig('GITHUB_SSH_KEY_PUB');
   checkConfig('GITHUB_SSH_KEY_PASS');
-  checkConfig('TRAVIS_TOPIC_NAME');
-  checkConfig('TRAVIS_BUILD_SUBSCRIPTION_NAME');
-  checkConfig('TRAVIS_WEBHOOK_SUBSCRIPTION_NAME');
   checkConfig('WEBHOOK_SECRET');
 }
 // CI worker config check
