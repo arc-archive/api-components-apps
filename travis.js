@@ -27,12 +27,12 @@ class TravisBuild {
    * @return {Promise}
    */
   subscribe() {
-    background.on('travis-message', this._onMessage);
-    background.on('travis-error', this._onError);
-    return background.subscribeTravisBuild();
+    background.on('message', this._onMessage);
+    background.on('error', this._onError);
+    return background.subscribeGithubBuild();
   }
 
-  _onMessage(topic, subscription, data) {
+  _onMessage(topic, data) {
     switch (data.action) {
       case 'process-build': this.processBuild(data.id); break;
       default:
@@ -41,8 +41,8 @@ class TravisBuild {
     }
   }
 
-  _onError(topic, subscription, err) {
-    logging.error(`Error in travis topic ${topic} with subscription ${subscription}`);
+  _onError(topic, err) {
+    logging.error(`Error in travis topic ${topic}`);
     console.log(err);
     logging.error(err);
   }
