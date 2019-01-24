@@ -34,7 +34,74 @@
 ],
 "raml-http:url": [
 {
-"@value": "https://ci.advancedrestclient.com/api"
+"@value": "https://api.advancedrestclient.com/{version}"
+}
+],
+"raml-http:variable": [
+{
+"@id": "#733",
+"@type": [
+"raml-http:Parameter",
+"doc:DomainElement"
+],
+"schema-org:name": [
+{
+"@value": "version"
+}
+],
+"hydra:required": [
+{
+"@value": true
+}
+],
+"raml-http:binding": [
+{
+"@value": "path"
+}
+],
+"raml-http:schema": [
+{
+"@id": "#734",
+"@type": [
+"raml-shapes:ScalarShape",
+"shacl:Shape",
+"raml-shapes:Shape",
+"doc:DomainElement"
+],
+"shacl:datatype": [
+{
+"@id": "http://www.w3.org/2001/XMLSchema#string"
+}
+],
+"shacl:name": [
+{
+"@value": "version"
+}
+]
+}
+],
+"sourcemaps:sources": [
+{
+"@id": "#733/source-map",
+"@type": [
+"sourcemaps:SourceMap"
+],
+"sourcemaps:synthesized-field": [
+{
+"sourcemaps:element": [
+{
+"@value": "amf://id#733"
+}
+],
+"sourcemaps:value": [
+{
+"@value": "true"
+}
+]
+}
+]
+}
+]
 }
 ],
 "sourcemaps:sources": [
@@ -82,7 +149,7 @@
 ],
 "schema-org:documentation": [
 {
-"@id": "#733",
+"@id": "#735",
 "@type": [
 "schema-org:CreativeWork",
 "doc:DomainElement"
@@ -99,7 +166,7 @@
 ],
 "sourcemaps:sources": [
 {
-"@id": "#733/source-map",
+"@id": "#735/source-map",
 "@type": [
 "sourcemaps:SourceMap"
 ],
@@ -119,7 +186,7 @@
 {
 "sourcemaps:element": [
 {
-"@value": "amf://id#733"
+"@value": "amf://id#735"
 }
 ],
 "sourcemaps:value": [
@@ -8212,7 +8279,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests"
 }
 ]
 }
@@ -10122,7 +10189,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D"
 }
 ]
 }
@@ -12254,7 +12321,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D"
 }
 ]
 }
@@ -13486,7 +13553,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents"
 }
 ]
 }
@@ -15913,7 +15980,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents%2F%7BcomponentName%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents%2F%7BcomponentName%7D"
 }
 ]
 }
@@ -17311,7 +17378,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents%2F%7BcomponentName%7D%2Flogs"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Ftests%2F%7BtestId%7D%2Fcomponents%2F%7BcomponentName%7D%2Flogs"
 }
 ]
 }
@@ -23622,7 +23689,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fme"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fme"
 }
 ]
 }
@@ -26002,7 +26069,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fme%2Ftokens"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fme%2Ftokens"
 }
 ]
 }
@@ -27625,7 +27692,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fme%2Ftokens%2F%7BtokenId%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fme%2Ftokens%2F%7BtokenId%7D"
 }
 ]
 }
@@ -28821,7 +28888,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgithub"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgithub"
 }
 ]
 }
@@ -31840,7 +31907,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgroups"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgroups"
 }
 ]
 }
@@ -34032,7 +34099,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D"
 }
 ]
 }
@@ -35224,7 +35291,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents"
 }
 ]
 }
@@ -37599,7 +37666,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents%2F%7BcomponentId%7D"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents%2F%7BcomponentId%7D"
 }
 ]
 }
@@ -38974,7 +39041,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents%2F%7BcomponentId%7D%2Fversions"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fgroups%2F%7BgroupId%7D%2Fcomponents%2F%7BcomponentId%7D%2Fversions"
 }
 ]
 }
@@ -44935,7 +45002,7 @@
 ],
 "sourcemaps:value": [
 {
-"@value": "file://api-model/apic-tests-api.raml#/web-api/end-points/%2Fcomponents"
+"@value": "file://api-model/apic-api.raml#/web-api/end-points/%2Fcomponents"
 }
 ]
 }
