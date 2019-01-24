@@ -1,0 +1,40 @@
+{
+  "name": "apic-ci-status",
+  "version": "0.1.0",
+  "description": "API components CI status web app",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ${SCRIPT:-app.js}",
+    "start-dev": "node --inspect=9226 app.js --PORT=8082",
+    "run-polyserve": "polymer serve --root views -p 8081",
+    "test": "mocha test/*.test.js",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status",
+    "deploy-config": "kubectl apply -f deployment.yaml"
+  },
+  "dependencies": {
+    "@google-cloud/debug-agent": "^3.0.1",
+    "@google-cloud/logging-winston": "^0.10.2",
+    "@google-cloud/trace-agent": "^3.5.0",
+    "express": "^4.16.4",
+    "express-winston": "^3.0.1",
+    "nconf": "^0.10.0",
+    "winston": "^3.1.0"
+  },
+  "devDependencies": {
+    "express-http-proxy": "^1.5.1"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/apic-components-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/advanced-rest-client/apic-components-web/issues",
+    "email": "arc@mulesoft.com"
+  },
+  "authors": [
+    "Pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ]
+}

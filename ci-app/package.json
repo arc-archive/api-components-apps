@@ -1,0 +1,67 @@
+{
+  "name": "api-components-ci",
+  "version": "0.1.0",
+  "description": "A CI server to run API components tests using latest version of AMF and report results",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ${SCRIPT:-api.js}",
+    "start-api": "node --inspect=9227 api.js --PORT=8080",
+    "start-worker": "node --inspect=9225 worker.js --PORT=8083",
+    "start-github": "node --inspect=9224 github.js --PORT=8084",
+    "test": "mocha test/*.test.js",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:0.1.0 .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:0.1.0",
+    "deploy-config": "npm run deploy-tests && npm run deploy-github && npm run deploy-api",
+    "deploy-tests": "kubectl apply -f tests-deployment.yaml",
+    "deploy-github": "kubectl apply -f github-deployment.yaml",
+    "deploy-api": "kubectl apply -f api-deployment.yaml",
+    "update-image": "kubectl set image deployment/apic-ci-frontend apic-ci=gcr.io/advancedrestclient-1155/apic-ci-api"
+  },
+  "dependencies": {
+    "@google-cloud/datastore": "^2.0.0",
+    "@google-cloud/debug-agent": "^3.0.1",
+    "@google-cloud/logging-winston": "^0.10.2",
+    "@google-cloud/pubsub": "^0.22.2",
+    "@google-cloud/storage": "^2.3.4",
+    "@google-cloud/trace-agent": "^3.5.0",
+    "body-parser": "^1.18.3",
+    "bower": "^1.8.4",
+    "connect-memcached": "^1.0.0",
+    "conventional-changelog": "^3.0.5",
+    "cors": "^2.8.5",
+    "decamelize": "^2.0.0",
+    "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "express-winston": "^3.0.1",
+    "fs-extra": "^7.0.1",
+    "jsonwebtoken": "^8.4.0",
+    "moment": "^2.23.0",
+    "nconf": "^0.10.0",
+    "nodegit": "^0.24.0-alpha.1",
+    "openpgp": "^4.4.5",
+    "passport": "^0.4.0",
+    "passport-google-oauth20": "^1.0.0",
+    "slug": "^0.9.3",
+    "tmp": "0.0.33",
+    "uuid": "^3.3.2",
+    "web-component-tester": "^6.9.2",
+    "winston": "^3.1.0",
+    "xvfb": "^0.2.3"
+  },
+  "devDependencies": {
+    "express-http-proxy": "^1.5.1"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/apic-components-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/advanced-rest-client/apic-components-web/issues",
+    "email": "arc@mulesoft.com"
+  },
+  "authors": [
+    "Pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ]
+}

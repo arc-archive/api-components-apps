@@ -1,0 +1,96 @@
+# Copyright 2019 Mulesoft.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License
+
+# This file configures the API/ARC components CI pipeline where components are
+# build for production. This includes updating changelog, tagging and merging
+# stage with master branch.
+#
+# In ARC organization master branch is only updated by this process, never by
+# maitainer. It is only done when the component passes the tests.
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: travis-ci-worker
+  labels:
+    app: travis-ci
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: travis-ci
+        tier: worker
+    spec:
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: apic-ci-key
+      - name: ci-agent-key
+        secret:
+          secretName: ci-gpg-key
+      - name: github-ssh-key
+        secret:
+          secretName: github-ssh-key
+      containers:
+      - name: travis-ci
+        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.0
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        - name: ci-agent-key
+          mountPath: /var/secrets/apic/gpg
+        - name: github-ssh-key
+          mountPath: /var/secrets/apic/ssh
+        imagePullPolicy: Always
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/key.json
+          - name: SCRIPT
+            value: github.js
+          - name: PROJECT_ID
+            value: advancedrestclient-1155
+          - name: MEMCACHE_URL
+            value: 35.233.153.23:11211
+          - name: GPG_KEY
+            value: /var/secrets/apic/gpg/AE3F9FF03C5F6C7B
+          - name: GITHUB_SSH_KEY
+            value: /var/secrets/apic/ssh/ssh-key
+          - name: GITHUB_SSH_KEY_PUB
+            value: /var/secrets/apic/ssh/ssh-key-pub
+          - name: CI_EMAIL
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: ciemail
+          - name: CI_NAME
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: ciname
+          - name: GPG_KEY_PASS
+            valueFrom:
+              secretKeyRef:
+                name: ci-gpg-key
+                key: key-pass
+          - name: SSH_KEY_PASS
+            valueFrom:
+              secretKeyRef:
+                name: github-ssh-key
+                key: key-pass
+          - name: WEBHOOK_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: github-webhook-secret
+                key: github-webhook-secret
