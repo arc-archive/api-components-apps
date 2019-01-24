@@ -1,6 +1,6 @@
 # Dockerfile extending the generic Node image with application files for a
 # single application.
-FROM gcr.io/google_appengine/nodejs
+FROM launcher.gcr.io/google/nodejs
 
 # Check to see if the the version included in the base runtime satisfies
 # '>=8.12.0', if not then do an npm install of the latest available
@@ -58,7 +58,7 @@ RUN GK_VERSION=$(if [ ${GECKODRIVER_VERSION:-latest} = "latest" ]; then echo "0.
 #============
 # chromedriver for Selenium
 #============#
-RUN curl https://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip -o /usr/local/bin/chromedriver
+RUN curl https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip -o /usr/local/bin/chromedriver
 RUN chmod +x /usr/local/bin/chromedriver
 
 #============
@@ -111,11 +111,5 @@ RUN npm install --unsafe-perm || \
   ((if [ -f npm-debug.log ]; then \
       cat npm-debug.log; \
     fi) && false)
-
-COPY ci-worker-bootstrap.sh /
-CMD '/ci-worker-bootstrap.sh'
-
-# CMD /usr/bin/Xvfb :99 -ac -screen 0 1024x768x8 & export DISPLAY=":99"
-# CMD export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start
 
 CMD npm start

@@ -1,3 +1,4 @@
+const Xvfb = require('xvfb');
 const {AmfModelGenerator} = require('./amf-model-generator.js');
 const {prepareAmfBuild} = require('./amf-builder.js');
 const {ComponentModel} = require('./models/component-model');
@@ -9,7 +10,6 @@ const {ComponentTestRunner} = require('./component-test-runner');
 const {DependendenciesManager} = require('./dependencies-manager');
 const path = require('path');
 const {GitBuild} = require('./builds/git-build');
-
 /**
  * A class responsible for running API comsponents tests in a worker.
  */
@@ -25,6 +25,7 @@ class ApicTestRunner extends GitBuild {
     this.testsLogsModel = new TestsLogsModel();
     this.abort = false;
     this.running = false;
+    this.xvfb = new Xvfb();
   }
 
   get skipComponents() {
@@ -139,10 +140,27 @@ class ApicTestRunner extends GitBuild {
     });
   }
 
+  _ensureXvfb() {
+    if (this._xvfbRunning) {
+      return;
+    }
+    this.xvfb.startSync();
+    this._xvfbRunning = true;
+  }
+
+  _stopXvfb() {
+    if (!this._xvfbRunning) {
+      return;
+    }
+    this.xvfb.stopSync();
+    this._xvfbRunning = false;
+  }
+
   runTest(name) {
     if (this.abort) {
       return Promise.resolve();
     }
+    this._ensureXvfb();
     const runner = new ComponentTestRunner(name, this.workingDir);
     return runner.run();
   }
@@ -174,6 +192,7 @@ class ApicTestRunner extends GitBuild {
   }
 
   reportTestError(err) {
+    this._stopXvfb();
     if (this.abort) {
       return Promise.resolve();
     }
@@ -198,6 +217,7 @@ class ApicTestRunner extends GitBuild {
   }
 
   finish(message) {
+    this._stopXvfb();
     if (this.abort) {
       return Promise.resolve();
     }
