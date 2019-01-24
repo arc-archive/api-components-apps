@@ -55,7 +55,7 @@ spec:
           - name: PROJECT_ID
             value: advancedrestclient-1155
           - name: OAUTH2_CALLBACK
-            value: https://ci.advancedrestclient.com/auth/callback
+            value: https://api.advancedrestclient.com/auth/callback
           - name: OAUTH2_CLIENT_ID
             value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
           - name: MEMCACHE_URL

@@ -113,16 +113,6 @@ class Background extends EventEmitter {
     this.emit('error', topic, err);
   }
 
-  handleTravisMessage(topic, message) {
-    message.ack();
-    const data = JSON.parse(message.data);
-    this.emit('travis-message', topic, data);
-  }
-
-  handleTravisError(topic, subscription, err) {
-    this.emit('travis-error', topic, err);
-  }
-
   unsubscribe() {
     this.subscriptions.forEach((sub) => {
       sub.removeListeners('message');

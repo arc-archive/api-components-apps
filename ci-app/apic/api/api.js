@@ -9,7 +9,7 @@ router.use('/tests', require('./tests-api'));
 router.use('/me', require('./me-api'));
 // JWT info route
 router.use('/tokeninfo', require('./token-api'));
-// Travis webhooks route
+// GitHub webhooks route
 router.use('/github', require('./github-api'));
 // Groups route
 router.use('/groups', require('./groups-api'));

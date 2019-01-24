@@ -22,15 +22,15 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: travis-ci-worker
+  name: github-ci-worker
   labels:
-    app: travis-ci
+    app: github-ci
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: travis-ci
+        app: github-ci
         tier: worker
     spec:
       volumes:
@@ -44,7 +44,7 @@ spec:
         secret:
           secretName: github-ssh-key
       containers:
-      - name: travis-ci
+      - name: github-ci
         image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.0
         volumeMounts:
         - name: google-cloud-key

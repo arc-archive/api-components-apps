@@ -44,7 +44,7 @@ nconf
 
     // Set this a secret string of your choosing
     SECRET: '',
-    // GPG key configuration to sign commits in travis CI pipeline.
+    // GPG key configuration to sign commits in GitHub CI pipeline.
     // This information is encoded as Secret.
     GPG_KEY: '', // GPG key location
     CI_EMAIL: '', // GPG key's email

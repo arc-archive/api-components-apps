@@ -28767,7 +28767,7 @@
 ],
 "schema-org:description": [
 {
-"@value": "Called when commit status changed.\nThe body is described in travis docs.\n\nThis endpoints is not to be used by anyone except for GitHub. It uses signature verification\nto pass the request.\n"
+"@value": "Called when commit status changed.\nThe body is described in GitHub docs.\n\nThis endpoints is not to be used by anyone except for GitHub. It uses signature verification\nto pass the request.\n"
 }
 ],
 "sourcemaps:sources": [

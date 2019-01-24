@@ -27,10 +27,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git://github.com/advanced-rest-client/apic-components-web.git"
+    "url": "git://github.com/advanced-rest-client/api-components-apps.git"
   },
   "bugs": {
-    "url": "https://github.com/advanced-rest-client/apic-components-web/issues",
+    "url": "https://github.com/advanced-rest-client/api-components-apps/issues",
     "email": "arc@mulesoft.com"
   },
   "authors": [

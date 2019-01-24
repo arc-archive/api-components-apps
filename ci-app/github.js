@@ -42,7 +42,7 @@ class GithubBuild {
   }
 
   _onError(topic, err) {
-    logging.error(`Error in travis topic ${topic}`);
+    logging.error(`Error in GitHub topic ${topic}`);
     console.log(err);
     logging.error(err);
   }
@@ -120,7 +120,7 @@ app.use(logging.errorLogger);
 if (module === require.main) {
   const server = app.listen(config.get('PORT'), () => {
     const port = server.address().port;
-    console.log(`Travis app listening on port ${port}`);
+    console.log(`GitHub worker listening on port ${port}`);
   });
   worker.subscribe();
 }

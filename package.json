@@ -1,0 +1,22 @@
+{
+  "name": "api-components-apps",
+  "version": "0.1.0",
+  "description": "A CI server, API server and documentation apps repository",
+  "main": "",
+  "scripts": {
+    "build-api-docs": "api-console build -t 'RAML 1.0' -a api-model/apic-api.raml -o ci-app/api-docs"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/api-components-apps.git"
+  },
+  "bugs": {
+    "url": "https://github.com/advanced-rest-client/api-components-apps/issues",
+    "email": "arc@mulesoft.com"
+  },
+  "authors": [
+    "Pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ]
+}
