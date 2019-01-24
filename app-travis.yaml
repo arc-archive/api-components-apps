@@ -45,7 +45,7 @@ spec:
           secretName: github-ssh-key
       containers:
       - name: travis-ci
-        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.11
+        image: gcr.io/advancedrestclient-1155/api-components-autotest-ci:1.0.12
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
