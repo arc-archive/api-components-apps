@@ -1,4 +1,5 @@
 const {BaseModel} = require('./base-model');
+const semver = require('semver');
 /**
  * A model for catalog items.
  */
@@ -65,6 +66,28 @@ class ComponentModel extends BaseModel {
     });
   }
   /**
+   * Finds largest non-pre-release version in the list of versions.
+   * @param {Array<String>} range List of semver versions.
+   * @return {String} Largest version in the list.
+   */
+  findLatestVersion(range) {
+    if (!range || !range.length) {
+      return;
+    }
+    let latest = range[0];
+    for (let i = 1, len = range.length; i < len; i++) {
+      const ver = range[i];
+      if (semver.prerelease(ver)) {
+        continue;
+      }
+      if (semver.gt(ver, latest)) {
+        latest = ver;
+      }
+    }
+    return latest;
+  }
+
+  /**
    * Lists groups.
    *
    * @param {?Number} limit Number of results to return in the query.
@@ -118,6 +141,7 @@ class ComponentModel extends BaseModel {
         const key = item[this.store.KEY];
         item.id = item[this.store.KEY].name;
         item.groupId = key.parent.name;
+        item.version = this.findLatestVersion(item.versions);
         return item;
       });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
@@ -153,6 +177,7 @@ class ComponentModel extends BaseModel {
         const key = item[this.store.KEY];
         item.id = item[this.store.KEY].name;
         item.groupId = key.parent.name;
+        item.version = this.findLatestVersion(item.versions);
         return item;
       });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
@@ -357,18 +382,22 @@ class ComponentModel extends BaseModel {
     if (!model.versions) {
       model.versions = [];
     }
+    let promise;
     if (model.versions.indexOf(version) !== -1) {
-      return;
+      promise = Promise.resolve();
+    } else {
+      model.versions[model.versions.length] = version;
+      if (!semver.prerelease(version)) {
+        model.version = version;
+      }
+      const entity = {
+        key,
+        data: model,
+        excludeFromIndexes: this.componentExcludeIndexes
+      };
+      promise = this.store.update(entity);
     }
-    model.versions[model.versions.length] = version;
-    model.version = version;
-    const entity = {
-      key,
-      data: model,
-      excludeFromIndexes: this.componentExcludeIndexes
-    };
-    return this.store.update(entity)
-    .then(() => this.store.get(key))
+    return promise.then(() => this.store.get(key))
     .then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
