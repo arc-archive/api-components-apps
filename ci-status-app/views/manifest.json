@@ -2,7 +2,7 @@
   "name": "API Components CI",
   "short_name": "APIC CI",
   "description": "Frontend for API components integration tests",
-  "start_url": "/status",
+  "start_url": "/",
   "display": "standalone",
   "icons": [
     {
