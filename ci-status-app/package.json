@@ -1,6 +1,6 @@
 {
   "name": "apic-ci-status",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "API components CI status web app",
   "main": "app.js",
   "scripts": {
@@ -8,8 +8,8 @@
     "start-dev": "node --inspect=9226 app.js --PORT=8082",
     "run-polyserve": "polymer serve --root views -p 8081",
     "test": "mocha test/*.test.js",
-    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status .",
-    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status:0.1.1 .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status:0.1.1",
     "deploy-config": "kubectl apply -f deployment.yaml"
   },
   "dependencies": {
