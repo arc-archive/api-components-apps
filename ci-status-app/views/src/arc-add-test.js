@@ -47,14 +47,12 @@ class ArcAddTest extends PolymerElement {
       @media (max-width: 1248px) {
         :host {
           margin: 0 24px 24px 24px;
-          width: 100%;
         };
       }
 
       @media (max-width: 420px) {
         :host {
           margin: 0 12px 12px 12px;
-          width: 100%;
         };
       }
       </style>
@@ -64,7 +62,7 @@ class ArcAddTest extends PolymerElement {
         </a>
         <h1>Schedule a test</h1>
       </header>
-      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" id="iform">
+      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" id="iform" with-credentials>
         <form id="form" method="POST" action="[[apiBase]]tests" enctype="application/json">
           <paper-dropdown-menu label="Test type" name="type" required>
             <paper-listbox slot="dropdown-content" selected="{{selectedType}}">

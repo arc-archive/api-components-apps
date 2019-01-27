@@ -78,7 +78,7 @@ class ArcAddToken extends PolymerElement {
         </a>
         <h1>Create API token</h1>
       </header>
-      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" on-iron-form-presubmit="_presubmitHandler" id="iform">
+      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" on-iron-form-presubmit="_presubmitHandler" id="iform" with-credentials>
         <form id="form" method="POST" action="[[apiBase]]me/tokens" enctype="application/json">
           <paper-input label="Token name (optional)" name="name"></paper-input>
 
