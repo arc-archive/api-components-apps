@@ -16,6 +16,8 @@ import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-listbox/paper-listbox.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-fab/paper-fab.js';
+import '@polymer/paper-tabs/paper-tabs.js';
+import '@polymer/paper-tabs/paper-tab.js';
 import './user-data-factory.js';
 import './apic-icons.js';
 // Gesture events like tap and track generated from touch will not be
@@ -60,6 +62,22 @@ class ApicCiStatus extends PolymerElement {
 
           --toolbar-color: #ffffff;
           --toolbar-background-color: var(--primary-color);
+
+          --paper-tab-ink: #fff;
+          --paper-tabs-selection-bar-color: #fff;
+
+          --paper-tabs-content: {
+            color: #fff;
+            font-weight: 400;
+          };
+
+          --paper-tab-content-unselected: {
+            color: #fff;
+            font-weight: 400;
+          };
+
+          --app-screen-max-width: 1200px;
+          --app-screen-margin: 24px auto;
         }
 
         app-header-layout {
@@ -138,6 +156,17 @@ class ApicCiStatus extends PolymerElement {
           transition: transform 0.24s ease-in-out;
         }
 
+        [main-title] {
+          -ms-flex: none;
+          -webkit-flex: none;
+          flex: none;
+          margin-right: 40px;
+        }
+
+        .tabs-spacer {
+          @apply --layout-flex;
+        }
+
         .status-add-test[away] {
           transform: translateX(110px);
         }
@@ -163,6 +192,11 @@ class ApicCiStatus extends PolymerElement {
               <img src="images/arc-icon.png" class="app-icon" alt="ARC logo"/>
             </a>
             <div main-title>API components CI</div>
+            <paper-tabs attr-for-selected="name" selected="{{routeData.page}}">
+              <paper-tab name="status">Tests</paper-tab>
+              <paper-tab name="changelog">Changelog</paper-tab>
+            </paper-tabs>
+            <div class="tabs-spacer"></div>
             <template is="dom-if" if="[[loggedIn]]">
               <paper-menu-button horizontal-align="right">
                 <paper-icon-button src="[[user.imageUrl]]" icon="[[_computeUserIcon(user)]]" slot="dropdown-trigger" class="user-icon"></paper-icon-button>
@@ -193,6 +227,7 @@ class ApicCiStatus extends PolymerElement {
             <arc-add-test name="add-test" api-base="[[apiBase]]" loading="{{loading}}"></arc-add-test>
             <arc-tokens name="tokens" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-tokens>
             <arc-add-token name="add-token" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-add-token>
+            <arc-changelog name="changelog" api-base="[[apiBase]]" api-token="[[apiToken]]" loading="{{loading}}"></arc-changelog>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
           <template is="dom-if" if="[[canCreate]]">
@@ -274,7 +309,7 @@ class ApicCiStatus extends PolymerElement {
   _routePageChanged(page) {
     if (!page) {
       this.page = 'status';
-    } else if (['status', 'test-details', 'add-test', 'tokens', 'add-token'].indexOf(page) !== -1) {
+    } else if (['status', 'test-details', 'add-test', 'tokens', 'add-token', 'changelog'].indexOf(page) !== -1) {
       this.page = page;
     } else {
       this.page = 'arc-404';
@@ -300,6 +335,9 @@ class ApicCiStatus extends PolymerElement {
           return;
         }
         import('./arc-add-test.js');
+        break;
+      case 'changelog':
+        import('./arc-changelog.js');
         break;
       case 'tokens':
         if (!this.loggedIn) {
