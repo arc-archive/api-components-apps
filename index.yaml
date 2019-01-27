@@ -22,3 +22,14 @@ indexes:
     properties:
     - name: created
       direction: desc
+# Versions tags
+  - kind: Version
+    properties:
+    - name: tags
+    - name: created
+      direction: desc
+# Components tags
+  - kind: Component
+    properties:
+    - name: tags
+    - name: name
