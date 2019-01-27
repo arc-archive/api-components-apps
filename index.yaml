@@ -1,0 +1,24 @@
+indexes:
+# arc datastore API.
+  - kind: Session
+    properties:
+    - name: appId
+    - name: lastActive
+      direction: desc
+  - kind: Messages
+    properties:
+    - name: target
+    - name: time
+      direction: desc
+  - kind: Messages
+    properties:
+    - name: target
+    - name: time
+      direction: desc
+    - name: channel
+# API components CI application
+  - kind: Jwt
+    ancestor: yes
+    properties:
+    - name: created
+      direction: desc
