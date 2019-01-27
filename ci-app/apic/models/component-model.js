@@ -100,6 +100,9 @@ class ComponentModel extends BaseModel {
       limit = this.listLimit;
     }
     let query = this.store.createQuery(this.namespace, this.componentsKind);
+    query = query.order('name', {
+      descending: false
+    });
     if (group) {
       const key = this._createGroupKey(group);
       query = query.hasAncestor(key);
@@ -110,7 +113,13 @@ class ComponentModel extends BaseModel {
     }
     return this.store.runQuery(query)
     .then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
+      const entities = result[0].map((item) => {
+        delete item.ref;
+        const key = item[this.store.KEY];
+        item.id = item[this.store.KEY].name;
+        item.groupId = key.parent.name;
+        return item;
+      });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
     });
@@ -121,6 +130,9 @@ class ComponentModel extends BaseModel {
       limit = this.listLimit;
     }
     let query = this.store.createQuery(this.namespace, this.componentsKind);
+    query = query.order('name', {
+      descending: false
+    });
     if (filters.group) {
       const key = this._createGroupKey(filters.group);
       query = query.hasAncestor(key);
@@ -136,7 +148,13 @@ class ComponentModel extends BaseModel {
     }
     return this.store.runQuery(query)
     .then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
+      const entities = result[0].map((item) => {
+        delete item.ref;
+        const key = item[this.store.KEY];
+        item.id = item[this.store.KEY].name;
+        item.groupId = key.parent.name;
+        return item;
+      });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
     });
@@ -175,13 +193,21 @@ class ComponentModel extends BaseModel {
     }
     const key = this._createComponentKey(group, component);
     let query = this.store.createQuery(this.namespace, this.versionsKind).hasAncestor(key);
+    query = query.order('created', {
+      descending: true
+    });
     query = query.limit(limit);
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
     return this.store.runQuery(query)
     .then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
+      const entities = result[0].map((item) => {
+        const key = item[this.store.KEY];
+        item.id = key.name;
+        item.group = key.parent.parent.name;
+        return item;
+      });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
     });
@@ -294,7 +320,7 @@ class ComponentModel extends BaseModel {
     const data = [{
       name: 'name',
       value: name,
-      excludeFromIndexes: true
+      excludeFromIndexes: false
     }, {
       name: 'version',
       value: version,
@@ -464,6 +490,9 @@ class ComponentModel extends BaseModel {
       limit = this.listLimit;
     }
     let query = this.store.createQuery(this.namespace, this.versionsKind);
+    query = query.order('created', {
+      descending: true
+    });
     if (filters.group && filters.component) {
       const key = this._createComponentKey(filters.group, filters.component);
       query = query.hasAncestor(key);
@@ -485,7 +514,12 @@ class ComponentModel extends BaseModel {
     }
     return this.store.runQuery(query)
     .then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
+      const entities = result[0].map((item) => {
+        const key = item[this.store.KEY];
+        item.id = key.name;
+        item.group = key.parent.parent.name;
+        return item;
+      });
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
     });

@@ -124,7 +124,15 @@ class ComponentsApiRoute extends BaseApi {
       since,
       until
     })
-    .then((result) => this.sendListResult(result, res))
+    .then((result) => {
+      const noDocs = req.query['skip-docs'];
+      if (noDocs === 'true') {
+        result[0].forEach((item) => {
+          delete item.docs;
+        });
+      }
+      return this.sendListResult(result, res);
+    })
     .catch((cause) => {
       console.error(cause);
       logging.error(cause);

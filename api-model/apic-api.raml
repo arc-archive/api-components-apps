@@ -465,3 +465,10 @@ securitySchemes:
           description: |
             Limit the query to a time ending at `until` parameter. It is
             an end timestamp of the query.
+        skip-docs:
+          type: boolean
+          displayName: Skip docs
+          default: false
+          description: |
+            Allows to filter out "docs" property from the version when querying for the list.
+            The `docs` property contains AST model for the component which may contain a lot of data. If this information won't be used it can be filtered out to reduce transfer size.
