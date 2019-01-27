@@ -139,13 +139,42 @@ class ApicTestRunner extends GitBuild {
       logging.verbose('API model generated.');
     });
   }
-
+  /**
+   * Tries to run xvbt. It retries twice before giving up.
+   * Usualy first attempt fails and whole test failes. This is to ensure that the test
+   * won't fail because of that.
+   * @return {Promise}
+   */
   _ensureXvfb() {
     if (this._xvfbRunning) {
-      return;
+      return Promise.resolve();
     }
-    this.xvfb.startSync();
-    this._xvfbRunning = true;
+    let attempt = 0;
+    return this.__startXvfb()
+    .catch((cause) => {
+      if (attempt < 3) {
+        attempt++;
+        return this._ensureXvfb();
+      }
+      throw cause;
+    })
+    .then(() => {
+      this._xvfbRunning = true;
+    });
+  }
+
+  __startXvfb() {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        this.xvfb.start((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }, 500);
+    });
   }
 
   _stopXvfb() {
@@ -160,9 +189,11 @@ class ApicTestRunner extends GitBuild {
     if (this.abort) {
       return Promise.resolve();
     }
-    this._ensureXvfb();
-    const runner = new ComponentTestRunner(name, this.workingDir);
-    return runner.run();
+    return this._ensureXvfb()
+    .then(() => {
+      const runner = new ComponentTestRunner(name, this.workingDir);
+      return runner.run();
+    });
   }
 
   reportComponentSuccess(name, result) {
