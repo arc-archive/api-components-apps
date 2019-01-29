@@ -15,7 +15,8 @@ class TestsModel extends BaseModel {
   }
 
   get excludedIndexes() {
-    return ['type', 'commit', 'branch', 'status', 'size', 'passed', 'failed', 'component', 'error', 'message'];
+    return ['type', 'commit', 'branch', 'status', 'size', 'passed', 'failed',
+      'component', 'error', 'message', 'includeDev'];
   }
 
   listTests(limit, nextPageToken) {
@@ -74,7 +75,13 @@ class TestsModel extends BaseModel {
         excludeFromIndexes: true
       });
     }
-
+    if (typeof info.includeDev === 'boolean') {
+      results.push({
+        name: 'includeDev',
+        value: info.includeDev,
+        excludeFromIndexes: true
+      });
+    }
     const entity = {
       key,
       data: results

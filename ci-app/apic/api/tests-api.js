@@ -67,6 +67,9 @@ class TestApiRoute extends BaseApi {
       if (body.component) {
         info.component = body.component;
       }
+      if (body.includeDev) {
+        info.includeDev = body.includeDev;
+      }
       return this.testModel.insertTest(info);
     })
     .then((testId) => {

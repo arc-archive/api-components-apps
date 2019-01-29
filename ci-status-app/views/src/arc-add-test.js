@@ -7,6 +7,7 @@ import '@polymer/iron-form/iron-form.js';
 import '@polymer/paper-input/paper-input.js';
 import '@polymer/paper-button/paper-button.js';
 import '@polymer/paper-toast/paper-toast.js';
+import '@polymer/paper-checkbox/paper-checkbox.js';
 import './apic-icons.js';
 
 class ArcAddTest extends PolymerElement {
@@ -44,6 +45,10 @@ class ArcAddTest extends PolymerElement {
         color: var(--accent-text-color);
       }
 
+      .dev-option {
+        margin: 20px 0;
+      }
+
       @media (max-width: 1248px) {
         :host {
           margin: 0 24px 24px 24px;
@@ -62,7 +67,7 @@ class ArcAddTest extends PolymerElement {
         </a>
         <h1>Schedule a test</h1>
       </header>
-      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" id="iform" with-credentials>
+      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" on-iron-form-presubmit="_presubmit" id="iform" with-credentials>
         <form id="form" method="POST" action="[[apiBase]]tests" enctype="application/json">
           <paper-dropdown-menu label="Test type" name="type" required>
             <paper-listbox slot="dropdown-content" selected="{{selectedType}}">
@@ -75,6 +80,9 @@ class ArcAddTest extends PolymerElement {
           </template>
           <paper-input label="Source branch" name="branch" required auto-validate></paper-input>
           <paper-input label="Commit sha (optional)" name="commit"></paper-input>
+          <div class="dev-option">
+            <paper-checkbox name="includeDev">Inlcude dev dependencies</paper-checkbox>
+          </div>
           <paper-button class="submit" on-click="submit" raised>Save</paper-button>
         </form>
       </iron-form>
@@ -104,6 +112,12 @@ class ArcAddTest extends PolymerElement {
     if (this.$.iform.validate()) {
       this.loading = true;
       this.$.iform.submit();
+    }
+  }
+
+  _presubmit(e) {
+    if (e.target.request.body.includeDev) {
+      e.target.request.body.includeDev = e.target.request.body.includeDev === 'on' ? true : false;
     }
   }
 
