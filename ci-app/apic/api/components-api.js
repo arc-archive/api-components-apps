@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const {BaseApi} = require('./base-api');
 const {ComponentModel} = require('../models/component-model');
+const {DependencyModel} = require('../models/dependency-model');
 const logging = require('../../lib/logging');
 
 const router = express.Router();
@@ -11,6 +12,7 @@ class ComponentsApiRoute extends BaseApi {
   constructor() {
     super();
     this.model = new ComponentModel();
+    this.dependencyModel = new DependencyModel();
   }
 
   _validateTagParameter(req) {
@@ -143,12 +145,62 @@ class ComponentsApiRoute extends BaseApi {
       this.sendError(res, cause.message, 500);
     });
   }
+
+  listParentComponents(req, res) {
+    let {devDependencies} = req.query;
+    const {componentId} = req.params;
+    if (devDependencies === 'true') {
+      devDependencies = true;
+    } else {
+      devDependencies = false;
+    }
+    this.dependencyModel.listParentComponents(componentId, devDependencies)
+    .then((result) => this.sendListResult(result, res))
+    .catch((cause) => {
+      console.error(cause);
+      logging.error(cause);
+      if (cause.code === 3) {
+        this.sendError(res, 'Inavlid nextPageToken parameter');
+        return;
+      }
+      this.sendError(res, cause.message, 500);
+    });
+  }
+
+  listDependencies(req, res) {
+    const {componentId} = req.params;
+    this.dependencyModel.get(componentId)
+    .then((data) => {
+      if (data) {
+        if (!data.dependencies) {
+          data.dependencies = [];
+        }
+        if (!data.devDependencies) {
+          data.devDependencies = [];
+        }
+        res.send(data);
+      } else {
+        this.sendError(res, 'Component not found', 404);
+      }
+    })
+    .catch((cause) => {
+      console.error(cause);
+      logging.error(cause);
+      if (cause.code === 3) {
+        this.sendError(res, 'Inavlid nextPageToken parameter');
+        return;
+      }
+      this.sendError(res, cause.message, 500);
+    });
+  }
 }
 
 const api = new ComponentsApiRoute();
 api.setCors(router);
 api.wrapApi(router, [
   ['/', 'listComponents'],
-  ['/versions', 'listVersions']
+  ['/versions', 'listVersions'],
+  ['/:componentId/dependee', 'listParentComponents'],
+  ['/:componentId/dependencies', 'listDependencies'],
 ]);
 module.exports = router;

@@ -51,6 +51,10 @@ class BaseModel {
     return 'Build';
   }
 
+  get dependencyKind() {
+    return 'Dependency';
+  }
+
   get apicUsersNamespace() {
     return 'api-components-users';
   }

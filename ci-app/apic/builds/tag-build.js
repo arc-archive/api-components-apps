@@ -1,6 +1,7 @@
 const logging = require('../../lib/logging');
 const {GitBuild} = require('./git-build');
 const {CatalogDataGenerator} = require('./catalog-data-generator');
+const {DependencyGraph} = require('./dependency-graph');
 /**
  * A class responsible for processing the component after tag is created.
  */
@@ -37,6 +38,7 @@ class TagBuild extends GitBuild {
     return this.createWorkingDir()
     .then(() => this._clone())
     .then(() => this._generateCatalogModel())
+    .then(() => this._generateGrpah())
     .then(() => this.cleanup())
     .then(() => {
       logging.info('Tag build completed.');
@@ -51,6 +53,12 @@ class TagBuild extends GitBuild {
   _generateCatalogModel() {
     const generator = new CatalogDataGenerator(this.workingDir, this.cmpName, this.info.branch);
     return generator.build();
+  }
+
+  _generateGrpah() {
+    const generator = new DependencyGraph(this.workingDir, this.cmpName);
+    return generator.buildGraph()
+    .catch(() => {});
   }
 }
 module.exports.TagBuild = TagBuild;
