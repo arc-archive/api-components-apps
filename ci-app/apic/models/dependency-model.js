@@ -48,9 +48,7 @@ class DependencyModel extends BaseModel {
     .select('__key__');
     return this.store.runQuery(query)
     .then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
-      const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
-      return [entities, hasMore];
+      return result[0].map(this.fromDatastore.bind(this));
     });
   }
 

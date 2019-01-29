@@ -4,6 +4,7 @@ const {prepareAmfBuild} = require('./amf-builder.js');
 const {ComponentModel} = require('./models/component-model');
 const {TestsModel} = require('./models/test-model');
 const {TestsComponentModel} = require('./models/test-component-model');
+const {DependencyModel} = require('./models/dependency-model');
 const {TestsLogsModel} = require('./models/test-logs-model');
 const logging = require('../lib/logging');
 const {ComponentTestRunner} = require('./component-test-runner');
@@ -23,6 +24,7 @@ class ApicTestRunner extends GitBuild {
     this.testsModel = new TestsModel();
     this.testsComponentModel = new TestsComponentModel();
     this.testsLogsModel = new TestsLogsModel();
+    this.dependencyModel = new DependencyModel();
     this.abort = false;
     this.running = false;
     this.xvfb = new Xvfb();
@@ -34,6 +36,10 @@ class ApicTestRunner extends GitBuild {
       'api-property-form-item'];
   }
 
+  get skipBottomUpComponents() {
+    return ['api-components-autotest', 'api-console-default-theme'];
+  }
+
   run() {
     if (this.abort) {
       return Promise.resolve();
@@ -41,23 +47,65 @@ class ApicTestRunner extends GitBuild {
     this.running = true;
     return this.testsModel.startTest(this.entryId)
     .then(() => this.createWorkingDir())
-    .then(() => this.catalogModel.listApiComponents())
+    .then(() => this._prepareTestType())
+    .then(() => {
+      setImmediate(() => this._next());
+    })
+    .catch((cause) => {
+      this.emit('status', 'error', cause.message);
+      return this.reportTestError(cause);
+    });
+  }
+
+  _prepareTestType() {
+    switch (this.config.type) {
+      case 'amf-build': return this._prepareAmfTest();
+      case 'bottom-up': return this._prepareBottomUpTest();
+      default:
+        throw new Error('Unknown test type: ' + this.config.type);
+    }
+  }
+  /**
+   * Prepares test run for AMF tests.
+   * This includes listing for all AMF powered components and build of
+   * AMF version.
+   * @return {Promise}
+   */
+  _prepareAmfTest() {
+    logging.verbose('Preparing AMF test...');
+    return this.catalogModel.listApiComponents()
     .then((result) => {
       const skip = this.skipComponents;
       this.cmps = result.filter((item) => skip.indexOf(item) === -1);
       return this.testsModel.updateTestScope(this.entryId, this.cmps.length);
     })
     .then(() => {
-      this.emit('status', 'amf-build', 'running');
+      this.emit('status', this.config.type, 'running');
     })
-    .then(() => prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha))
-    .then(() => {
-      this.emit('status', 'amf-build', 'finished');
-      setImmediate(() => this._next());
-    })
-    .catch((cause) => {
-      this.emit('status', 'error', cause.message);
-      return this.reportTestError(cause);
+    .then(() => prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha));
+  }
+  /**
+   * Prepares test run for bottom-up tests.
+   * Bottom up tests allows to test component that is a dependency of other components to check
+   * whether a change to the version would break any component that depends on this component.
+   *
+   * This function lists a parent dependencies for the component.
+   * @return {Promise}
+   */
+  _prepareBottomUpTest() {
+    logging.verbose('Preparing bottom-up test...');
+    return this.dependencyModel.listParentComponents(this.config.component, this.config.includeDev)
+    .then((data) => {
+      const skip = this.skipBottomUpComponents;
+      const result = [];
+      for (let i = 0, len = data.length; i < len; i++) {
+        const item = data[i].id;
+        if (skip.indexOf(item) === -1) {
+          result[result.length] = item;
+        }
+      }
+      this.cmps = result;
+      return this.testsModel.updateTestScope(this.entryId, this.cmps.length);
     });
   }
 
@@ -99,13 +147,25 @@ class ApicTestRunner extends GitBuild {
       logging.error(cause.stack || cause.message);
       throw cause;
     })
-    .then(() => this.updateModels(name))
+    .then(() => {
+      switch (this.config.type) {
+        case 'amf-build': return this.updateModels(name);
+      }
+    })
     .then(() => {
       if (this.abort) {
         return;
       }
       const dm = new DependendenciesManager(path.join(this.workingDir, name));
-      return dm.installDependencies()
+      let extra;
+      if (this.config.type === 'bottom-up') {
+        extra = {
+          component: this.config.component,
+          branch: this.config.branch,
+          commit: this.config.commit
+        };
+      }
+      return dm.installDependencies(extra)
       .catch((cause) => {
         logging.error('Cannot Install dependencies for   ' + name);
         logging.error(cause.stack || cause.message);

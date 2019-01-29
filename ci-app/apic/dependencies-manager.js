@@ -29,9 +29,10 @@ class DependendenciesManager {
   /**
    * Installs bower dependencies if the `bower.json` file exists in `workingDir`
    *
+   * @param {?Object} extra An extra component to install after bower dependencies are installed.
    * @return {Promise} Resolved promise when operation is completed.
    */
-  installDependencies() {
+  installDependencies(extra) {
     return fs.pathExists(path.join(this.workingDir, 'bower.json'))
     .then((exists) => {
       if (!exists) {
@@ -39,7 +40,13 @@ class DependendenciesManager {
         logging.info('No bower file. Skipping dependencies.');
         return;
       }
-      return this._processDependencies();
+      let p;
+      if (extra) {
+        p = this._addExtraBower(extra);
+      } else {
+        p = Promise.resolve();
+      }
+      return p.then(() => this._processDependencies());
     });
   }
   /**
@@ -67,6 +74,32 @@ class DependendenciesManager {
     })
     .then(() => {
       logging.verbose('Dependencies installed.');
+    });
+  }
+  /**
+   * Adds a depdendency to bower file when running `bottom-up` tests to inject
+   * a component into the test run.
+   * @param {Object} extra Extra component definition:
+   * - `component` Stirng - component name
+   * - `branch` String - branch to checkout.
+   * @return {Promise}
+   */
+  _addExtraBower(extra) {
+    const name = extra.component;
+    const depenedency = `advanced-rest-client/${extra.component}#${extra.branch}`;
+    logging.verbose(`Adding extra dependency ${depenedency}...`);
+    const file = path.join(this.workingDir, 'bower.json');
+    return fs.readJson(file)
+    .then((bower) => {
+      if (!bower.dependencies) {
+        bower.dependencies = {};
+      }
+      bower.dependencies[name] = depenedency;
+      if (!bower.resolutions) {
+        bower.resolutions = {};
+      }
+      bower.resolutions[name] = extra.branch;
+      return fs.outputJson(file, bower);
     });
   }
 }
