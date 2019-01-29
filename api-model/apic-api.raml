@@ -472,3 +472,98 @@ securitySchemes:
           description: |
             Allows to filter out "docs" property from the version when querying for the list.
             The `docs` property contains AST model for the component which may contain a lot of data. If this information won't be used it can be filtered out to reduce transfer size.
+  /{componentId}:
+    uriParameters:
+      componentId:
+        type: string
+        description: Component id / normalized name
+        displayName: Component
+        example: api-summary
+    /dependees:
+      get:
+        displayName: List dependees
+        description: |
+          Lists components that depends on the `componentId` component.
+        queryParameters:
+          devDependencies:
+            type: boolean
+            displayName: Include dev relation
+            description: |
+              When set it also looks for parent component that has this component in dev dependencies.
+        responses:
+          200:
+            body:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        displayName: Dependee id.
+                        description: |
+                          Name of the dependee component.
+                      development:
+                        type: boolean
+                        required: false
+                        description: |
+                          When set the dependee has this component as a dev dependency
+                      production:
+                        type: boolean
+                        required: false
+                        description: |
+                          When set the dependee has this component as a dependency
+              example:
+                items:
+                  - id: api-summary
+                    production: true
+                  - id: cookie-manager
+                    development: true
+    /dependencies:
+      get:
+        displayName: List dependencies
+        description: |
+          Lists components dependencies graph.
+        responses:
+          200:
+            body:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        displayName: This component id.
+                      dependencies:
+                        type: string[]
+                        description: |
+                          List of production depndencies (only API components)
+                      devDependencies:
+                        type: string[]
+                        description: |
+                          List of development depndencies (only API components)
+              example:
+                items:
+                  - id: cookie-manager
+                    depenednecies:
+                      - arc-icons
+                      - tutorial-toast
+                      - bottom-sheet
+                      - cookies-list-items
+                      - cookie-editor
+                      - cookie-details
+                    devDependencies:
+                      - arc-electron-default-theme
+                      - arc-data-generator
+          404:
+            description: |
+              Depdenecy graph has not yet been created.
+              This means that the component has not yet been process by this CI pipeline and therefore dependecies cannot be
+              resolved. Depdeencies are processed when new tag is being released.
+            body:
+              type: ErrorResource

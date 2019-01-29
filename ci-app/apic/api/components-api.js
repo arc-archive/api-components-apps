@@ -155,7 +155,7 @@ class ComponentsApiRoute extends BaseApi {
       devDependencies = false;
     }
     this.dependencyModel.listParentComponents(componentId, devDependencies)
-    .then((result) => this.sendListResult(result, res))
+    .then((result) => this.sendListResult([result], res))
     .catch((cause) => {
       console.error(cause);
       logging.error(cause);
@@ -200,7 +200,7 @@ api.setCors(router);
 api.wrapApi(router, [
   ['/', 'listComponents'],
   ['/versions', 'listVersions'],
-  ['/:componentId/dependee', 'listParentComponents'],
+  ['/:componentId/dependees', 'listParentComponents'],
   ['/:componentId/dependencies', 'listDependencies'],
 ]);
 module.exports = router;

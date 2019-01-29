@@ -20,13 +20,13 @@ class DependencyModel extends BaseModel {
     });
   }
 
-  set(component, depenednecies, devDependencies) {
+  set(component, dependencies, devDependencies) {
     const key = this._createKey(component);
     const results = [];
-    if (depenednecies) {
+    if (dependencies) {
       results[results.length] = {
-        name: 'depenednecies',
-        value: depenednecies
+        name: 'dependencies',
+        value: dependencies
       };
     }
     if (devDependencies) {
@@ -42,13 +42,43 @@ class DependencyModel extends BaseModel {
     return this.store.upsert(entity);
   }
 
-  listParentComponents(dependency) {
+  listParentComponents(dependency, includeDev) {
     let query = this.store.createQuery(this.namespace, this.dependencyKind);
-    query = query.filter('depenednecies', '=', dependency)
+    query = query.filter('dependencies', '=', dependency)
     .select('__key__');
     return this.store.runQuery(query)
     .then((result) => {
-      return result[0].map(this.fromDatastore.bind(this));
+      let deps = result[0].map((item) => {
+        item = this.fromDatastore(item);
+        item.production = true;
+        return item;
+      });
+      let p;
+      if (includeDev) {
+        p = this.listDevParentComponents(dependency);
+      } else {
+        p = Promise.resolve();
+      }
+      return p.then((result) => {
+        if (result) {
+          deps = deps.concat(result);
+        }
+        return deps;
+      });
+    });
+  }
+
+  listDevParentComponents(dependency) {
+    let query = this.store.createQuery(this.namespace, this.dependencyKind);
+    query = query.filter('devdependencies', '=', dependency)
+    .select('__key__');
+    return this.store.runQuery(query)
+    .then((result) => {
+      return result[0].map((item) => {
+        item = this.fromDatastore(item);
+        item.development = true;
+        return item;
+      });
     });
   }
 
