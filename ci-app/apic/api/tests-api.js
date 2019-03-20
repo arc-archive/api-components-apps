@@ -39,7 +39,7 @@ class TestApiRoute extends BaseApi {
   }
 
   createTest(req, res) {
-    return this.isValidAccess(req, 'delete-test')
+    return this.isValidAccess(req, 'create-test')
     .then((hasAccess) => {
       if (!hasAccess) {
         const o = {

@@ -51,6 +51,10 @@ class BaseModel {
     return 'Build';
   }
 
+  get messageKind() {
+    return 'Messages';
+  }
+
   get dependencyKind() {
     return 'Dependency';
   }
@@ -96,7 +100,8 @@ class BaseModel {
    * @return {Object}
    */
   fromDatastore(obj) {
-    obj.id = obj[this.store.KEY].name;
+    const key = obj[this.store.KEY];
+    obj.id = key.name || key.id;
     return obj;
   }
   /**

@@ -53,6 +53,8 @@ Note that authenticated user of the web UI application has `all` scope by defaul
 | `all` | Allows to access all endpoints |
 | `create-test` | To be used to schedule automated test |
 | `delete-test` | Allows to remove test from the queue |
+| `create-message` | Allows to create ARC info message |
+| `delete-message` | Allows to delete ARC info message |
 
 ## Revoking a token
 

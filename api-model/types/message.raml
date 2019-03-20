@@ -6,7 +6,18 @@ description: |
 type: !include create-message.raml
 
 properties:
-  key:
-    type: integer
+  id:
+    type: string
+    displayName: Id
+    description: |
+      Datastore key.
   kind:
     type: string
+    displayName: Kind
+    description: |
+      Object structure identifier.
+  time:
+    type: integer
+    displayName: Time
+    description: |
+      Timestamp of creation time.

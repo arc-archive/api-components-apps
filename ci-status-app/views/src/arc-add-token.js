@@ -87,6 +87,8 @@ class ArcAddToken extends PolymerElement {
             <paper-checkbox name="scopes" value="all" checked="{{allScopes}}">All</paper-checkbox>
             <paper-checkbox name="scopes" value="create-test" disabled="[[allScopes]]">create-test</paper-checkbox>
             <paper-checkbox name="scopes" value="delete-test" disabled="[[allScopes]]">delete-test</paper-checkbox>
+            <paper-checkbox name="scopes" value="create-message" disabled="[[allScopes]]">create-message</paper-checkbox>
+            <paper-checkbox name="scopes" value="delete-message" disabled="[[allScopes]]">delete-message</paper-checkbox>
           </div>
 
           <div class="time-selector">

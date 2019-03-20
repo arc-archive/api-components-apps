@@ -15,6 +15,8 @@ router.use('/github', require('./github-api'));
 router.use('/groups', require('./groups-api'));
 // Components route
 router.use('/components', require('./components-api'));
+// ARC info messages
+router.use('/messages', require('./messages-api'));
 // Errors
 router.use((req, res) => {
   const message = `Route ${req.url} not found`;

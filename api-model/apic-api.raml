@@ -598,13 +598,13 @@ securitySchemes:
         description: |
           A timestamp of a end date when querying for the messages.
           Dates in the future causes error.
-      platform:
+      target:
         type: string
         examples:
           Chrome app: chrome
           Electron app: electron
           Web client: web
-        displayName: Platform
+        displayName: Target
         description: |
           Name of the platform used to render the messages.
       channel:
@@ -639,8 +639,8 @@ securitySchemes:
   /{messageId}:
     uriParameters:
       messageId:
-        type: integer
-        displayName: Key
+        type: string
+        displayName: Id
         description: |
           The datastore key of the message.
           It is returned by the list query endpoint.
