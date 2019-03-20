@@ -8,6 +8,7 @@ const colorize = process.env.NODE_ENV !== 'production';
 
 // Logger to capture all requests and output them to the console.
 const requestLogger = expressWinston.logger({
+  level: 'warn',
   transports: [
     new StackdriverTransport(),
     new winston.transports.Console({
@@ -21,6 +22,7 @@ const requestLogger = expressWinston.logger({
 
 // Logger to capture any top-level errors and output json diagnostic info.
 const errorLogger = expressWinston.errorLogger({
+  level: 'warn',
   transports: [
     new StackdriverTransport(),
     new winston.transports.Console({
