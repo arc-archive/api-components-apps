@@ -4,7 +4,8 @@
   "description": "A CI server, API server and documentation apps repository",
   "main": "",
   "scripts": {
-    "build-api-docs": "api-console build -t 'RAML 1.0' -a api-model/apic-api.raml -o ci-app/api-docs"
+    "build-api-docs": "api-console build -t 'RAML 1.0' -a api-model/apic-api.raml -o ci-app/api-docs",
+    "create-index": "gcloud datastore indexes create index.yaml"
   },
   "license": "Apache-2.0",
   "repository": {
