@@ -16,6 +16,11 @@ indexes:
     - name: time
       direction: desc
     - name: channel
+  - kind: Messages
+    properties:
+    - name: channel
+    - name: time
+      direction: desc
 # API components CI application
   - kind: Jwt
     ancestor: yes
