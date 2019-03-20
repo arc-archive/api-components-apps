@@ -1,0 +1,12 @@
+#%RAML 1.0 DataType
+
+displayName: Message
+description: |
+  ARC info message model
+type: !include create-message.raml
+
+properties:
+  key:
+    type: integer
+  kind:
+    type: string

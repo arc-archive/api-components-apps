@@ -36,6 +36,8 @@ types:
   Group: !include types/group.raml
   Component: !include types/component.raml
   Version: !include types/version.raml
+  CreateMessage: !include types/create-message.raml
+  Message: !include types/message.raml
   ErrorResource:
     description: A response that is errored
     type: object
@@ -567,3 +569,91 @@ securitySchemes:
               resolved. Depdeencies are processed when new tag is being released.
             body:
               type: ErrorResource
+/messages:
+  displayName: ARC messages
+  description: |
+    An endpoint to list application meessages. Messages are rendered in ARC
+    in a side panel. The app queries for messages when starting up and
+    renders an icon to open messages center.
+
+    It is possible to query for messages by time, channel, and platform.
+  get:
+    displayName: List messages
+    description: |
+      Lists available messages.
+    is: [Paginated: {resourceType: Message}]
+    queryParameters:
+      since:
+        type: integer
+        required: false
+        displayName: Since
+        description: |
+          A timestamp of a start date when querying for the messages.
+          It is to be used to limit number of records returned by the API
+          when the application already have messages received in the past.
+      until:
+        type: integer
+        required: false
+        displayName: Until
+        description: |
+          A timestamp of a end date when querying for the messages.
+          Dates in the future causes error.
+      platform:
+        type: string
+        examples:
+          Chrome app: chrome
+          Electron app: electron
+          Web client: web
+        displayName: Platform
+        description: |
+          Name of the platform used to render the messages.
+      channel:
+        type: string
+        required: false
+        displayName: Channel
+        enum: [stable, beta, alpha]
+        description: |
+          Name of the release channel.
+    responses:
+      400:
+        description: |
+          This response is expected when `since` and `until` parameters doesn't
+          make sense (since higher then until) or if any date is in the future.
+  post:
+    displayName: Create message
+    securedBy: [JwtSecurity]
+    description: |
+      Creates a message to be sent to the application
+    body:
+      type: CreateMessage
+    responses:
+      200:
+        description: Message has been created
+        body:
+          type: Message
+      400:
+        description: Returned when request verification failed.
+        body:
+          displayName: Request validation failed
+          type: ErrorResource
+  /{messageId}:
+    uriParameters:
+      messageId:
+        type: integer
+        displayName: Key
+        description: |
+          The datastore key of the message.
+          It is returned by the list query endpoint.
+    delete:
+      securedBy: [JwtSecurity]
+      displayName: Delete message
+      description: |
+        Removes message from the data store.
+      responses:
+        204:
+          description: Status returned when the message has been deleted.
+        404:
+          description: The message cannot be found
+          body:
+            displayName: Message not found
+            type: ErrorResource
