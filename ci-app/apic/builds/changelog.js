@@ -58,8 +58,8 @@ class Changelog {
       pkg: {
         path: 'package.json'
       },
-      append: true,
-      releaseCount: 1,
+      // append: true,
+      // releaseCount: 1,
       warn: console.warn.bind(console),
       // debug: console.debug.bind(console)
     });
