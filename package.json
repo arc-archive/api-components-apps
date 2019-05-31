@@ -5,7 +5,9 @@
   "main": "",
   "scripts": {
     "build-api-docs": "api-console build -t 'RAML 1.0' -a api-model/apic-api.raml -o ci-app/api-docs",
-    "create-index": "gcloud datastore indexes create index.yaml"
+    "create-index": "gcloud datastore indexes create index.yaml",
+    "test": "npm run test-ci-app",
+    "test-ci-app": "mocha ci-app/test/*.spec.js"
   },
   "license": "Apache-2.0",
   "repository": {
