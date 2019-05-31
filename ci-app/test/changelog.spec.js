@@ -75,7 +75,7 @@ describe('Changelog class', () => {
 
     afterEach(() => {
       process.chdir(startDir);
-      return fs.remove(instance.changelogFile);
+      return fs.remove(path.join(__dirname, '..', instance.changelogFile));
     });
 
     it('Returns a promise', () => {
