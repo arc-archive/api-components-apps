@@ -1,7 +1,10 @@
 language: node_js
 node_js: 10
 install:
-- npm install
+- npm ci
+- cd catalog-app && npm ci
+- cd ../ci-app && npm ci
+- cd ../ci-status-app && npm ci
 script: npm run test
 cache:
   directories:
