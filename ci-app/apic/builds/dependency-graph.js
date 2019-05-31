@@ -31,9 +31,23 @@ class DependencyGraph {
       throw cause;
     });
   }
-
+  /**
+   * Reads dependencies from bower/package file.
+   * @return {Array} First item is a map of dependencies and second item is a
+   * map of dev dependencies. Both can be undefined.
+   */
   readProjectDependencies() {
-    const file = path.join(this.workingDir, 'bower.json');
+    return this._readDependencies('bower.json')
+    .then((result) => {
+      if (!result) {
+        return this._readDependencies('package.json');
+      }
+      return result;
+    });
+  }
+
+  _readDependencies(fileName) {
+    const file = path.join(this.workingDir, fileName);
     return fs.readJson(file)
     .then((data) => {
       let deps;
@@ -47,29 +61,39 @@ class DependencyGraph {
       return [deps, devDeps];
     })
     .catch(() => {
-      logging.warn('bower.json file do not exists. Skipping.');
+      logging.warn(fileName + ' file do not exists. Skipping.');
     });
   }
-
+  /**
+   * Filters out all non ARC/API components.
+   * @param {Object} deps Bower/Npm dependencies map
+   * @return {Array<String>} List of ARC/API components dependencies
+   */
   filterDependencies(deps) {
-    const values = Object.values(deps);
     const result = [];
-    for (let i = 0; i < values.length; i++) {
-      let dependency = values[i];
-      const index = dependency.indexOf('advanced-rest-client/');
+    for (let [key, value] of Object.entries(deps)) {
+      if (key.indexOf('@advanced-rest-client') === 0 || key.indexOf('@api-components') === 0) {
+        result[result.length] = key;
+        continue;
+      }
+      let index = value.indexOf('advanced-rest-client/');
       if (index === -1) {
         continue;
       }
-      dependency = dependency.substr(21);
-      const hash = dependency.indexOf('#');
+      value = value.substr(21);
+      const hash = value.indexOf('#');
       if (hash !== -1) {
-        dependency = dependency.substr(0, hash);
+        value = value.substr(0, hash);
       }
-      result[result.length] = dependency;
+      result[result.length] = value;
     }
     return result.length ? result : undefined;
   }
-
+  /**
+   * Filters and stores dependendies graph data.
+   * @param {Array} data List of dependencies returned by `readProjectDependencies()`
+   * @return {Promise}
+   */
   processDepenedencies(data) {
     let deps;
     let devDeps;
