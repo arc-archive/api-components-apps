@@ -1,0 +1,23 @@
+<dom-module id="test-component">
+  <template>
+    <style></style>
+    <h1>Test</h1>
+  </template>
+  <script>
+  /**
+   * This is test component.
+   *
+   * @customElement
+   * @polymer
+   * @demo demo/index.html
+   * @memberof ApiElements
+   * @appliesMixin ApiElements.AmfHelperMixin
+   */
+  class TestComponent extends Polymer.Element {
+    static get is() {
+      return 'test-component';
+    }
+  }
+  window.customElements.define(TestComponent.is, TestComponent);
+  </script>
+</dom-module>

@@ -54,14 +54,14 @@ class CatalogDataGenerator {
   }
   /**
    * All API/ARC components have `polymer.json` file describing polymer tools configuration.
+   *
+   * This function will reject the promise when file does not exist or JSON is
+   * invalid.
    * @return {Promise<Boolean>}
    */
   isComponent() {
-    return fs.readJson(path.join(this.workingDir, 'polymer.json'), {throws: false})
+    return fs.readJson(path.join(this.workingDir, 'polymer.json'))
     .then((polymer) => {
-      if (!polymer) {
-        throw new Error('Not a web component repository.');
-      }
       const rule = polymer.lint && polymer.lint.rules && polymer.lint.rules[0];
       this.polymerVersion = rule;
       return true;
