@@ -8,7 +8,7 @@
     "start-api": "node --inspect=9227 api.js --PORT=8080",
     "start-worker": "node --inspect=9225 worker.js --PORT=8083",
     "start-github": "node --inspect=9224 github.js --PORT=8084",
-    "test": "mocha test/*.test.js",
+    "test": "mocha test/*.spec.js",
     "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:0.1.3 .",
     "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:0.1.3",
     "deploy-config": "npm run deploy-tests && npm run deploy-github && npm run deploy-api",
@@ -50,7 +50,9 @@
     "xvfb": "^0.2.3"
   },
   "devDependencies": {
-    "express-http-proxy": "^1.5.1"
+    "chai": "^4.2.0",
+    "express-http-proxy": "^1.5.1",
+    "mocha": "^6.1.4"
   },
   "license": "Apache-2.0",
   "repository": {
