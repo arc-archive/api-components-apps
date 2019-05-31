@@ -5,6 +5,7 @@ install:
 - cd catalog-app && npm ci
 - cd ../ci-app && npm ci
 - cd ../ci-status-app && npm ci
+- cd ../
 script: npm run test
 cache:
   directories:
