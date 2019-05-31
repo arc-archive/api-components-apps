@@ -1,0 +1,14 @@
+{
+  "name": "test-component",
+  "dependencies": {
+    "@polymer/polymer-x": "^2.0.0",
+    "@advanced-rest-client/api-xtest1": "^2.0.0",
+    "@advanced-rest-client/api-xtest2": "^2.0.0"
+  },
+  "devDependencies": {
+    "@polymer/iron-demo-helpers-x": "^2.0.0",
+    "@polymer/iron-component-page-x": "^3.0.1",
+    "@advanced-rest-client/arc-xtest1": "^0.1.11",
+    "@advanced-rest-client/arc-xtest2": "^2.0.1"
+  }
+}

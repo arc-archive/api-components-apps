@@ -1,0 +1,15 @@
+{
+  "name": "test-component",
+  "main": "test-component.js",
+  "dependencies": {
+    "@polymer/polymer": "Polymer/polymer#^2.0.0",
+    "@advanced-rest-client/api-test1": "^2.0.0",
+    "@api-components/api-test2": "^2.0.0"
+  },
+  "devDependencies": {
+    "@polymer/iron-demo-helpers": "^2.0.0",
+    "@polymer/iron-component-page": "^3.0.1",
+    "@advanced-rest-client/arc-test1": "^0.1.11",
+    "@api-components/arc-test2": "^2.0.1"
+  }
+}
