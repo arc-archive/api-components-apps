@@ -1,7 +1,7 @@
 'use strict';
 const background = require('../../lib/background');
 const logging = require('../../lib/logging');
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 const uuidv4 = require('uuid/v4');
 /**
  * A model for catalog items.

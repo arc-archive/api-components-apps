@@ -10,7 +10,7 @@ const express = require('express');
 const config = require('./config');
 const logging = require('./lib/logging');
 const background = require('./lib/background');
-const {ApicBuildRunner} = require('./apic/builds/build-runner');
+const { ApicBuildRunner } = require('./apic/builds/build-runner');
 
 /**
  * Routing for GitHub web hooks.
@@ -85,7 +85,7 @@ class GithubBuild {
   }
 
   routeRun(req, res) {
-    const {id} = req.params;
+    const { id } = req.params;
     this.setupQueue(id);
     res.sendStatus(204);
   }

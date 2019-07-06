@@ -1,5 +1,5 @@
 const jwt = require('../../lib/jwt');
-const {TokenModel} = require('../models/token-model');
+const { TokenModel } = require('../models/token-model');
 const cors = require('cors');
 
 let tokenModel;

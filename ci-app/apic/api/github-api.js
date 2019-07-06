@@ -3,9 +3,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 const config = require('../../config');
-const {BaseApi} = require('./base-api');
+const { BaseApi } = require('./base-api');
 const logging = require('../../lib/logging');
-const {ComponentBuildModel} = require('../models/component-build-model');
+const { ComponentBuildModel } = require('../models/component-build-model');
 
 const router = express.Router();
 router.use(bodyParser.json());

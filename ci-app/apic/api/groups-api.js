@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {BaseApi} = require('./base-api');
-const {ComponentModel} = require('../models/component-model');
+const { BaseApi } = require('./base-api');
+const { ComponentModel } = require('../models/component-model');
 const logging = require('../../lib/logging');
 
 const router = express.Router();
@@ -19,7 +19,7 @@ class GroupsApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    let {limit, nextPageToken} = req.query;
+    let { limit, nextPageToken } = req.query;
     this.model.listGroups(limit, nextPageToken)
     .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
@@ -33,7 +33,7 @@ class GroupsApiRoute extends BaseApi {
   }
 
   getGroup(req, res) {
-    const {groupId} = req.params;
+    const { groupId } = req.params;
     this.model.getGroup(groupId)
     .then((resource) => {
       if (resource) {
@@ -54,8 +54,8 @@ class GroupsApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    let {limit, nextPageToken} = req.query;
-    const {groupId} = req.params;
+    let { limit, nextPageToken } = req.query;
+    const { groupId } = req.params;
     this.model.listComponents(limit, nextPageToken, groupId)
     .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
@@ -69,7 +69,7 @@ class GroupsApiRoute extends BaseApi {
   }
 
   getComponent(req, res) {
-    const {groupId, componentId} = req.params;
+    const { groupId, componentId } = req.params;
     this.model.getComponent(groupId, componentId)
     .then((resource) => {
       if (resource) {
@@ -90,8 +90,8 @@ class GroupsApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    let {limit, nextPageToken} = req.query;
-    const {groupId, componentId} = req.params;
+    let { limit, nextPageToken } = req.query;
+    const { groupId, componentId } = req.params;
     this.model.listVersions(groupId, componentId, limit, nextPageToken)
     .then((result) => this.sendListResult(result, res))
     .catch((cause) => {
@@ -105,7 +105,7 @@ class GroupsApiRoute extends BaseApi {
   }
 
   getVersion(req, res) {
-    const {groupId, componentId, versionId} = req.params;
+    const { groupId, componentId, versionId } = req.params;
     this.model.getVersion(groupId, componentId, versionId)
     .then((resource) => {
       if (resource) {

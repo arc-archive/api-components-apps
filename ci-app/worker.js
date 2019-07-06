@@ -9,9 +9,9 @@ if (process.env.NODE_ENV === 'production') {
 const express = require('express');
 const config = require('./config');
 const logging = require('./lib/logging');
-const {ComponentModel} = require('./apic/models/component-model');
-const {TestsModel} = require('./apic/models/test-model');
-const {ApicTestRunner} = require('./apic/test-runner');
+const { ComponentModel } = require('./apic/models/component-model');
+const { TestsModel } = require('./apic/models/test-model');
+const { ApicTestRunner } = require('./apic/test-runner');
 const background = require('./lib/background');
 
 

@@ -2,7 +2,7 @@
 
 const express = require('express');
 const config = require('../config');
-const {UserModel} = require('../apic/models/user-model');
+const { UserModel } = require('../apic/models/user-model');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const model = new UserModel();

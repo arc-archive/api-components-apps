@@ -1,8 +1,8 @@
 const EventEmitter = require('events');
-const {ComponentBuildModel} = require('../models/component-build-model');
-const {StageBuild} = require('./stage-build');
-const {MasterBuild} = require('./master-build');
-const {TagBuild} = require('./tag-build');
+const { ComponentBuildModel } = require('../models/component-build-model');
+const { StageBuild } = require('./stage-build');
+const { MasterBuild } = require('./master-build');
+const { TagBuild } = require('./tag-build');
 
 class ApicBuildRunner extends EventEmitter {
   constructor(id) {

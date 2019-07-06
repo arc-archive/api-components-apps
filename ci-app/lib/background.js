@@ -13,7 +13,7 @@
 
 'use strict';
 const EventEmitter = require('events');
-const {PubSub} = require('@google-cloud/pubsub');
+const { PubSub } = require('@google-cloud/pubsub');
 const config = require('../config');
 const logging = require('./logging');
 

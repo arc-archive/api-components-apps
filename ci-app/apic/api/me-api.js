@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {BaseApi} = require('./base-api');
-const {UserModel} = require('../models/user-model');
+const { BaseApi } = require('./base-api');
+const { UserModel } = require('../models/user-model');
 const jwt = require('../../lib/jwt');
 
 const router = express.Router();
@@ -61,7 +61,7 @@ class MeApiRoute extends BaseApi {
         throw o;
       }
 
-      let {limit, nextPageToken} = req.query;
+      let { limit, nextPageToken } = req.query;
       return this.userModel.listTokens(req.user.id, limit, nextPageToken);
     })
     .then((result) => {
@@ -142,7 +142,7 @@ class MeApiRoute extends BaseApi {
         };
         throw o;
       }
-      const {token} = req.params;
+      const { token } = req.params;
       return this.userModel.getToken(req.user.id, token);
     })
     .then((resource) => {
@@ -160,7 +160,7 @@ class MeApiRoute extends BaseApi {
   }
 
   deleteUserToken(req, res) {
-    const {token} = req.params;
+    const { token } = req.params;
     return this.isValidAccess(req)
     .then((hasAccess) => {
       if (!hasAccess) {
@@ -196,7 +196,7 @@ class MeApiRoute extends BaseApi {
   }
 
   revokeUserToken(req, res) {
-    const {token} = req.params;
+    const { token } = req.params;
     return this.isValidAccess(req)
     .then((hasAccess) => {
       if (!hasAccess) {

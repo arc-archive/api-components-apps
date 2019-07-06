@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {BaseApi} = require('./base-api');
-const {ComponentModel} = require('../models/component-model');
-const {DependencyModel} = require('../models/dependency-model');
+const { BaseApi } = require('./base-api');
+const { ComponentModel } = require('../models/component-model');
+const { DependencyModel } = require('../models/dependency-model');
 const logging = require('../../lib/logging');
 
 const router = express.Router();
@@ -16,7 +16,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateTagParameter(req) {
-    let {tags} = req.query;
+    let { tags } = req.query;
     if (!tags) {
       return;
     }
@@ -47,7 +47,7 @@ class ComponentsApiRoute extends BaseApi {
       this.sendError(res, tagError);
       return;
     }
-    let {limit, nextPageToken, tags, group} = req.query;
+    let { limit, nextPageToken, tags, group } = req.query;
     this.model.queryComponents(limit, nextPageToken, {
       tags,
       group
@@ -65,7 +65,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateTimeRange(req) {
-    let {since, until} = req.query;
+    let { since, until } = req.query;
     if (!since && !until) {
       return;
     }
@@ -88,7 +88,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateParentParameters(req) {
-    let {group, component} = req.query;
+    let { group, component } = req.query;
     if (group && !component) {
       return 'The "component" parameter is required when "group" is used';
     }
@@ -118,7 +118,7 @@ class ComponentsApiRoute extends BaseApi {
       this.sendError(res, groupError);
       return;
     }
-    let {limit, nextPageToken, tags, group, component, since, until} = req.query;
+    let { limit, nextPageToken, tags, group, component, since, until } = req.query;
     this.model.queryVersions(limit, nextPageToken, {
       tags,
       group,
@@ -147,8 +147,8 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   listParentComponents(req, res) {
-    let {devDependencies} = req.query;
-    const {componentId} = req.params;
+    let { devDependencies } = req.query;
+    const { componentId } = req.params;
     if (devDependencies === 'true') {
       devDependencies = true;
     } else {
@@ -168,7 +168,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   listDependencies(req, res) {
-    const {componentId} = req.params;
+    const { componentId } = req.params;
     this.dependencyModel.get(componentId)
     .then((data) => {
       if (data) {

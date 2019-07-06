@@ -1,7 +1,7 @@
 const logging = require('../../lib/logging');
 const Git = require('nodegit');
-const {Changelog} = require('./changelog');
-const {GitBuild} = require('./git-build');
+const { Changelog } = require('./changelog');
+const { GitBuild } = require('./git-build');
 /**
  * A class responsible for processing "stage" branch after successfult stage build.
  */
@@ -24,6 +24,7 @@ class StageBuild extends GitBuild {
       logging.info('Stage build completed.');
     })
     .catch((cause) => {
+      this.cleanup();
       console.error(cause);
       logging.error('Stage build error: ' + cause.message);
       throw cause;
@@ -83,7 +84,7 @@ class StageBuild extends GitBuild {
     })
     .then((commit) => {
       theirsCommit = commit;
-      return Git.Merge.commits(this.repo, ourCommit, theirsCommit, {fileFavor: Git.Merge.FILE_FAVOR.THEIRS});
+      return Git.Merge.commits(this.repo, ourCommit, theirsCommit, { fileFavor: Git.Merge.FILE_FAVOR.THEIRS });
     })
     .then((index) => {
       if (index.hasConflicts()) {
@@ -123,7 +124,7 @@ class StageBuild extends GitBuild {
     return this.repo.fetch('origin', this._getFetchOptions())
     .then(() => {
       const sig = this._createSignature();
-      return this.repo.mergeBranches(remote, origin, sig, {}, {fileFavor: Git.Merge.FILE_FAVOR.OURS});
+      return this.repo.mergeBranches(remote, origin, sig, {}, { fileFavor: Git.Merge.FILE_FAVOR.OURS });
     });
   }
 }
