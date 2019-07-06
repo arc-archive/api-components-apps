@@ -1,6 +1,6 @@
 {
   "name": "api-components-ci",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "start-worker": "node --inspect=9225 worker.js --PORT=8083",
     "start-github": "node --inspect=9224 github.js --PORT=8084",
     "test": "mocha test/*.spec.js",
-    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:0.1.4 .",
-    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:0.1.4",
+    "build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:0.1.5 .",
+    "deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:0.1.5",
     "deploy-config": "npm run deploy-tests && npm run deploy-github && npm run deploy-api",
     "deploy-tests": "kubectl apply -f tests-deployment.yaml",
     "deploy-github": "kubectl apply -f github-deployment.yaml",
