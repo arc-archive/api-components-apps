@@ -54,12 +54,13 @@ class Changelog {
    */
   _getChangelogStreem() {
     return conventionalChangelog({
-      preset: 'eslint',
+      preset: 'angular',
       pkg: {
         path: 'package.json'
       },
-      // append: true,
-      // releaseCount: 1,
+      append: false,
+      releaseCount: 1,
+      reverse: false,
       warn: console.warn.bind(console),
       // debug: console.debug.bind(console)
     });
