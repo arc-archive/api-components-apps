@@ -124,8 +124,7 @@ class Background extends EventEmitter {
   publish(payload, topicName) {
     return this.getTopic(topicName)
     .then((topic) => {
-      const publisher = topic.publisher();
-      return publisher.publish(Buffer.from(JSON.stringify(payload)));
+      return topic.publisher.publish(Buffer.from(JSON.stringify(payload)));
     })
     .then(() => {
       logging.info('Message published to topic ' + topicName);
