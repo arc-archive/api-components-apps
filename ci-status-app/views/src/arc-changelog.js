@@ -229,7 +229,7 @@ class ArcChangelog extends PolymerElement {
     }
     this._lastrBaseQuery = url;
     if (this.pageToken) {
-      url += '&nextPageToken=' + this.pageToken;
+      url += '&nextPageToken=' + encodeURIComponent(this.pageToken);
     }
     const init = {
       credentials: 'include'
