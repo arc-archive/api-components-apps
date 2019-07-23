@@ -109,15 +109,16 @@ class BaseApi {
     const origin = req.header('Origin');
     let corsOptions;
     if (!origin) {
-      corsOptions = {origin: false};
+      corsOptions = { origin: false };
     } else if (origin.indexOf('http://localhost:') === 0 || origin.indexOf('http://127.0.0.1:') === 0) {
-      corsOptions = {origin: true};
+      corsOptions = { origin: true };
     } else if (whitelist.indexOf(origin) !== -1) {
-      corsOptions = {origin: true};
+      corsOptions = { origin: true };
     }
     if (corsOptions) {
       corsOptions.credentials = true;
       corsOptions.allowedHeaders = ['Content-Type', 'Authorization'];
+      corsOptions.origin = origin;
     }
     callback(null, corsOptions);
   }
@@ -142,7 +143,7 @@ class BaseApi {
    */
   validatePagination(req) {
     const messages = [];
-    let {limit} = req.query;
+    let { limit } = req.query;
     if (limit) {
       if (isNaN(limit)) {
         messages[messages.length] = 'Limit value is not a number';
