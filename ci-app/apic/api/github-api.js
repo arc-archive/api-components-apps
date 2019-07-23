@@ -160,11 +160,135 @@ class GithubApiRoute extends BaseApi {
       throw new Error('Signature is invalid');
     }
   }
+  /**
+   * Schedules stage build for a component manually.
+   * The body must contain:
+   * - `sshUrl`, e.g. `git@github.com:advanced-rest-client/star-rating.git`
+   * - `component`, e.g. `advanced-rest-client/star-rating`
+   * - `commit`, e.g. `6b4855889c6d30cf203beddb6cf8eb42b5257609`
+   *
+   * This endpoint requires admin access or token with `schedule-component-build`
+   * scope.
+   *
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Promise}
+   */
+  async queueStageManual(req, res) {
+    try {
+      const hasAccess = await this.isValidAccess(req, 'schedule-component-build');
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      this.ack(res);
+      const { body } = req;
+      const { commit, sshUrl, component } = body;
+      this.model.insertBuild({
+        type: 'stage-build',
+        branch: 'stage',
+        component,
+        commit,
+        sshUrl
+      });
+    } catch (e) {
+      logging.error(e);
+      const status = e.status || 500;
+      this.sendError(res, e.message, status);
+    }
+  }
+  /**
+   * Schedules master build for a component manually.
+   * The body must contain:
+   * - `sshUrl`, e.g. `git@github.com:advanced-rest-client/star-rating.git`
+   * - `component`, e.g. `advanced-rest-client/star-rating`
+   * - `commit`, e.g. `220ab4f78bfd180fc7a2ad3358735d76c5fb9487`
+   *
+   * This endpoint requires admin access or token with `schedule-component-build`
+   * scope.
+   *
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Promise}
+   */
+  async queueMasterManual(req, res) {
+    try {
+      const hasAccess = await this.isValidAccess(req, 'schedule-component-build');
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      this.ack(res);
+      const { body } = req;
+      const { commit, sshUrl, component } = body;
+      this.model.insertBuild({
+        type: 'master-build',
+        branch: 'master',
+        component,
+        commit,
+        sshUrl
+      });
+    } catch (e) {
+      logging.error(e);
+      const status = e.status || 500;
+      this.sendError(res, e.message, status);
+    }
+  }
+  /**
+   * Schedules tag build for a component manually.
+   * The body must contain:
+   * - `sshUrl`, e.g. `git@github.com:advanced-rest-client/star-rating.git`
+   * - `component`, e.g. `advanced-rest-client/star-rating`
+   * - `commit`, e.g. `220ab4f78bfd180fc7a2ad3358735d76c5fb9487`
+   * - `branch`, e.g. `1.0.1`
+   *
+   * This endpoint requires admin access or token with `schedule-component-build`
+   * scope.
+   *
+   * @param {Object} req
+   * @param {Object} res
+   * @return {Promise}
+   */
+  async queueTagManual(req, res) {
+    try {
+      const hasAccess = await this.isValidAccess(req, 'schedule-component-build');
+      if (!hasAccess) {
+        const o = {
+          message: 'Unauthorized',
+          status: 401
+        };
+        throw o;
+      }
+      this.ack(res);
+      const { body } = req;
+      const { commit, sshUrl, component, branch } = body;
+      this.model.insertBuild({
+        type: 'tag-build',
+        branch: branch || 'master',
+        component,
+        commit,
+        sshUrl
+      });
+    } catch (e) {
+      logging.error(e);
+      const status = e.status || 500;
+      this.sendError(res, e.message, status);
+    }
+  }
 }
 
 const api = new GithubApiRoute();
 api.setCors(router);
 const checkCorsFn = api._processCors;
 router.post('/status', cors(checkCorsFn), api.processStatus.bind(api));
+router.post('/manual/stage', cors(checkCorsFn), api.queueStageManual.bind(api));
+router.post('/manual/master', cors(checkCorsFn), api.queueMasterManual.bind(api));
+router.post('/manual/tag', cors(checkCorsFn), api.queueTagManual.bind(api));
 
 module.exports = router;

@@ -23,6 +23,8 @@ traits:
 documentation:
   - title: Authorization
     content: !include documentation/authorization.md
+  - title: Change log
+    content: !include documentation/changelog.md
 
 types:
   Test: !include types/test.raml
@@ -38,6 +40,8 @@ types:
   Version: !include types/version.raml
   CreateMessage: !include types/create-message.raml
   Message: !include types/message.raml
+  GhCreateBuild: !include types/gh-create-build.raml
+  GhCreateBuildTag: !include types/gh-create-build-tag.raml
   ErrorResource:
     description: A response that is errored
     type: object
@@ -297,6 +301,54 @@ securitySchemes:
 
         This endpoints is not to be used by anyone except for GitHub. It uses signature verification
         to pass the request.
+  /manual/stage:
+    securedBy: [JwtSecurity]
+    post:
+      description: |
+        Schedules stage branch build manually.
+
+        Note, this is a last resort! This API should not be used unless nescesary.
+        It may be uses in cases when the CI stuck for some reason unrelated to component
+        build process. **It cannot be used to force component release.**
+
+        This endpoint requires `schedule-component-build` scope on generated token.
+      body:
+        type: GhCreateBuild
+      responses:
+        201:
+          description: The build scheduled successfully.
+  /manual/master:
+    securedBy: [JwtSecurity]
+    post:
+      description: |
+        Schedules master branch build manually.
+
+        Note, this is a last resort! This API should not be used unless nescesary.
+        It may be uses in cases when the CI stuck for some reason unrelated to component
+        build process. **It cannot be used to force component release.**
+
+        This endpoint requires `schedule-component-build` scope on generated token.
+      body:
+        type: GhCreateBuild
+      responses:
+        201:
+          description: The build scheduled successfully.
+  /manual/tag:
+    securedBy: [JwtSecurity]
+    post:
+      description: |
+        Schedules master branch build manually.
+
+        Note, this is a last resort! This API should not be used unless nescesary.
+        It may be uses in cases when the CI stuck for some reason unrelated to component
+        build process. **It cannot be used to force component release.**
+
+        This endpoint requires `schedule-component-build` scope on generated token.
+      body:
+        type: GhCreateBuildTag
+      responses:
+        201:
+          description: The build scheduled successfully.
 /groups:
   description: Components listing database
   get:
