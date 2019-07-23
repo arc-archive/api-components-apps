@@ -1,7 +1,10 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
-const scopes = module.exports.scopes = ['all', 'create-test', 'delete-test'];
+const scopes = module.exports.scopes = [
+  'all', 'create-test', 'delete-test', 'create-message', 'delete-message',
+  'schedule-component-build'
+];
 const tokenIssuer = 'urn:arc-ci';
 
 /**
