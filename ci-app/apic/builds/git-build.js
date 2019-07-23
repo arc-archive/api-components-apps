@@ -13,39 +13,35 @@ class GitBuild extends EventEmitter {
    * Creates a working directory where the files will be processed.
    *
    * @return {Promise} Resolved promise when the tmp dire was created
-   * with path to the working
-   * directory.
+   * with path to the working directory.
    */
-  createWorkingDir() {
-    return this.createTempDir()
-    .then((path) => fs.realpath(path))
-    .then((dir) => {
-      logging.verbose('Created working directory ' + dir);
-      this.workingDir = dir;
-    });
+  async createWorkingDir() {
+    const path = await this.createTempDir();
+    const dir = fs.realpath(path);
+    logging.verbose('Created working directory ' + dir);
+    this.workingDir = dir;
+    return dir;
   }
   /**
    * Cleans up the temporaty directory.
    * @return {Promise}
    */
-  cleanup() {
+  async cleanup() {
     if (!this.workingDir) {
       return Promise.resolve();
     }
     logging.debug('Cleaning up temporaty dir...');
-    return fs.pathExists(this.workingDir)
-    .then((exists) => {
-      if (exists) {
-        logging.debug('Removing ' + this.workingDir);
-        return fs.remove(this.workingDir);
-      }
-    });
+    const exists = await fs.pathExists(this.workingDir);
+    if (exists) {
+      logging.debug('Removing ' + this.workingDir);
+      await fs.remove(this.workingDir);
+    }
   }
   /**
    * Creates a temp working dir for the console.
    * @return {Promise}
    */
-  createTempDir() {
+  async createTempDir() {
     logging.debug('Creating working directory...');
     return new Promise((resolve, reject) => {
       tmp.dir((err, _path) => {
@@ -65,57 +61,49 @@ class GitBuild extends EventEmitter {
    * property. Additional property is `componentDir` which overrides `this.workingDir`.
    * @return {Promise}
    */
-  _clone(cloneOpts) {
+  async _clone(cloneOpts) {
     logging.verbose('Cloning the repository...');
     const opts = {
       fetchOpts: this._getFetchOptions()
     };
     const info = Object.assign({}, (this.info || {}), (cloneOpts || {}));
     const componentDir = info.componentDir || this.workingDir;
-    return Git.Clone(info.sshUrl, componentDir, opts)
-    .then((repo) => {
-      this.repo = repo;
-      return repo.getCurrentBranch();
-    })
-    .then((ref) => {
-      logging.verbose('Repository cloned.');
-      const current = ref.shorthand();
-      if (current === info.branch) {
-        return;
-      }
-      return this._checkoutBranch(info.branch);
-    })
-    .then(() => this.repo.getCurrentBranch())
-    .then((ref) => {
-      logging.verbose('On branch ' + ref.shorthand());
-    });
+    const repo = await Git.Clone(info.sshUrl, componentDir, opts);
+    this.repo = repo;
+    let ref = await repo.getCurrentBranch();
+    logging.verbose('Repository cloned.');
+    const current = ref.shorthand();
+    if (current !== info.branch) {
+      await this._checkoutBranch(info.branch);
+    }
+    ref = this.repo.getCurrentBranch();
+    logging.verbose('On branch ' + ref.shorthand());
   }
 
-  _checkoutBranch(name) {
+  async _checkoutBranch(name) {
     logging.verbose(`Changing branch to ${name}...`);
-    let creating;
-    return this.repo.getBranch(name)
-    .catch(() => {
-      creating = true;
-      return this._createBranch(name)
-      .then((reference) => this.repo.checkoutBranch(reference, {}))
-      .then(() => this.repo.getReferenceCommit('refs/remotes/origin/' + name))
-      .then((commit) => Git.Reset.reset(this.repo, commit, 3, {}));
-    })
-    .then((ref) => {
-      if (creating) {
-        return;
-      }
-      return this.repo.checkoutBranch(ref, {});
-    });
+    let ref;
+    try {
+      ref = await this.repo.getBranch(name);
+    } catch (_) {
+      const reference = await this._createBranch(name);
+      await this.repo.checkoutBranch(reference, {});
+      const commit = await this.repo.getReferenceCommit('refs/remotes/origin/' + name);
+      await Git.Reset.reset(this.repo, commit, 3, {});
+    }
+    if (ref) {
+      await this.repo.checkoutBranch(ref, {});
+    }
   }
-
-  _createBranch(name) {
+  /**
+   * Creates a branch for given name.
+   * @param {String} name Name of the branch to create
+   * @return {Promise} Resolved promise returns a {Git.Reference} object.
+   */
+  async _createBranch(name) {
     logging.verbose(`Creating branch ${name}...`);
-    return this.repo.getHeadCommit()
-    .then((targetCommit) => {
-      return this.repo.createBranch(name, targetCommit, false);
-    });
+    const targetCommit = await this.repo.getHeadCommit();
+    return await this.repo.createBranch(name, targetCommit, false);
   }
 
   /**
@@ -128,10 +116,10 @@ class GitBuild extends EventEmitter {
       callbacks: {
         credentials: function(url, userName) {
           return Git.Cred.sshKeyNew(
-            userName,
-            config.get('GITHUB_SSH_KEY_PUB'),
-            config.get('GITHUB_SSH_KEY'),
-            config.get('GITHUB_SSH_KEY_PASS')
+              userName,
+              config.get('GITHUB_SSH_KEY_PUB'),
+              config.get('GITHUB_SSH_KEY'),
+              config.get('GITHUB_SSH_KEY_PASS')
           );
         }
       }
@@ -143,48 +131,37 @@ class GitBuild extends EventEmitter {
    * @param {String} tosign A string to sign.
    * @return {Promise}
    */
-  _onSignature(tosign) {
-    return this._decryptGpg()
-    .then((privateKeyResult) => {
-      if (!privateKeyResult) {
-        throw new Error('GPG key decoding error.');
-      }
-      // use binary to preserve line-endings to make signatures match
-      const buf = new Uint8Array(tosign.length);
-      for (let i = 0; i < tosign.length; i++) {
-        buf[i] = tosign.charCodeAt(i);
-      }
-
-      const options = {
-        message: openpgp.message.fromBinary(buf),
-        privateKeys: [privateKeyResult],
-        detached: true
-      };
-      return openpgp.sign(options);
-    })
-    .then((signed) => {
-      return signed.signature;
-    });
+  async _onSignature(tosign) {
+    const privateKeyResult = await this._decryptGpg();
+    if (!privateKeyResult) {
+      throw new Error('GPG key decoding error.');
+    }
+    const buf = new Uint8Array(tosign.length);
+    for (let i = 0; i < tosign.length; i++) {
+      buf[i] = tosign.charCodeAt(i);
+    }
+    const options = {
+      message: openpgp.message.fromBinary(buf),
+      privateKeys: [privateKeyResult],
+      detached: true
+    };
+    const signed = await openpgp.sign(options);
+    return signed.signature;
   }
   /**
    * Decrypts GPG key to be used to sign commits.
    * @return {Promise}
    */
-  _decryptGpg() {
-    let keyObj;
+  async _decryptGpg() {
     const key = config.get('GPG_KEY');
     const pass = config.get('GPG_KEY_PASS');
-    return fs.readFile(key)
-    .then((buff) => openpgp.key.readArmored(buff))
-    .then((result) => {
-      keyObj = result.keys[0];
-      return keyObj.decrypt(pass);
-    })
-    .then((result) => {
-      if (result) {
-        return keyObj;
-      }
-    });
+    const buff = await fs.readFile(key);
+    const armored = await openpgp.key.readArmored(buff);
+    const keyObj = armored.keys[0];
+    const decrypted = keyObj.decrypt(pass);
+    if (decrypted) {
+      return keyObj;
+    }
   }
   /**
    * Creates a signature object from application configuration.
@@ -215,15 +192,13 @@ class GitBuild extends EventEmitter {
     //   parents, 'gpgsig', this._onSignature.bind(this));
   }
 
-  _push(branch) {
+  async _push(branch) {
     logging.verbose('Pushing to the remote: ' + branch);
-    return this.repo.getRemote('origin')
-    .then((remote) => {
-      const refs = [
-        `refs/heads/${branch}:refs/heads/${branch}`
-      ];
-      return remote.push(refs, this._getFetchOptions());
-    });
+    const remote = await this.repo.getRemote('origin');
+    const refs = [
+      `refs/heads/${branch}:refs/heads/${branch}`
+    ];
+    return await remote.push(refs, this._getFetchOptions());
   }
 }
 module.exports.GitBuild = GitBuild;

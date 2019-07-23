@@ -1,16 +1,16 @@
 const Xvfb = require('xvfb');
-const {AmfModelGenerator} = require('./amf-model-generator.js');
-const {prepareAmfBuild} = require('./amf-builder.js');
-const {ComponentModel} = require('./models/component-model');
-const {TestsModel} = require('./models/test-model');
-const {TestsComponentModel} = require('./models/test-component-model');
-const {DependencyModel} = require('./models/dependency-model');
-const {TestsLogsModel} = require('./models/test-logs-model');
+const { AmfModelGenerator } = require('./amf-model-generator.js');
+const { prepareAmfBuild } = require('./amf-builder.js');
+const { ComponentModel } = require('./models/component-model');
+const { TestsModel } = require('./models/test-model');
+const { TestsComponentModel } = require('./models/test-component-model');
+const { DependencyModel } = require('./models/dependency-model');
+const { TestsLogsModel } = require('./models/test-logs-model');
 const logging = require('../lib/logging');
-const {ComponentTestRunner} = require('./component-test-runner');
-const {DependendenciesManager} = require('./dependencies-manager');
+const { ComponentTestRunner } = require('./component-test-runner');
+const { DependendenciesManager } = require('./dependencies-manager');
 const path = require('path');
-const {GitBuild} = require('./builds/git-build');
+const { GitBuild } = require('./builds/git-build');
 /**
  * A class responsible for running API comsponents tests in a worker.
  */
@@ -40,21 +40,20 @@ class ApicTestRunner extends GitBuild {
     return ['api-components-autotest', 'api-console-default-theme'];
   }
 
-  run() {
+  async run() {
     if (this.abort) {
       return Promise.resolve();
     }
     this.running = true;
-    return this.testsModel.startTest(this.entryId)
-    .then(() => this.createWorkingDir())
-    .then(() => this._prepareTestType())
-    .then(() => {
+    try {
+      await this.testsModel.startTest(this.entryId);
+      await this.createWorkingDir();
+      await this._prepareTestType();
       setImmediate(() => this._next());
-    })
-    .catch((cause) => {
-      this.emit('status', 'error', cause.message);
-      return this.reportTestError(cause);
-    });
+    } catch (e) {
+      this.emit('status', 'error', e.message);
+      return this.reportTestError(e);
+    }
   }
 
   _prepareTestType() {
@@ -71,18 +70,14 @@ class ApicTestRunner extends GitBuild {
    * AMF version.
    * @return {Promise}
    */
-  _prepareAmfTest() {
+  async _prepareAmfTest() {
     logging.verbose('Preparing AMF test...');
-    return this.catalogModel.listApiComponents()
-    .then((result) => {
-      const skip = this.skipComponents;
-      this.cmps = result.filter((item) => skip.indexOf(item) === -1);
-      return this.testsModel.updateTestScope(this.entryId, this.cmps.length);
-    })
-    .then(() => {
-      this.emit('status', this.config.type, 'running');
-    })
-    .then(() => prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha));
+    const result = await this.catalogModel.listApiComponents();
+    const skip = this.skipComponents;
+    this.cmps = result.filter((item) => skip.indexOf(item) === -1);
+    await this.testsModel.updateTestScope(this.entryId, this.cmps.length);
+    this.emit('status', this.config.type, 'running');
+    return await prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha);
   }
   /**
    * Prepares test run for bottom-up tests.
@@ -92,24 +87,22 @@ class ApicTestRunner extends GitBuild {
    * This function lists a parent dependencies for the component.
    * @return {Promise}
    */
-  _prepareBottomUpTest() {
+  async _prepareBottomUpTest() {
     logging.verbose('Preparing bottom-up test...');
-    return this.dependencyModel.listParentComponents(this.config.component, this.config.includeDev)
-    .then((data) => {
-      const skip = this.skipBottomUpComponents;
-      const result = [];
-      for (let i = 0, len = data.length; i < len; i++) {
-        const item = data[i].id;
-        if (skip.indexOf(item) === -1) {
-          result[result.length] = item;
-        }
+    const data = await this.dependencyModel.listParentComponents(this.config.component, this.config.includeDev);
+    const skip = this.skipBottomUpComponents;
+    const result = [];
+    for (let i = 0, len = data.length; i < len; i++) {
+      const item = data[i].id;
+      if (skip.indexOf(item) === -1) {
+        result[result.length] = item;
       }
-      this.cmps = result;
-      return this.testsModel.updateTestScope(this.entryId, this.cmps.length);
-    });
+    }
+    this.cmps = result;
+    return await this.testsModel.updateTestScope(this.entryId, this.cmps.length);
   }
 
-  _next() {
+  async _next() {
     if (this.abort) {
       return;
     }
@@ -119,17 +112,15 @@ class ApicTestRunner extends GitBuild {
       return;
     }
     logging.info('Executing test: ' + component);
-    return Promise.resolve()
-    .then(() => {
-      return this.testsComponentModel.create(this.entryId, component);
-    })
-    .then(() => this.prepare(component))
-    .then(() => this.runTest(component))
-    .then((result) => this.reportComponentSuccess(component, result))
-    .catch((cause) => this.reportComponentError(component, cause))
-    .then(() => {
-      setImmediate(() => this._next());
-    });
+    try {
+      await this.testsComponentModel.create(this.entryId, component);
+      await this.prepare(component);
+      const result = await this.runTest(component);
+      await this.reportComponentSuccess(component, result);
+    } catch (e) {
+      this.reportComponentError(component, e);
+    }
+    setImmediate(() => this._next());
   }
 
   prepare(name) {

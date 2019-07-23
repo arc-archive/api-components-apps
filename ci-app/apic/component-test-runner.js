@@ -1,6 +1,6 @@
 const path = require('path');
-const {Writable} = require('stream');
-const {test: wctTest} = require('web-component-tester');
+const { Writable } = require('stream');
+const { test: wctTest } = require('web-component-tester');
 const logging = require('../lib/logging');
 
 class WctOutput extends Writable {
@@ -100,16 +100,17 @@ class ComponentTestRunner {
     return error;
   }
 
-  run() {
+  async run() {
     logging.verbose('Running selenium tests for ' + this.component);
     const opts = this.getWctOptions();
-    return wctTest(opts)
-    .catch((cause) => {
-      console.log('UNHANDLED', cause);
+    try {
+      await wctTest(opts);
+    } catch (e) {
+      console.log('UNHANDLED', e);
       logging.error('WTC ERROR');
-      logging.error(cause.stack || cause.message || cause);
-    })
-    .then(() => this._finalize());
+      logging.error(e.stack || e.message || e);
+    }
+    return this._finalize();
   }
 
   _finalize() {
