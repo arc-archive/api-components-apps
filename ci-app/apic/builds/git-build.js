@@ -66,7 +66,7 @@ class GitBuild extends EventEmitter {
     const opts = {
       fetchOpts: this._getFetchOptions()
     };
-    const info = Object.assign({}, (this.info || {}), (cloneOpts || {}));
+    const info = Object.assign({}, this.info || {}, cloneOpts || {});
     const componentDir = info.componentDir || this.workingDir;
     const repo = await Git.Clone(info.sshUrl, componentDir, opts);
     this.repo = repo;
@@ -116,10 +116,10 @@ class GitBuild extends EventEmitter {
       callbacks: {
         credentials: function(url, userName) {
           return Git.Cred.sshKeyNew(
-              userName,
-              config.get('GITHUB_SSH_KEY_PUB'),
-              config.get('GITHUB_SSH_KEY'),
-              config.get('GITHUB_SSH_KEY_PASS')
+            userName,
+            config.get('GITHUB_SSH_KEY_PUB'),
+            config.get('GITHUB_SSH_KEY'),
+            config.get('GITHUB_SSH_KEY_PASS')
           );
         }
       }
@@ -195,9 +195,7 @@ class GitBuild extends EventEmitter {
   async _push(branch) {
     logging.verbose('Pushing to the remote: ' + branch);
     const remote = await this.repo.getRemote('origin');
-    const refs = [
-      `refs/heads/${branch}:refs/heads/${branch}`
-    ];
+    const refs = [`refs/heads/${branch}:refs/heads/${branch}`];
     return await remote.push(refs, this._getFetchOptions());
   }
 }

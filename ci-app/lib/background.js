@@ -39,13 +39,14 @@ class Background extends EventEmitter {
    * @return {Promise<Topic>}
    */
   getTopic(name) {
-    return this.pubsub.topic(name).get()
-    .then((data) => data[0])
-    .catch(() => {
-      logging.verbose('Creating new topic ' + name);
-      return this.pubsub.createTopic(name)
-      .then((data) => data[0]);
-    });
+    return this.pubsub
+      .topic(name)
+      .get()
+      .then((data) => data[0])
+      .catch(() => {
+        logging.verbose('Creating new topic ' + name);
+        return this.pubsub.createTopic(name).then((data) => data[0]);
+      });
   }
   /**
    * Gets or creates subscription.
@@ -54,53 +55,59 @@ class Background extends EventEmitter {
    * @return {Promise<Subscription>}
    */
   getSubscription(topic, name) {
-    return this.pubsub.subscription(name).get()
-    .then((data) => data[0])
-    .catch(() => {
-      logging.verbose('Creating new subscription ' + name);
-      return this.pubsub.createSubscription(topic, name, {
-        pushConfig: undefined
-      })
-      .then((data) => data[0]);
-    });
+    return this.pubsub
+      .subscription(name)
+      .get()
+      .then((data) => data[0])
+      .catch(() => {
+        logging.verbose('Creating new subscription ' + name);
+        return this.pubsub
+          .createSubscription(topic, name, {
+            pushConfig: undefined
+          })
+          .then((data) => data[0]);
+      });
   }
 
   subscribe() {
     return this.getTopic(this.topicTestProcess)
-    .then((topic) => this.getSubscription(topic, this.subBuildWorker))
-    .then((subscription) => {
-      subscription.on('message', this.handleMessage.bind(this, this.topicTestProcess));
-      subscription.on('error', this.handleError.bind(this, this.topicTestProcess));
-      logging.verbose('Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker);
-      this.subscriptions.push(subscription);
-    });
+      .then((topic) => this.getSubscription(topic, this.subBuildWorker))
+      .then((subscription) => {
+        subscription.on('message', this.handleMessage.bind(this, this.topicTestProcess));
+        subscription.on('error', this.handleError.bind(this, this.topicTestProcess));
+        logging.verbose(
+          'Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker
+        );
+        this.subscriptions.push(subscription);
+      });
   }
 
   subscribeGithubBuild() {
     return this.getTopic(this.topicGhWebhook)
-    .then((topic) => this.getSubscription(topic, this.subGhCi))
-    .then((subscription) => {
-      subscription.on('message', this.handleMessage.bind(this, this.topicGhWebhook));
-      subscription.on('error', this.handleError.bind(this, this.topicGhWebhook));
-      logging.verbose('Subscribed to a topic: ' + this.topicGhWebhook + ' with subscription ' + this.subGhCi);
-      this.subscriptions.push(subscription);
-    })
-    .catch((cause) => {
-      console.error(cause);
-      throw cause;
-    });
+      .then((topic) => this.getSubscription(topic, this.subGhCi))
+      .then((subscription) => {
+        subscription.on('message', this.handleMessage.bind(this, this.topicGhWebhook));
+        subscription.on('error', this.handleError.bind(this, this.topicGhWebhook));
+        logging.verbose('Subscribed to a topic: ' + this.topicGhWebhook + ' with subscription ' + this.subGhCi);
+        this.subscriptions.push(subscription);
+      })
+      .catch((cause) => {
+        console.error(cause);
+        throw cause;
+      });
   }
 
   subscribeTestsResults() {
     return this.getTopic(this.topicTestResult)
-    .then((topic) => this.getSubscription(topic, this.this.subWorkerTestResult))
-    .then((subscription) => {
-      subscription.on('message', this.handleMessage.bind(this, this.topicTestResult));
-      subscription.on('error', this.handleError.bind(this, this.topicTestResult));
-      logging.verbose('Subscribed to a topic: ' + this.topicTestResult +
-        ' with subscription ' + this.subWorkerTestResult);
-      this.subscriptions.push(subscription);
-    });
+      .then((topic) => this.getSubscription(topic, this.this.subWorkerTestResult))
+      .then((subscription) => {
+        subscription.on('message', this.handleMessage.bind(this, this.topicTestResult));
+        subscription.on('error', this.handleError.bind(this, this.topicTestResult));
+        logging.verbose(
+          'Subscribed to a topic: ' + this.topicTestResult + ' with subscription ' + this.subWorkerTestResult
+        );
+        this.subscriptions.push(subscription);
+      });
   }
 
   handleMessage(topic, message) {
@@ -123,16 +130,16 @@ class Background extends EventEmitter {
 
   publish(payload, topicName) {
     return this.getTopic(topicName)
-    .then((topic) => {
-      return topic.publisher.publish(Buffer.from(JSON.stringify(payload)));
-    })
-    .then(() => {
-      logging.info('Message published to topic ' + topicName);
-    })
-    .catch((cause) => {
-      console.error(cause);
-      logging.error('Error occurred while queuing background task', cause);
-    });
+      .then((topic) => {
+        return topic.publisher.publish(Buffer.from(JSON.stringify(payload)));
+      })
+      .then(() => {
+        logging.info('Message published to topic ' + topicName);
+      })
+      .catch((cause) => {
+        console.error(cause);
+        logging.error('Error occurred while queuing background task', cause);
+      });
   }
   /**
    * Queues a test to be performed by the worker

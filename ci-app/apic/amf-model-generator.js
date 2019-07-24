@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const {fork} = require('child_process');
+const { fork } = require('child_process');
 const logging = require('../lib/logging');
 /**
  * A class representing a model definition in `apis.json` file.
@@ -79,8 +79,12 @@ class AmfModelGenerator {
     for (let i = 0, len = keys.length; i < len; i++) {
       const prop = keys[i];
       switch (prop) {
-        case 'src': src = models[prop]; break;
-        case 'dest': dest = models[prop]; break;
+        case 'src':
+          src = models[prop];
+          break;
+        case 'dest':
+          dest = models[prop];
+          break;
         default:
           result.push(new ModelEntry(prop, models[prop]));
           break;
@@ -113,7 +117,7 @@ class AmfModelGenerator {
       if (fs.pathExistsSync(locations[i][0])) {
         this.modeslDir = path.join(this.componentDir, locations[i][1]);
         try {
-          return fs.readJsonSync(locations[i][0], {throws: false});
+          return fs.readJsonSync(locations[i][0], { throws: false });
         } catch (cause) {
           logging.error('Failed to load model definitions.');
           logging.error(cause);

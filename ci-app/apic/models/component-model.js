@@ -1,4 +1,4 @@
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 const semver = require('semver');
 /**
  * A model for catalog items.
@@ -12,36 +12,24 @@ class ComponentModel extends BaseModel {
   }
 
   get componentExcludeIndexes() {
-    return [
-      'name', 'version', 'versions', 'group'
-    ];
+    return ['name', 'version', 'versions', 'group'];
   }
 
   get versionExcludeIndexes() {
-    return [
-      'name', 'version', 'docs', 'changelog'
-    ];
+    return ['name', 'version', 'docs', 'changelog'];
   }
 
   _createGroupKey(name) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.groupsKind,
-        this.slug(name)
-      ]
+      path: [this.groupsKind, this.slug(name)]
     });
   }
 
   _createComponentKey(groupName, componentName) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.groupsKind,
-        this.slug(groupName),
-        this.componentsKind,
-        this.slug(componentName)
-      ]
+      path: [this.groupsKind, this.slug(groupName), this.componentsKind, this.slug(componentName)]
     });
   }
 
@@ -103,8 +91,7 @@ class ComponentModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map(this.fromDatastore.bind(this));
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
@@ -134,8 +121,7 @@ class ComponentModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map((item) => {
         delete item.ref;
         const key = item[this.store.KEY];
@@ -170,8 +156,7 @@ class ComponentModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map((item) => {
         delete item.ref;
         const key = item[this.store.KEY];
@@ -191,18 +176,19 @@ class ComponentModel extends BaseModel {
   listApiComponents() {
     let query = this.store.createQuery(this.namespace, this.componentsKind);
     query = query.filter('tags', '=', 'apic');
-    return this.store.runQuery(query)
-    .then((result) => result[0])
-    .then((components) => {
-      const result = [];
-      if (!components.length) {
+    return this.store
+      .runQuery(query)
+      .then((result) => result[0])
+      .then((components) => {
+        const result = [];
+        if (!components.length) {
+          return result;
+        }
+        for (let i = 0, len = components.length; i < len; i++) {
+          result[result.length] = components[i].name;
+        }
         return result;
-      }
-      for (let i = 0, len = components.length; i < len; i++) {
-        result[result.length] = components[i].name;
-      }
-      return result;
-    });
+      });
   }
   /**
    * Lists version of a component.
@@ -225,8 +211,7 @@ class ComponentModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map((item) => {
         const key = item[this.store.KEY];
         item.id = key.name;
@@ -250,8 +235,8 @@ class ComponentModel extends BaseModel {
    */
   addVersion(version, componentName, groupName, data, changelog) {
     return this._ensureGroup(groupName)
-    .then(() => this._ensureComponent(version, componentName, groupName))
-    .then((cmp) => this._ensureVersion(cmp, version, componentName, groupName, data, changelog));
+      .then(() => this._ensureComponent(version, componentName, groupName))
+      .then((cmp) => this._ensureVersion(cmp, version, componentName, groupName, data, changelog));
   }
   /**
    * Creates a group of components if it does not exist.
@@ -261,8 +246,7 @@ class ComponentModel extends BaseModel {
    */
   _ensureGroup(groupName) {
     const key = this._createGroupKey(groupName);
-    return this.store.get(key)
-    .catch(() => this._createGroup(groupName, key));
+    return this.store.get(key).catch(() => this._createGroup(groupName, key));
   }
   /**
    * Returns group model.
@@ -271,8 +255,7 @@ class ComponentModel extends BaseModel {
    */
   getGroup(name) {
     const key = this._createGroupKey(name);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }
@@ -286,11 +269,13 @@ class ComponentModel extends BaseModel {
    * @return {Object} Generated model.
    */
   _createGroup(name, key) {
-    const data = [{
-      name: 'name',
-      value: name,
-      excludeFromIndexes: true
-    }];
+    const data = [
+      {
+        name: 'name',
+        value: name,
+        excludeFromIndexes: true
+      }
+    ];
     const entity = {
       key,
       data
@@ -307,15 +292,16 @@ class ComponentModel extends BaseModel {
    */
   _ensureComponent(version, componentName, groupName) {
     const key = this._createComponentKey(groupName, componentName);
-    return this.store.get(key)
-    .catch(() => {})
-    .then((data) => {
-      if (!data || !data[0]) {
-        return this._createComponent(componentName, version, groupName, key);
-      } else {
-        return this._addComponentVersion(data[0], version, key);
-      }
-    });
+    return this.store
+      .get(key)
+      .catch(() => {})
+      .then((data) => {
+        if (!data || !data[0]) {
+          return this._createComponent(componentName, version, groupName, key);
+        } else {
+          return this._addComponentVersion(data[0], version, key);
+        }
+      });
   }
   /**
    * Returns component definition.
@@ -325,8 +311,7 @@ class ComponentModel extends BaseModel {
    */
   getComponent(groupName, componentName) {
     const key = this._createComponentKey(groupName, componentName);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }
@@ -342,34 +327,40 @@ class ComponentModel extends BaseModel {
    * @return {Object} Generated model.
    */
   _createComponent(name, version, groupName, key) {
-    const data = [{
-      name: 'name',
-      value: name,
-      excludeFromIndexes: false
-    }, {
-      name: 'version',
-      value: version,
-      excludeFromIndexes: true
-    }, {
-      name: 'versions',
-      value: [version],
-      excludeFromIndexes: true
-    }, {
-      name: 'group',
-      value: groupName,
-      excludeFromIndexes: true
-    }];
+    const data = [
+      {
+        name: 'name',
+        value: name,
+        excludeFromIndexes: false
+      },
+      {
+        name: 'version',
+        value: version,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'versions',
+        value: [version],
+        excludeFromIndexes: true
+      },
+      {
+        name: 'group',
+        value: groupName,
+        excludeFromIndexes: true
+      }
+    ];
     const entity = {
       key,
       data
     };
-    return this.store.upsert(entity)
-    .then(() => this.store.get(key))
-    .then((entity) => {
-      if (entity && entity[0]) {
-        return this.fromDatastore(entity[0]);
-      }
-    });
+    return this.store
+      .upsert(entity)
+      .then(() => this.store.get(key))
+      .then((entity) => {
+        if (entity && entity[0]) {
+          return this.fromDatastore(entity[0]);
+        }
+      });
   }
   /**
    * Adds a new version to the component model.
@@ -397,12 +388,13 @@ class ComponentModel extends BaseModel {
       };
       promise = this.store.update(entity);
     }
-    return promise.then(() => this.store.get(key))
-    .then((entity) => {
-      if (entity && entity[0]) {
-        return this.fromDatastore(entity[0]);
-      }
-    });
+    return promise
+      .then(() => this.store.get(key))
+      .then((entity) => {
+        if (entity && entity[0]) {
+          return this.fromDatastore(entity[0]);
+        }
+      });
   }
   /**
    * Replaces/creates version in the datastrore
@@ -417,33 +409,34 @@ class ComponentModel extends BaseModel {
    */
   _ensureVersion(parent, version, componentName, groupName, data, changelog) {
     const key = this._createVersionKey(groupName, componentName, version);
-    return this.store.get(key)
-    .catch(() => {})
-    .then((model) => {
-      if (!model || !model[0]) {
-        return this._createVersion(parent, version, componentName, groupName, data, changelog);
-      } else {
-        model = model[0];
-        model.created = Date.now();
-        model.docs = JSON.stringify(data);
-        if (parent.tags) {
-          model.tags = parent.tags;
-        } else if (model.tags) {
-          delete model.tags;
+    return this.store
+      .get(key)
+      .catch(() => {})
+      .then((model) => {
+        if (!model || !model[0]) {
+          return this._createVersion(parent, version, componentName, groupName, data, changelog);
+        } else {
+          model = model[0];
+          model.created = Date.now();
+          model.docs = JSON.stringify(data);
+          if (parent.tags) {
+            model.tags = parent.tags;
+          } else if (model.tags) {
+            delete model.tags;
+          }
+          if (changelog) {
+            model.changelog = changelog;
+          } else if (model.changelog) {
+            delete model.changelog;
+          }
+          const entity = {
+            key,
+            data: model,
+            excludeFromIndexes: this.versionExcludeIndexes
+          };
+          return this.store.update(entity);
         }
-        if (changelog) {
-          model.changelog = changelog;
-        } else if (model.changelog) {
-          delete model.changelog;
-        }
-        const entity = {
-          key,
-          data: model,
-          excludeFromIndexes: this.versionExcludeIndexes
-        };
-        return this.store.update(entity);
-      }
-    });
+      });
   }
   /**
    * Creates component version entity.
@@ -458,19 +451,23 @@ class ComponentModel extends BaseModel {
    */
   _createVersion(parent, version, componentName, groupName, docs, changelog) {
     const key = this._createVersionKey(groupName, componentName, version);
-    const data = [{
-      name: 'name',
-      value: componentName,
-      excludeFromIndexes: true
-    }, {
-      name: 'docs',
-      value: JSON.stringify(docs),
-      excludeFromIndexes: true
-    }, {
-      name: 'created',
-      value: Date.now(),
-      excludeFromIndexes: false
-    }];
+    const data = [
+      {
+        name: 'name',
+        value: componentName,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'docs',
+        value: JSON.stringify(docs),
+        excludeFromIndexes: true
+      },
+      {
+        name: 'created',
+        value: Date.now(),
+        excludeFromIndexes: false
+      }
+    ];
     if (parent.tags) {
       data.push({
         name: 'tags',
@@ -500,8 +497,7 @@ class ComponentModel extends BaseModel {
    */
   getVersion(groupName, componentName, version) {
     const key = this._createVersionKey(groupName, componentName, version);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }
@@ -541,8 +537,7 @@ class ComponentModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map((item) => {
         const key = item[this.store.KEY];
         item.id = key.name;

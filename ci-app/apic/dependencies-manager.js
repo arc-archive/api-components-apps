@@ -33,8 +33,7 @@ class DependendenciesManager {
    * @return {Promise} Resolved promise when operation is completed.
    */
   installDependencies(extra) {
-    return fs.pathExists(path.join(this.workingDir, 'bower.json'))
-    .then((exists) => {
+    return fs.pathExists(path.join(this.workingDir, 'bower.json')).then((exists) => {
       if (!exists) {
         // no bower file, exit.
         logging.info('No bower file. Skipping dependencies.');
@@ -65,14 +64,17 @@ class DependendenciesManager {
   _processDependencies() {
     logging.verbose('Installing bower dependencies...');
     return new Promise((resolve, reject) => {
-      const factory = bower.commands.install([], {}, {
-        cwd: this.workingDir,
-        quiet: true
-      });
+      const factory = bower.commands.install(
+        [],
+        {},
+        {
+          cwd: this.workingDir,
+          quiet: true
+        }
+      );
       factory.on('end', () => resolve());
       factory.on('error', (e) => reject(e));
-    })
-    .then(() => {
+    }).then(() => {
       logging.verbose('Dependencies installed.');
     });
   }
@@ -89,8 +91,7 @@ class DependendenciesManager {
     const depenedency = `advanced-rest-client/${extra.component}#${extra.branch}`;
     logging.verbose(`Adding extra dependency ${depenedency}...`);
     const file = path.join(this.workingDir, 'bower.json');
-    return fs.readJson(file)
-    .then((bower) => {
+    return fs.readJson(file).then((bower) => {
       if (!bower.dependencies) {
         bower.dependencies = {};
       }

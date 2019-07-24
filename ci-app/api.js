@@ -38,12 +38,12 @@ const sessionConfig = {
   resave: false,
   saveUninitialized: false,
   secret: config.get('SECRET'),
-  signed: true,
+  signed: true
 };
 
 if (config.get('NODE_ENV') === 'production' && config.get('MEMCACHE_URL')) {
   sessionConfig.store = new MemcachedStore({
-    hosts: [config.get('MEMCACHE_URL')],
+    hosts: [config.get('MEMCACHE_URL')]
   });
 }
 

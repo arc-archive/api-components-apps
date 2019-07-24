@@ -73,11 +73,9 @@ class MyApp extends PolymerElement {
         }
       </style>
 
-      <app-location route="{{route}}" url-space-regex="^[[rootPath]]">
-      </app-location>
+      <app-location route="{{route}}" url-space-regex="^[[rootPath]]"> </app-location>
 
-      <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}">
-      </app-route>
+      <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"> </app-route>
 
       <app-drawer-layout fullbleed="" narrow="{{narrow}}">
         <!-- Drawer content -->
@@ -92,7 +90,6 @@ class MyApp extends PolymerElement {
 
         <!-- Main content -->
         <app-header-layout has-scrolling-region="">
-
           <app-header slot="header" condenses="" reveals="" effects="waterfall">
             <app-toolbar>
               <paper-icon-button icon="my-icons:menu" drawer-toggle=""></paper-icon-button>
@@ -124,16 +121,14 @@ class MyApp extends PolymerElement {
   }
 
   static get observers() {
-    return [
-      '_routePageChanged(routeData.page)'
-    ];
+    return ['_routePageChanged(routeData.page)'];
   }
 
   _routePageChanged(page) {
-     // Show the corresponding page according to the route.
-     //
-     // If no page was found in the route data, page will be an empty string.
-     // Show 'view1' in that case. And if the page doesn't exist, show 'view404'.
+    // Show the corresponding page according to the route.
+    //
+    // If no page was found in the route data, page will be an empty string.
+    // Show 'view1' in that case. And if the page doesn't exist, show 'view404'.
     if (!page) {
       this.page = 'view1';
     } else if (['view1', 'view2', 'view3'].indexOf(page) !== -1) {

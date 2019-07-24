@@ -1,7 +1,6 @@
-const {Analyzer, FsUrlLoader, PackageUrlResolver, generateAnalysis} =
-  require('polymer-analyzer');
-const {ComponentModel} = require('../models/component-model');
-const {Changelog} = require('./changelog');
+const { Analyzer, FsUrlLoader, PackageUrlResolver, generateAnalysis } = require('polymer-analyzer');
+const { ComponentModel } = require('../models/component-model');
+const { Changelog } = require('./changelog');
 const fs = require('fs-extra');
 const path = require('path');
 /**
@@ -19,10 +18,10 @@ class CatalogDataGenerator {
     this.component = component;
     this.version = tagVersion;
     this.workingDir = workingDir;
-    this.urlResolver = new PackageUrlResolver({packageDir: workingDir});
+    this.urlResolver = new PackageUrlResolver({ packageDir: workingDir });
     this.analyzer = new Analyzer({
       urlLoader: new FsUrlLoader(workingDir),
-      urlResolver: this.urlResolver,
+      urlResolver: this.urlResolver
     });
   }
   /**
@@ -35,22 +34,22 @@ class CatalogDataGenerator {
     const isInTests = /(\b|\/|\\)(test)(\/|\\)/;
     const isNotTest = (f) => f.sourceRange && !isInTests.test(f.sourceRange.file);
     return this.isComponent()
-    .then(() => this.analyzer.analyzePackage())
-    .then((analysis) => {
-      this.analysis = analysis;
-      return this._extractComponentTags();
-    })
-    .then(() => generateAnalysis(this.analysis, this.urlResolver, isNotTest))
-    .then((result) => this._cleanStoreData(result))
-    .then((result) => {
-      this.componentDocs = result;
-      return this.getChangelogData();
-    })
-    .then((cl) => {
-      const group = this._getGroupName();
-      const model = new ComponentModel();
-      return model.addVersion(this.version, this.component, group, this.componentDocs, cl);
-    });
+      .then(() => this.analyzer.analyzePackage())
+      .then((analysis) => {
+        this.analysis = analysis;
+        return this._extractComponentTags();
+      })
+      .then(() => generateAnalysis(this.analysis, this.urlResolver, isNotTest))
+      .then((result) => this._cleanStoreData(result))
+      .then((result) => {
+        this.componentDocs = result;
+        return this.getChangelogData();
+      })
+      .then((cl) => {
+        const group = this._getGroupName();
+        const model = new ComponentModel();
+        return model.addVersion(this.version, this.component, group, this.componentDocs, cl);
+      });
   }
   /**
    * All API/ARC components have `polymer.json` file describing polymer tools configuration.
@@ -60,8 +59,7 @@ class CatalogDataGenerator {
    * @return {Promise<Boolean>}
    */
   isComponent() {
-    return fs.readJson(path.join(this.workingDir, 'polymer.json'))
-    .then((polymer) => {
+    return fs.readJson(path.join(this.workingDir, 'polymer.json')).then((polymer) => {
       const rule = polymer.lint && polymer.lint.rules && polymer.lint.rules[0];
       this.polymerVersion = rule;
       return true;
@@ -72,14 +70,13 @@ class CatalogDataGenerator {
    * Extracts group name from the analysis result.
    */
   _extractComponentTags() {
-    const set = this.analysis.getFeatures({kind: 'element', id: this.component});
+    const set = this.analysis.getFeatures({ kind: 'element', id: this.component });
     let element;
     set.forEach((item) => {
       element = item;
     });
     let result = [];
-    if (element && element.jsdoc && element.jsdoc.tags &&
-      element.jsdoc.tags.length) {
+    if (element && element.jsdoc && element.jsdoc.tags && element.jsdoc.tags.length) {
       result = element.jsdoc.tags;
     }
     this.tags = result;
@@ -93,8 +90,7 @@ class CatalogDataGenerator {
     let t = this.tags;
     let result;
     if (t) {
-      let tag = t.find((item) =>
-        item.title === 'memberof' || item.title === 'group');
+      let tag = t.find((item) => item.title === 'memberof' || item.title === 'group');
       if (tag) {
         result = tag.description;
       }
@@ -117,8 +113,7 @@ class CatalogDataGenerator {
     if (data.metadata) {
       if (data.metadata.polymer) {
         if (data.metadata.polymer.behaviors) {
-          data.metadata.polymer.behaviors =
-          data.metadata.polymer.behaviors.map((item) => this._cleanItem(item));
+          data.metadata.polymer.behaviors = data.metadata.polymer.behaviors.map((item) => this._cleanItem(item));
         }
       }
     }

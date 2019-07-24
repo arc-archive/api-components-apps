@@ -14,20 +14,22 @@ const model = new UserModel();
 // object, which will be set at `req.user` in route handlers after
 // authentication.
 passport.use(
-  new GoogleStrategy({
+  new GoogleStrategy(
+    {
       clientID: config.get('OAUTH2_CLIENT_ID'),
       clientSecret: config.get('OAUTH2_CLIENT_SECRET'),
       callbackURL: config.get('OAUTH2_CALLBACK'),
-      accessType: 'offline',
+      accessType: 'offline'
     },
     (accessToken, refreshToken, profile, cb) => {
-      model.findOrCreateUser(profile, refreshToken)
-      .then((profile) => {
-        cb(null, profile);
-      })
-      .catch((cause) => {
-        cb(cause);
-      });
+      model
+        .findOrCreateUser(profile, refreshToken)
+        .then((profile) => {
+          cb(null, profile);
+        })
+        .catch((cause) => {
+          cb(cause);
+        });
     }
   )
 );
@@ -36,13 +38,14 @@ passport.serializeUser((user, cb) => {
   cb(null, user.id);
 });
 passport.deserializeUser((id, cb) => {
-  model.getUser(id)
-  .then((user) => {
-    cb(null, user || false);
-  })
-  .catch((cause) => {
-    cb(cause);
-  });
+  model
+    .getUser(id)
+    .then((user) => {
+      cb(null, user || false);
+    })
+    .catch((cause) => {
+      cb(cause);
+    });
 });
 
 const router = express.Router();
@@ -77,7 +80,7 @@ router.get(
   },
 
   // Start OAuth 2 flow using Passport.js
-  passport.authenticate('google', {scope: ['email', 'profile']})
+  passport.authenticate('google', { scope: ['email', 'profile'] })
 );
 
 router.get(

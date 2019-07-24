@@ -1,4 +1,4 @@
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 /**
  * A model for catalog items.
  */
@@ -13,10 +13,7 @@ class DependencyModel extends BaseModel {
   _createKey(name) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.dependencyKind,
-        this.slug(name)
-      ]
+      path: [this.dependencyKind, this.slug(name)]
     });
   }
 
@@ -44,10 +41,8 @@ class DependencyModel extends BaseModel {
 
   listParentComponents(dependency, includeDev) {
     let query = this.store.createQuery(this.namespace, this.dependencyKind);
-    query = query.filter('dependencies', '=', dependency)
-    .select('__key__');
-    return this.store.runQuery(query)
-    .then((result) => {
+    query = query.filter('dependencies', '=', dependency).select('__key__');
+    return this.store.runQuery(query).then((result) => {
       let deps = result[0].map((item) => {
         item = this.fromDatastore(item);
         item.production = true;
@@ -70,10 +65,8 @@ class DependencyModel extends BaseModel {
 
   listDevParentComponents(dependency) {
     let query = this.store.createQuery(this.namespace, this.dependencyKind);
-    query = query.filter('devdependencies', '=', dependency)
-    .select('__key__');
-    return this.store.runQuery(query)
-    .then((result) => {
+    query = query.filter('devdependencies', '=', dependency).select('__key__');
+    return this.store.runQuery(query).then((result) => {
       return result[0].map((item) => {
         item = this.fromDatastore(item);
         item.development = true;
@@ -84,8 +77,7 @@ class DependencyModel extends BaseModel {
 
   get(component) {
     const key = this._createKey(component);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }

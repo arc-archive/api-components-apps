@@ -112,10 +112,7 @@ class BaseModel {
   createTestKey(testId) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.testKind,
-        testId
-      ]
+      path: [this.testKind, testId]
     });
   }
   /**
@@ -127,26 +124,14 @@ class BaseModel {
   createTestComponentKey(testId, componentName) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.testKind,
-        testId,
-        this.componentsKind,
-        this.slug(componentName)
-      ]
+      path: [this.testKind, testId, this.componentsKind, this.slug(componentName)]
     });
   }
 
   createTestLogKey(testId, componentName, id) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.testKind,
-        testId,
-        this.componentsKind,
-        this.slug(componentName),
-        this.testLogsKind,
-        id
-      ]
+      path: [this.testKind, testId, this.componentsKind, this.slug(componentName), this.testLogsKind, id]
     });
   }
   /**
@@ -157,10 +142,7 @@ class BaseModel {
   createBuildKey(id) {
     return this.store.key({
       namespace: this.buildsNamespace,
-      path: [
-        this.buildKind,
-        id
-      ]
+      path: [this.buildKind, id]
     });
   }
 }

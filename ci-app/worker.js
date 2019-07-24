@@ -14,7 +14,6 @@ const { TestsModel } = require('./apic/models/test-model');
 const { ApicTestRunner } = require('./apic/test-runner');
 const background = require('./lib/background');
 
-
 // When running on Google App Engine Managed VMs, the worker needs
 // to respond to HTTP requests and can optionally supply a health check.
 const app = express();
@@ -50,8 +49,12 @@ class ApiComponentsTestsWorker {
 
   _onMessage(topic, data) {
     switch (data.action) {
-      case 'runTest': this.runTest(data.id); break;
-      case 'removeTest': this.removeTest(data.id); break;
+      case 'runTest':
+        this.runTest(data.id);
+        break;
+      case 'removeTest':
+        this.removeTest(data.id);
+        break;
       default:
         logging.warn('Unknown request');
         logging.warn(data);
@@ -83,11 +86,12 @@ class ApiComponentsTestsWorker {
 
   runTest(id) {
     logging.verbose('Running test ' + id);
-    return this.testsModel.getTest(id)
-    .then((info) => this.setupQueue(id, info))
-    .catch((cause) => {
-      logging.warn(cause);
-    });
+    return this.testsModel
+      .getTest(id)
+      .then((info) => this.setupQueue(id, info))
+      .catch((cause) => {
+        logging.warn(cause);
+      });
   }
 
   setupQueue(id, info) {
@@ -107,13 +111,13 @@ class ApiComponentsTestsWorker {
   routeTestRun(req, res) {
     const id = req.params.id;
     this.runTest(id)
-    .then(() => {
-      res.send(`This worker has processed ${this.testCount} tests.`);
-    })
-    .catch((cause) => {
-      console.error(cause);
-      res.send(`${cause}`);
-    });
+      .then(() => {
+        res.send(`This worker has processed ${this.testCount} tests.`);
+      })
+      .catch((cause) => {
+        console.error(cause);
+        res.send(`${cause}`);
+      });
   }
 
   afterRun(runner) {
@@ -133,10 +137,18 @@ class ApiComponentsTestsWorker {
 
   updateStatus(runner, type, status) {
     switch (type) {
-      case 'amf-build': background.sendBuildingAmfStatus(runner.id, status); break;
-      case 'test-result': background.sendComponentTestResult(runner.id, status); break;
-      case 'error': background.sendTestError(runner.id, status); break;
-      case 'result': background.sendTestFinished(runner.id, status); break;
+      case 'amf-build':
+        background.sendBuildingAmfStatus(runner.id, status);
+        break;
+      case 'test-result':
+        background.sendComponentTestResult(runner.id, status);
+        break;
+      case 'error':
+        background.sendTestError(runner.id, status);
+        break;
+      case 'result':
+        background.sendTestFinished(runner.id, status);
+        break;
     }
   }
 

@@ -1,4 +1,4 @@
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 
 class TokenModel extends BaseModel {
   /**
@@ -17,8 +17,7 @@ class TokenModel extends BaseModel {
     let query = this.store.createQuery(this.namespace, this.tokenKind);
     query = query.filter('token', '=', token);
     query = query.limit(1);
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const token = result[0] && result[0][0];
       if (!token) {
         return;

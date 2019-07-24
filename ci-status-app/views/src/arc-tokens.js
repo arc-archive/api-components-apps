@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-item/paper-item.js';
 import '@polymer/paper-item/paper-item-body.js';
@@ -13,91 +13,98 @@ class ArcTokens extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        position: relative;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      a {
-        color: currentColor;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      .add-button {
-        background-color: var(--accent-color);
-        color: var(--accent-text-color);
-      }
-
-      .token-details {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      .token-value {
-        color: rgba(0, 0, 0, 0.72);
-        text-overflow: ellipsis;
-        overflow: hidden;
-        @apply --layout-flex;
-      }
-
-      #copy {
-        display: inline-block;
-        width: 0;
-        height: 0;
-        border: none;
-        overflow: hidden;
-      }
-
-      #copy[copying] {
-        display: inline;
-      }
-
-      .li {
-        border: 1px #E0E0E0 solid;
-        border-radius: 3px;
-        margin: 8px 0;
-        border-left: 2px #2E7D32 solid;
-      }
-
-      .li[expired],
-      .li[revoked] {
-        border-left: 2px #9E9E9E solid;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
+          display: block;
+          position: relative;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-      }
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        a {
+          color: currentColor;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        .add-button {
+          background-color: var(--accent-color);
+          color: var(--accent-text-color);
+        }
+
+        .token-details {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        .token-value {
+          color: rgba(0, 0, 0, 0.72);
+          text-overflow: ellipsis;
+          overflow: hidden;
+          @apply --layout-flex;
+        }
+
+        #copy {
+          display: inline-block;
+          width: 0;
+          height: 0;
+          border: none;
+          overflow: hidden;
+        }
+
+        #copy[copying] {
+          display: inline;
+        }
+
+        .li {
+          border: 1px #e0e0e0 solid;
+          border-radius: 3px;
+          margin: 8px 0;
+          border-left: 2px #2e7d32 solid;
+        }
+
+        .li[expired],
+        .li[revoked] {
+          border-left: 2px #9e9e9e solid;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+        }
       </style>
-      <tokens-data-factory id="request" api-base="[[apiBase]]" list="{{tokens}}" has-more="{{hasMore}}" loading="{{loading}}" api-token="[[apiToken]]"></tokens-data-factory>
+      <tokens-data-factory
+        id="request"
+        api-base="[[apiBase]]"
+        list="{{tokens}}"
+        has-more="{{hasMore}}"
+        loading="{{loading}}"
+        api-token="[[apiToken]]"
+      ></tokens-data-factory>
       <header>
         <a href="#/">
           <paper-icon-button icon="apic:arrow-back" title="Return to tests list"></paper-icon-button>
@@ -133,7 +140,7 @@ class ArcTokens extends PolymerElement {
       apiBase: String,
       tokens: Array,
       hasMore: Boolean,
-      loading: {type: Boolean, notify: true},
+      loading: { type: Boolean, notify: true },
       apiToken: String,
       hasTokens: {
         type: Boolean,
@@ -143,13 +150,15 @@ class ArcTokens extends PolymerElement {
   }
 
   _newTokenHandler() {
-    this.dispatchEvent(new CustomEvent('navigate', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        path: '/add-token'
-      }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('navigate', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          path: '/add-token'
+        }
+      })
+    );
   }
 
   refresh() {
@@ -172,21 +181,21 @@ class ArcTokens extends PolymerElement {
       init.headers = [['authorization', 'bearer ' + this.apiToken]];
     }
     return fetch(this.apiBase + 'me/tokens/' + id + '/revoke', init)
-    .then((response) => {
-      if (response.status === 204) {
-        this.set(`tokens.${index}.revoked`, true);
-      } else {
-        return response.json();
-      }
-    })
-    .then((error) => {
-      if (error) {
-        this._renderError(error.message || 'Request to the API failed.');
-      }
-    })
-    .catch((cause) => {
-      this._renderError(cause.message || 'Unable to connect to the API.');
-    });
+      .then((response) => {
+        if (response.status === 204) {
+          this.set(`tokens.${index}.revoked`, true);
+        } else {
+          return response.json();
+        }
+      })
+      .then((error) => {
+        if (error) {
+          this._renderError(error.message || 'Request to the API failed.');
+        }
+      })
+      .catch((cause) => {
+        this._renderError(cause.message || 'Unable to connect to the API.');
+      });
   }
 
   _renderError(message) {

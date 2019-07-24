@@ -1,7 +1,7 @@
 const logging = require('../../lib/logging');
-const {GitBuild} = require('./git-build');
-const {CatalogDataGenerator} = require('./catalog-data-generator');
-const {DependencyGraph} = require('./dependency-graph');
+const { GitBuild } = require('./git-build');
+const { CatalogDataGenerator } = require('./catalog-data-generator');
+const { DependencyGraph } = require('./dependency-graph');
 /**
  * A class responsible for processing the component after tag is created.
  */
@@ -27,8 +27,16 @@ class TagBuild extends GitBuild {
    * @return {Array}
    */
   get nonElements() {
-    return ['arc-datastore', 'arc-tools', 'polymd', 'cookie-parser',
-    'har', 'arc-element-catalog', 'ci-server', 'arc-electron'];
+    return [
+      'arc-datastore',
+      'arc-tools',
+      'polymd',
+      'cookie-parser',
+      'har',
+      'arc-element-catalog',
+      'ci-server',
+      'arc-electron'
+    ];
   }
 
   build() {
@@ -36,18 +44,18 @@ class TagBuild extends GitBuild {
       return Promise.resolve();
     }
     return this.createWorkingDir()
-    .then(() => this._clone())
-    .then(() => this._generateCatalogModel())
-    .then(() => this._generateGrpah())
-    .then(() => this.cleanup())
-    .then(() => {
-      logging.info('Tag build completed.');
-    })
-    .catch((cause) => {
-      console.error(cause);
-      logging.error('Tag build error: ' + cause.message);
-      throw cause;
-    });
+      .then(() => this._clone())
+      .then(() => this._generateCatalogModel())
+      .then(() => this._generateGrpah())
+      .then(() => this.cleanup())
+      .then(() => {
+        logging.info('Tag build completed.');
+      })
+      .catch((cause) => {
+        console.error(cause);
+        logging.error('Tag build error: ' + cause.message);
+        throw cause;
+      });
   }
 
   _generateCatalogModel() {
@@ -57,8 +65,7 @@ class TagBuild extends GitBuild {
 
   _generateGrpah() {
     const generator = new DependencyGraph(this.workingDir, this.cmpName);
-    return generator.buildGraph()
-    .catch(() => {});
+    return generator.buildGraph().catch(() => {});
   }
 }
 module.exports.TagBuild = TagBuild;

@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const logging = require('../../lib/logging');
-const {DependencyModel} = require('../models/dependency-model');
+const { DependencyModel } = require('../models/dependency-model');
 class DependencyGraph {
   /**
    * @constructor
@@ -18,18 +18,18 @@ class DependencyGraph {
   buildGraph() {
     logging.verbose('Building dependency graph...');
     return this.readProjectDependencies()
-    .then((data) => {
-      if (data && (data[0] || data[1])) {
-        return this.processDepenedencies(data);
-      }
-    })
-    .then(() => {
-      logging.verbose('Dependency graph ready.');
-    })
-    .catch((cause) => {
-      logging.error(cause.message);
-      throw cause;
-    });
+      .then((data) => {
+        if (data && (data[0] || data[1])) {
+          return this.processDepenedencies(data);
+        }
+      })
+      .then(() => {
+        logging.verbose('Dependency graph ready.');
+      })
+      .catch((cause) => {
+        logging.error(cause.message);
+        throw cause;
+      });
   }
   /**
    * Reads dependencies from bower/package file.
@@ -37,8 +37,7 @@ class DependencyGraph {
    * map of dev dependencies. Both can be undefined.
    */
   readProjectDependencies() {
-    return this._readDependencies('bower.json')
-    .then((result) => {
+    return this._readDependencies('bower.json').then((result) => {
       if (!result) {
         return this._readDependencies('package.json');
       }
@@ -48,21 +47,22 @@ class DependencyGraph {
 
   _readDependencies(fileName) {
     const file = path.join(this.workingDir, fileName);
-    return fs.readJson(file)
-    .then((data) => {
-      let deps;
-      if (data.dependencies && Object.keys(data.dependencies).length) {
-        deps = data.dependencies;
-      }
-      let devDeps;
-      if (data.devDependencies && Object.keys(data.devDependencies).length) {
-        devDeps = data.devDependencies;
-      }
-      return [deps, devDeps];
-    })
-    .catch(() => {
-      logging.warn(fileName + ' file do not exists. Skipping.');
-    });
+    return fs
+      .readJson(file)
+      .then((data) => {
+        let deps;
+        if (data.dependencies && Object.keys(data.dependencies).length) {
+          deps = data.dependencies;
+        }
+        let devDeps;
+        if (data.devDependencies && Object.keys(data.devDependencies).length) {
+          devDeps = data.devDependencies;
+        }
+        return [deps, devDeps];
+      })
+      .catch(() => {
+        logging.warn(fileName + ' file do not exists. Skipping.');
+      });
   }
   /**
    * Filters out all non ARC/API components.

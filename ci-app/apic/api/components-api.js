@@ -48,20 +48,21 @@ class ComponentsApiRoute extends BaseApi {
       return;
     }
     let { limit, nextPageToken, tags, group } = req.query;
-    this.model.queryComponents(limit, nextPageToken, {
-      tags,
-      group
-    })
-    .then((result) => this.sendListResult(result, res))
-    .catch((cause) => {
-      console.error(cause);
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    this.model
+      .queryComponents(limit, nextPageToken, {
+        tags,
+        group
+      })
+      .then((result) => this.sendListResult(result, res))
+      .catch((cause) => {
+        console.error(cause);
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   _validateTimeRange(req) {
@@ -119,31 +120,32 @@ class ComponentsApiRoute extends BaseApi {
       return;
     }
     let { limit, nextPageToken, tags, group, component, since, until } = req.query;
-    this.model.queryVersions(limit, nextPageToken, {
-      tags,
-      group,
-      component,
-      since,
-      until
-    })
-    .then((result) => {
-      const noDocs = req.query['skip-docs'];
-      if (noDocs === 'true') {
-        result[0].forEach((item) => {
-          delete item.docs;
-        });
-      }
-      return this.sendListResult(result, res);
-    })
-    .catch((cause) => {
-      console.error(cause);
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    this.model
+      .queryVersions(limit, nextPageToken, {
+        tags,
+        group,
+        component,
+        since,
+        until
+      })
+      .then((result) => {
+        const noDocs = req.query['skip-docs'];
+        if (noDocs === 'true') {
+          result[0].forEach((item) => {
+            delete item.docs;
+          });
+        }
+        return this.sendListResult(result, res);
+      })
+      .catch((cause) => {
+        console.error(cause);
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   listParentComponents(req, res) {
@@ -154,44 +156,46 @@ class ComponentsApiRoute extends BaseApi {
     } else {
       devDependencies = false;
     }
-    this.dependencyModel.listParentComponents(componentId, devDependencies)
-    .then((result) => this.sendListResult([result], res))
-    .catch((cause) => {
-      console.error(cause);
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    this.dependencyModel
+      .listParentComponents(componentId, devDependencies)
+      .then((result) => this.sendListResult([result], res))
+      .catch((cause) => {
+        console.error(cause);
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   listDependencies(req, res) {
     const { componentId } = req.params;
-    this.dependencyModel.get(componentId)
-    .then((data) => {
-      if (data) {
-        if (!data.dependencies) {
-          data.dependencies = [];
+    this.dependencyModel
+      .get(componentId)
+      .then((data) => {
+        if (data) {
+          if (!data.dependencies) {
+            data.dependencies = [];
+          }
+          if (!data.devDependencies) {
+            data.devDependencies = [];
+          }
+          res.send(data);
+        } else {
+          this.sendError(res, 'Component not found', 404);
         }
-        if (!data.devDependencies) {
-          data.devDependencies = [];
+      })
+      .catch((cause) => {
+        console.error(cause);
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
         }
-        res.send(data);
-      } else {
-        this.sendError(res, 'Component not found', 404);
-      }
-    })
-    .catch((cause) => {
-      console.error(cause);
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+        this.sendError(res, cause.message, 500);
+      });
   }
 }
 
@@ -201,6 +205,6 @@ api.wrapApi(router, [
   ['/', 'listComponents'],
   ['/versions', 'listVersions'],
   ['/:componentId/dependees', 'listParentComponents'],
-  ['/:componentId/dependencies', 'listDependencies'],
+  ['/:componentId/dependencies', 'listDependencies']
 ]);
 module.exports = router;

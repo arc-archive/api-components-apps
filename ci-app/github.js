@@ -34,7 +34,9 @@ class GithubBuild {
 
   _onMessage(topic, data) {
     switch (data.action) {
-      case 'process-build': this.processBuild(data.id); break;
+      case 'process-build':
+        this.processBuild(data.id);
+        break;
       default:
         logging.warn('Unknown request');
         logging.warn(data);
@@ -110,7 +112,6 @@ app.use(logging.requestLogger);
 app.get('/_ah/health', (req, res) => {
   res.status(200).send('ok');
 });
-
 
 const worker = new GithubBuild();
 // app.get('/', worker.routeMain.bind(worker));

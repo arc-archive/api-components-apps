@@ -67,7 +67,11 @@ class BaseApi {
     if (!auth) {
       return Promise.resolve(false);
     }
-    if (!String(auth).toLowerCase().startsWith('bearer ')) {
+    if (
+      !String(auth)
+        .toLowerCase()
+        .startsWith('bearer ')
+    ) {
       return Promise.resolve(false);
     }
     const token = auth.substr(7);
@@ -87,24 +91,29 @@ class BaseApi {
         }
       }
     }
-    return this.tokenModel.find(token)
-    .catch(() => {})
-    .then((token) => {
-      if (!token || token.revoked) {
-        return false;
-      }
-      req.user = {
-        id: token.issuer.id,
-        displayName: token.issuer.displayName
-      };
-      return true;
-    });
+    return this.tokenModel
+      .find(token)
+      .catch(() => {})
+      .then((token) => {
+        if (!token || token.revoked) {
+          return false;
+        }
+        req.user = {
+          id: token.issuer.id,
+          displayName: token.issuer.displayName
+        };
+        return true;
+      });
   }
 
   _processCors(req, callback) {
     const whitelist = [
-      'http://localhost:8080', 'http://localhost:8081', 'http://127.0.0.1:8081',
-      'http://localhost:8082', 'http://127.0.0.1:8082', 'https://ci.advancedrestclient.com'
+      'http://localhost:8080',
+      'http://localhost:8081',
+      'http://127.0.0.1:8081',
+      'http://localhost:8082',
+      'http://127.0.0.1:8082',
+      'https://ci.advancedrestclient.com'
     ];
     const origin = req.header('Origin');
     let corsOptions;

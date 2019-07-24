@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-input/paper-input.js';
@@ -13,95 +13,95 @@ class ArcChangelog extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        max-width: var(--app-screen-max-width);
-        margin: var(--app-screen-margin);
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      h2 {
-        @apply --paper-font-title;
-        @apply --layout-flex;
-      }
-
-      h3 {
-        @apply --paper-font-subhead;
-        @apply --layout-flex;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      .config {
-        @apply --shadow-elevation-4dp;
-        padding: 12px;
-      }
-
-      .time-row,
-      .tag-line {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      .time-row paper-input {
-        margin-right: 8px;
-      }
-
-      .search-action {
-        margin-top: 24px;
-      }
-
-      .search-button {
-        background-color: var(--primary-color);
-        color: #fff;
-      }
-
-      .changelog-item {
-        @apply --shadow-elevation-2dp;
-        @apply --paper-font-body1;
-        padding: 12px;
-        margin: 20px 0;
-      }
-
-      .changelog-item .value {
-        @apply --paper-font-body2;
-        margin-left: 8px;
-      }
-
-      .markdown-html {
-        background-color: #FFF3E0;
-        word-break: break-all;
-        padding: 8px;
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
-
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-
-        .time-row {
-          @apply --layout-vertical;
-          @apply --layout-start;
+          display: block;
+          max-width: var(--app-screen-max-width);
+          margin: var(--app-screen-margin);
         }
-      }
+
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        h2 {
+          @apply --paper-font-title;
+          @apply --layout-flex;
+        }
+
+        h3 {
+          @apply --paper-font-subhead;
+          @apply --layout-flex;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        .config {
+          @apply --shadow-elevation-4dp;
+          padding: 12px;
+        }
+
+        .time-row,
+        .tag-line {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        .time-row paper-input {
+          margin-right: 8px;
+        }
+
+        .search-action {
+          margin-top: 24px;
+        }
+
+        .search-button {
+          background-color: var(--primary-color);
+          color: #fff;
+        }
+
+        .changelog-item {
+          @apply --shadow-elevation-2dp;
+          @apply --paper-font-body1;
+          padding: 12px;
+          margin: 20px 0;
+        }
+
+        .changelog-item .value {
+          @apply --paper-font-body2;
+          margin-left: 8px;
+        }
+
+        .markdown-html {
+          background-color: #fff3e0;
+          word-break: break-all;
+          padding: 8px;
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+
+          .time-row {
+            @apply --layout-vertical;
+            @apply --layout-start;
+          }
+        }
       </style>
       <header>
         <h1>Components changelog</h1>
@@ -134,17 +134,14 @@ class ArcChangelog extends PolymerElement {
             <h2>[[item.name]] v[[item.id]]</h2>
 
             <div class="description-line">
-              <label>Published:</label><relative-time class="value" datetime$="[[_computeTimeValue(item.created)]]"></relative-time>
+              <label>Published:</label
+              ><relative-time class="value" datetime$="[[_computeTimeValue(item.created)]]"></relative-time>
             </div>
 
-            <div class="description-line">
-              <label>Component group:</label><span class="value">[[item.group]]</span>
-            </div>
+            <div class="description-line"><label>Component group:</label><span class="value">[[item.group]]</span></div>
 
             <template is="dom-if" if="[[_hasTags(item.tags)]]" restamp>
-              <div class="description-line">
-                <label>Tags:</label><span class="value">[[item.tags]]</span>
-              </div>
+              <div class="description-line"><label>Tags:</label><span class="value">[[item.tags]]</span></div>
             </template>
 
             <template is="dom-if" if="[[item.changelog]]" restamp>
@@ -172,10 +169,10 @@ class ArcChangelog extends PolymerElement {
   static get properties() {
     return {
       apiBase: String,
-      hasMore: {type: Boolean, value: false},
-      loading: {type: Boolean, notify: true},
-      hasResults: {type: Boolean, computed: '_computeHasResults(testsList.*)'},
-      renderEmptyInfo: {type: Boolean, computed: '_computeRenderEmptyInfo(hasResults, loading)'},
+      hasMore: { type: Boolean, value: false },
+      loading: { type: Boolean, notify: true },
+      hasResults: { type: Boolean, computed: '_computeHasResults(testsList.*)' },
+      renderEmptyInfo: { type: Boolean, computed: '_computeRenderEmptyInfo(hasResults, loading)' },
       pageToken: String,
       tags: {
         type: Array,
@@ -198,7 +195,7 @@ class ArcChangelog extends PolymerElement {
   }
 
   addTag() {
-    this.push('tags', {name: ''});
+    this.push('tags', { name: '' });
   }
 
   _removeTag(e) {
@@ -238,24 +235,24 @@ class ArcChangelog extends PolymerElement {
 
     this.loading = true;
     return fetch(url, init)
-    .then((response) => {
-      if (!response.ok) {
-        success = false;
-      }
-      return response.json();
-    })
-    .then((data) => {
-      this.loading = false;
-      if (!success) {
-        this._reportError(data.message);
-      } else {
-        this._processResponse(data);
-      }
-    })
-    .catch((cause) => {
-      console.warn(cause);
-      this._reportError(cause.message);
-    });
+      .then((response) => {
+        if (!response.ok) {
+          success = false;
+        }
+        return response.json();
+      })
+      .then((data) => {
+        this.loading = false;
+        if (!success) {
+          this._reportError(data.message);
+        } else {
+          this._processResponse(data);
+        }
+      })
+      .catch((cause) => {
+        console.warn(cause);
+        this._reportError(cause.message);
+      });
   }
 
   _reportError(message) {

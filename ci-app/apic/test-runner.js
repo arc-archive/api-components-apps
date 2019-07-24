@@ -31,9 +31,14 @@ class ApicTestRunner extends GitBuild {
   }
 
   get skipComponents() {
-    return ['api-components-autotest', 'api-console-default-theme',
-      'api-console-ext-comm', 'api-candidates-dialog', 'api-form-mixin',
-      'api-property-form-item'];
+    return [
+      'api-components-autotest',
+      'api-console-default-theme',
+      'api-console-ext-comm',
+      'api-candidates-dialog',
+      'api-form-mixin',
+      'api-property-form-item'
+    ];
   }
 
   get skipBottomUpComponents() {
@@ -58,8 +63,10 @@ class ApicTestRunner extends GitBuild {
 
   _prepareTestType() {
     switch (this.config.type) {
-      case 'amf-build': return this._prepareAmfTest();
-      case 'bottom-up': return this._prepareBottomUpTest();
+      case 'amf-build':
+        return this._prepareAmfTest();
+      case 'bottom-up':
+        return this._prepareBottomUpTest();
       default:
         throw new Error('Unknown test type: ' + this.config.type);
     }
@@ -133,42 +140,42 @@ class ApicTestRunner extends GitBuild {
       sshUrl: `git@github.com:advanced-rest-client/${name}.git`,
       componentDir: path.join(this.workingDir, name)
     })
-    .catch((cause) => {
-      logging.error('Unable to process component sources   ' + name);
-      logging.error(cause.stack || cause.message);
-      throw cause;
-    })
-    .then(() => {
-      switch (this.config.type) {
-        case 'amf-build': return this.updateModels(name);
-      }
-    })
-    .then(() => {
-      if (this.abort) {
-        return;
-      }
-      const dm = new DependendenciesManager(path.join(this.workingDir, name));
-      let extra;
-      if (this.config.type === 'bottom-up') {
-        extra = {
-          component: this.config.component,
-          branch: this.config.branch,
-          commit: this.config.commit
-        };
-      }
-      return dm.installDependencies(extra)
       .catch((cause) => {
-        logging.error('Cannot Install dependencies for   ' + name);
+        logging.error('Unable to process component sources   ' + name);
         logging.error(cause.stack || cause.message);
         throw cause;
+      })
+      .then(() => {
+        switch (this.config.type) {
+          case 'amf-build':
+            return this.updateModels(name);
+        }
+      })
+      .then(() => {
+        if (this.abort) {
+          return;
+        }
+        const dm = new DependendenciesManager(path.join(this.workingDir, name));
+        let extra;
+        if (this.config.type === 'bottom-up') {
+          extra = {
+            component: this.config.component,
+            branch: this.config.branch,
+            commit: this.config.commit
+          };
+        }
+        return dm.installDependencies(extra).catch((cause) => {
+          logging.error('Cannot Install dependencies for   ' + name);
+          logging.error(cause.stack || cause.message);
+          throw cause;
+        });
+      })
+      .then(() => {
+        if (this.abort) {
+          return;
+        }
+        logging.verbose(`Component ${name} is ready`);
       });
-    })
-    .then(() => {
-      if (this.abort) {
-        return;
-      }
-      logging.verbose(`Component ${name} is ready`);
-    });
   }
 
   updateModels(name) {
@@ -177,18 +184,19 @@ class ApicTestRunner extends GitBuild {
     }
     logging.verbose('Generating API models for ' + name);
     const updater = new AmfModelGenerator(this.workingDir, name);
-    return updater.generate()
-    .catch((cause) => {
-      logging.error('Cannot generate AMF model for  ' + name);
-      logging.error(cause.stack || cause.message);
-      throw cause;
-    })
-    .then(() => {
-      if (this.abort) {
-        return;
-      }
-      logging.verbose('API model generated.');
-    });
+    return updater
+      .generate()
+      .catch((cause) => {
+        logging.error('Cannot generate AMF model for  ' + name);
+        logging.error(cause.stack || cause.message);
+        throw cause;
+      })
+      .then(() => {
+        if (this.abort) {
+          return;
+        }
+        logging.verbose('API model generated.');
+      });
   }
   /**
    * Tries to run xvbt. It retries twice before giving up.
@@ -202,16 +210,16 @@ class ApicTestRunner extends GitBuild {
     }
     let attempt = 0;
     return this.__startXvfb()
-    .catch((cause) => {
-      if (attempt < 3) {
-        attempt++;
-        return this._ensureXvfb();
-      }
-      throw cause;
-    })
-    .then(() => {
-      this._xvfbRunning = true;
-    });
+      .catch((cause) => {
+        if (attempt < 3) {
+          attempt++;
+          return this._ensureXvfb();
+        }
+        throw cause;
+      })
+      .then(() => {
+        this._xvfbRunning = true;
+      });
   }
 
   __startXvfb() {
@@ -240,8 +248,7 @@ class ApicTestRunner extends GitBuild {
     if (this.abort) {
       return Promise.resolve();
     }
-    return this._ensureXvfb()
-    .then(() => {
+    return this._ensureXvfb().then(() => {
       const runner = new ComponentTestRunner(name, this.workingDir);
       return runner.run();
     });
@@ -252,9 +259,10 @@ class ApicTestRunner extends GitBuild {
       return Promise.resolve();
     }
     logging.verbose(`Component ${name} finished with success.`);
-    return this.testsComponentModel.updateComponent(this.entryId, name, result)
-    .then(() => this.testsLogsModel.addLogs(this.entryId, name, result.results))
-    .then(() => this.testsModel.updateComponentResult(this.entryId, result));
+    return this.testsComponentModel
+      .updateComponent(this.entryId, name, result)
+      .then(() => this.testsLogsModel.addLogs(this.entryId, name, result.results))
+      .then(() => this.testsModel.updateComponentResult(this.entryId, result));
   }
 
   reportComponentError(component, err) {
@@ -269,8 +277,9 @@ class ApicTestRunner extends GitBuild {
     if (!err) {
       err = 'Unknown error occurred';
     }
-    return this.testsComponentModel.updateComponentError(this.entryId, component, err)
-    .then(() => this.testsModel.setComponentError(this.entryId));
+    return this.testsComponentModel
+      .updateComponentError(this.entryId, component, err)
+      .then(() => this.testsModel.setComponentError(this.entryId));
   }
 
   reportTestError(err) {
@@ -286,16 +295,17 @@ class ApicTestRunner extends GitBuild {
     if (!err) {
       err = 'Unknown error occurred';
     }
-    return this.testsModel.setTestError(this.entryId, err)
-    .then(() => this.cleanup())
-    .catch((cause) => {
-      logging.error(cause.stack || cause.message);
-    })
-    .then(() => {
-      this.running = false;
-      this.emit('end');
-      this.emit('status', 'error', err);
-    });
+    return this.testsModel
+      .setTestError(this.entryId, err)
+      .then(() => this.cleanup())
+      .catch((cause) => {
+        logging.error(cause.stack || cause.message);
+      })
+      .then(() => {
+        this.running = false;
+        this.emit('end');
+        this.emit('status', 'error', err);
+      });
   }
 
   finish(message) {
@@ -305,20 +315,21 @@ class ApicTestRunner extends GitBuild {
     }
     logging.info('The test finished.');
     let model;
-    return this.testsModel.finishTest(this.entryId, message)
-    .then(() => this.testsModel.getTest(this.entryId))
-    .then((result) => {
-      model = result;
-      return this.cleanup();
-    })
-    .catch((cause) => {
-      logging.error(cause.stack || cause.message);
-    })
-    .then(() => {
-      this.running = false;
-      this.emit('status', 'result', model);
-      this.emit('end');
-    });
+    return this.testsModel
+      .finishTest(this.entryId, message)
+      .then(() => this.testsModel.getTest(this.entryId))
+      .then((result) => {
+        model = result;
+        return this.cleanup();
+      })
+      .catch((cause) => {
+        logging.error(cause.stack || cause.message);
+      })
+      .then(() => {
+        this.running = false;
+        this.emit('status', 'result', model);
+        this.emit('end');
+      });
   }
 }
 

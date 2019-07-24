@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const {BaseApi} = require('./base-api');
-const {MessageModel} = require('../models/message-model');
+const { BaseApi } = require('./base-api');
+const { MessageModel } = require('../models/message-model');
 const logging = require('../../lib/logging');
 
 const router = express.Router();
@@ -20,7 +20,7 @@ class MessagesApiRoute extends BaseApi {
     } else {
       messages = [];
     }
-    let {nextPageToken, since, until} = req.query;
+    let { nextPageToken, since, until } = req.query;
     if (!nextPageToken) {
       if (until) {
         until = Number(until);
@@ -52,7 +52,7 @@ class MessagesApiRoute extends BaseApi {
 
   collectQueryParameters(req) {
     const result = {};
-    const {nextPageToken, since, until, target, channel, limit} = req.query;
+    const { nextPageToken, since, until, target, channel, limit } = req.query;
     if (nextPageToken) {
       result.nextPageToken = nextPageToken;
     } else {
@@ -76,7 +76,7 @@ class MessagesApiRoute extends BaseApi {
   }
 
   validateCreateMessage(req) {
-    const {abstract, title, actionUrl, cta, target, channel} = req.body;
+    const { abstract, title, actionUrl, cta, target, channel } = req.body;
     const messages = [];
 
     if (!abstract) {
@@ -123,114 +123,111 @@ class MessagesApiRoute extends BaseApi {
       return;
     }
     const params = this.collectQueryParameters(req);
-    this.model.list(params)
-    .then((result) => {
-      if (result[0]) {
-        result[0].forEach((item) => {
-          item.kind = 'ArcInfo#Message';
-        });
-      }
-      this.sendListResult(result, res);
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    this.model
+      .list(params)
+      .then((result) => {
+        if (result[0]) {
+          result[0].forEach((item) => {
+            item.kind = 'ArcInfo#Message';
+          });
+        }
+        this.sendListResult(result, res);
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   createMesage(req, res) {
     return this.isValidAccess(req, 'create-message')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        const o = {
-          message: 'Unauthorized',
-          status: 401
-        };
-        throw o;
-      }
+      .then((hasAccess) => {
+        if (!hasAccess) {
+          const o = {
+            message: 'Unauthorized',
+            status: 401
+          };
+          throw o;
+        }
 
-      const errors = this.validateCreateMessage(req);
-      if (errors) {
-        const o = {
-          message: errors,
-          status: 400
-        };
-        throw o;
-      }
+        const errors = this.validateCreateMessage(req);
+        if (errors) {
+          const o = {
+            message: errors,
+            status: 400
+          };
+          throw o;
+        }
 
-      const body = req.body;
-      const info = {
-        abstract: body.abstract,
-        title: body.title
-      };
-      if (body.actionUrl) {
-        info.actionUrl = body.actionUrl;
-      }
-      if (body.cta) {
-        info.cta = body.cta;
-      }
-      if (body.target && body.target.length) {
-        info.target = body.target;
-      }
-      if (body.channel) {
-        info.channel = body.channel;
-      }
-      return this.model.insert(info);
-    })
-    .then((message) => {
-      message.kind = 'ArcInfo#Message';
-      res.send(message);
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      const status = cause.status || 500;
-      this.sendError(res, cause.message, status);
-    });
+        const body = req.body;
+        const info = {
+          abstract: body.abstract,
+          title: body.title
+        };
+        if (body.actionUrl) {
+          info.actionUrl = body.actionUrl;
+        }
+        if (body.cta) {
+          info.cta = body.cta;
+        }
+        if (body.target && body.target.length) {
+          info.target = body.target;
+        }
+        if (body.channel) {
+          info.channel = body.channel;
+        }
+        return this.model.insert(info);
+      })
+      .then((message) => {
+        message.kind = 'ArcInfo#Message';
+        res.send(message);
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        const status = cause.status || 500;
+        this.sendError(res, cause.message, status);
+      });
   }
 
   deleteMessage(req, res) {
-    const {messageId} = req.params;
+    const { messageId } = req.params;
     return this.isValidAccess(req, 'delete-message')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        const o = {
-          message: 'Unauthorized',
-          status: 401
-        };
-        throw o;
-      }
-      console.log(messageId);
-      return this.model.get(messageId);
-    })
-    .then((resource) => {
-      if (!resource) {
-        const o = {
-          message: 'Message not found',
-          status: 404
-        };
-        throw o;
-      }
-      return this.model.delete(messageId);
-    })
-    .then(() => {
-      res.sendStatus(204).end();
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      const status = cause.status || 500;
-      this.sendError(res, cause.message, status);
-    });
+      .then((hasAccess) => {
+        if (!hasAccess) {
+          const o = {
+            message: 'Unauthorized',
+            status: 401
+          };
+          throw o;
+        }
+        console.log(messageId);
+        return this.model.get(messageId);
+      })
+      .then((resource) => {
+        if (!resource) {
+          const o = {
+            message: 'Message not found',
+            status: 404
+          };
+          throw o;
+        }
+        return this.model.delete(messageId);
+      })
+      .then(() => {
+        res.sendStatus(204).end();
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        const status = cause.status || 500;
+        this.sendError(res, cause.message, status);
+      });
   }
 }
 const api = new MessagesApiRoute();
 api.setCors(router);
-api.wrapApi(router, [
-  ['/', 'listMessages'],
-  ['/', 'createMesage', 'post'],
-  ['/:messageId', 'deleteMessage', 'delete'],
-]);
+api.wrapApi(router, [['/', 'listMessages'], ['/', 'createMesage', 'post'], ['/:messageId', 'deleteMessage', 'delete']]);
 module.exports = router;

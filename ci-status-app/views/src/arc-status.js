@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-styles/shadow.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -10,83 +10,83 @@ class ArcStatus extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        position: relative;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      .li {
-        border: 1px #E0E0E0 solid;
-        border-radius: 3px;
-        margin: 8px 0;
-        border-left: 2px #2E7D32 solid;
-      }
-
-      .li[failed] {
-        border-left: 2px #F44336 solid;
-      }
-
-      .li[queued] {
-        border-left: 2px #9E9E9E solid;
-      }
-
-      .no-data-container {
-        margin: 30% auto;
-        width: 50%;
-      }
-
-      .visual {
-        @apply --layout-horizontal;
-        background-color: #757575;
-        opacity: 0.7;
-      }
-
-      .item {
-        @apply --layout-flex;
-        height: 40px;
-        background-color: #B0BEC5;
-        margin: 6px;
-      }
-
-      .item.accent {
-        background-color: #4CAF50;
-      }
-
-      .empty-info {
-        text-align: center;
-        color: #616161;
-        font-size: 22px;
-      }
-
-      .empty-info2 {
-        text-align: center;
-        color: #9E9E9E;
-        font-size: 22px;
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
+          display: block;
+          position: relative;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-      }
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        .li {
+          border: 1px #e0e0e0 solid;
+          border-radius: 3px;
+          margin: 8px 0;
+          border-left: 2px #2e7d32 solid;
+        }
+
+        .li[failed] {
+          border-left: 2px #f44336 solid;
+        }
+
+        .li[queued] {
+          border-left: 2px #9e9e9e solid;
+        }
+
+        .no-data-container {
+          margin: 30% auto;
+          width: 50%;
+        }
+
+        .visual {
+          @apply --layout-horizontal;
+          background-color: #757575;
+          opacity: 0.7;
+        }
+
+        .item {
+          @apply --layout-flex;
+          height: 40px;
+          background-color: #b0bec5;
+          margin: 6px;
+        }
+
+        .item.accent {
+          background-color: #4caf50;
+        }
+
+        .empty-info {
+          text-align: center;
+          color: #616161;
+          font-size: 22px;
+        }
+
+        .empty-info2 {
+          text-align: center;
+          color: #9e9e9e;
+          font-size: 22px;
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+        }
       </style>
       <header>
         <h1>API components tests</h1>
@@ -114,18 +114,24 @@ class ArcStatus extends PolymerElement {
         </div>
       </template>
 
-      <tests-model id="model" api-base="[[apiBase]]" list="{{testsList}}" has-more="{{hasMore}}" loading="{{loading}}"></tests-model>
+      <tests-model
+        id="model"
+        api-base="[[apiBase]]"
+        list="{{testsList}}"
+        has-more="{{hasMore}}"
+        loading="{{loading}}"
+      ></tests-model>
     `;
   }
 
   static get properties() {
     return {
-      testsList: {type: Array},
+      testsList: { type: Array },
       apiBase: String,
-      hasMore: {type: Boolean, value: true},
-      loading: {type: Boolean, notify: true},
-      hasResults: {type: Boolean, computed: '_computeHasResults(testsList.*)'},
-      renderEmptyInfo: {type: Boolean, computed: '_computeRenderEmptyInfo(hasResults, loading)'}
+      hasMore: { type: Boolean, value: true },
+      loading: { type: Boolean, notify: true },
+      hasResults: { type: Boolean, computed: '_computeHasResults(testsList.*)' },
+      renderEmptyInfo: { type: Boolean, computed: '_computeRenderEmptyInfo(hasResults, loading)' }
     };
   }
 

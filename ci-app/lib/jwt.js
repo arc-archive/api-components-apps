@@ -1,10 +1,14 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
-const scopes = module.exports.scopes = [
-  'all', 'create-test', 'delete-test', 'create-message', 'delete-message',
+const scopes = (module.exports.scopes = [
+  'all',
+  'create-test',
+  'delete-test',
+  'create-message',
+  'delete-message',
   'schedule-component-build'
-];
+]);
 const tokenIssuer = 'urn:arc-ci';
 
 /**
@@ -37,14 +41,22 @@ function verifyToken(token) {
       if (err) {
         let msg;
         switch (err.message) {
-          case 'invalid audience': msg = 'Token audinece is invalid'; break;
-          case 'invalid issuer': msg = 'Token issuer (source) is invalid'; break;
-          case 'jwt expired': msg = `Token expored at ${err.expiredAt}`; break;
+          case 'invalid audience':
+            msg = 'Token audinece is invalid';
+            break;
+          case 'invalid issuer':
+            msg = 'Token issuer (source) is invalid';
+            break;
+          case 'jwt expired':
+            msg = `Token expored at ${err.expiredAt}`;
+            break;
           case 'jwt signature is required':
           case 'invalid signature':
             msg = 'Singature is invalid';
             break;
-          case 'jwt malformed': msg = 'Malformed token'; break;
+          case 'jwt malformed':
+            msg = 'Malformed token';
+            break;
           case 'invalid jwt id':
           case 'invalid subject':
           case 'jwt signature is required':

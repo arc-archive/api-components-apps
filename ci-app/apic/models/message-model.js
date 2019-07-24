@@ -1,4 +1,4 @@
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 /**
  * A model for catalog items.
  */
@@ -11,9 +11,7 @@ class MessageModel extends BaseModel {
   }
 
   get excludeIndexes() {
-    return [
-      'abstract', 'actionUrl', 'cta', 'title'
-    ];
+    return ['abstract', 'actionUrl', 'cta', 'title'];
   }
 
   /**
@@ -23,9 +21,7 @@ class MessageModel extends BaseModel {
   autoKey() {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.messageKind
-      ]
+      path: [this.messageKind]
     });
   }
 
@@ -37,10 +33,7 @@ class MessageModel extends BaseModel {
   createMessageKey(messageId) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.messageKind,
-        Number(messageId)
-      ]
+      path: [this.messageKind, Number(messageId)]
     });
   }
 
@@ -50,8 +43,7 @@ class MessageModel extends BaseModel {
    * @return {Object} Datastore query object
    */
   _createQuery(config) {
-    let query = this.store.createQuery(this.namespace, this.messageKind)
-    .order('time', {
+    let query = this.store.createQuery(this.namespace, this.messageKind).order('time', {
       descending: true
     });
     if (config.nextPageToken) {
@@ -81,8 +73,7 @@ class MessageModel extends BaseModel {
    */
   list(config) {
     const query = this._createQuery(config);
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map(this.fromDatastore.bind(this));
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
@@ -96,19 +87,23 @@ class MessageModel extends BaseModel {
    */
   insert(message) {
     const key = this.autoKey();
-    const results = [{
-      name: 'abstract',
-      value: message.abstract,
-      excludeFromIndexes: true
-    }, {
-      name: 'title',
-      value: message.abstract,
-      excludeFromIndexes: true
-    }, {
-      name: 'time',
-      value: Date.now(),
-      excludeFromIndexes: false
-    }];
+    const results = [
+      {
+        name: 'abstract',
+        value: message.abstract,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'title',
+        value: message.abstract,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'time',
+        value: Date.now(),
+        excludeFromIndexes: false
+      }
+    ];
 
     if (message.actionUrl) {
       results.push({
@@ -146,16 +141,16 @@ class MessageModel extends BaseModel {
       key,
       data: results
     };
-    return this.store.upsert(entity)
-    .then(() => this.store.get(key))
-    .then((entity) => this.fromDatastore(entity[0]));
+    return this.store
+      .upsert(entity)
+      .then(() => this.store.get(key))
+      .then((entity) => this.fromDatastore(entity[0]));
   }
 
   get(messageId) {
     const key = this.createMessageKey(messageId);
     console.log(key);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         console.log(entity[0][this.store.KEY]);
         return this.fromDatastore(entity[0]);
@@ -166,13 +161,14 @@ class MessageModel extends BaseModel {
   delete(messageId) {
     const transaction = this.store.transaction();
     const key = this.createMessageKey(messageId);
-    return transaction.run()
-    .then(() => transaction.delete(key))
-    .then(() => transaction.commit())
-    .catch((cause) => {
-      transaction.rollback();
-      return Promise.reject(cause);
-    });
+    return transaction
+      .run()
+      .then(() => transaction.delete(key))
+      .then(() => transaction.commit())
+      .catch((cause) => {
+        transaction.rollback();
+        return Promise.reject(cause);
+      });
   }
 }
 

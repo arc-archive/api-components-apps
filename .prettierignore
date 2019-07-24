@@ -1,3 +1,6 @@
 coverage/
 _site/
 dist/
+ci-app/api-docs/
+ci-status-app/views/build/
+catalog-app/views/build/

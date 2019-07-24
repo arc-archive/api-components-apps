@@ -23,30 +23,32 @@ class Changelog {
   build() {
     logging.verbose('Building changelog...');
     process.chdir(this.workingDir);
-    return fs.ensureFile(this.changelogFile)
-    .then(() => this._runChangelog())
-    .then(() => {
-      process.chdir(this.startDir);
-    })
-    .catch((cause) => {
-      process.chdir(this.startDir);
-      throw cause;
-    });
+    return fs
+      .ensureFile(this.changelogFile)
+      .then(() => this._runChangelog())
+      .then(() => {
+        process.chdir(this.startDir);
+      })
+      .catch((cause) => {
+        process.chdir(this.startDir);
+        throw cause;
+      });
   }
 
   get() {
     logging.verbose('Reading changelog data...');
     process.chdir(this.workingDir);
-    return fs.ensureFile(this.changelogFile)
-    .then(() => this._changelogString())
-    .then((result) => {
-      process.chdir(this.startDir);
-      return result;
-    })
-    .catch((cause) => {
-      process.chdir(this.startDir);
-      throw cause;
-    });
+    return fs
+      .ensureFile(this.changelogFile)
+      .then(() => this._changelogString())
+      .then((result) => {
+        process.chdir(this.startDir);
+        return result;
+      })
+      .catch((cause) => {
+        process.chdir(this.startDir);
+        throw cause;
+      });
   }
   /**
    * Get a stream from configured conventional releaser.
@@ -61,7 +63,7 @@ class Changelog {
       append: false,
       releaseCount: 1,
       reverse: false,
-      warn: console.warn.bind(console),
+      warn: console.warn.bind(console)
       // debug: console.debug.bind(console)
     });
   }
@@ -76,15 +78,17 @@ class Changelog {
       const stream = this._getChangelogStreem();
       stream.on('error', (err) => reject(err));
       stream
-      .pipe(fs.createWriteStream(this.changelogFile, {
-        flags: 'a'
-      }))
-      .on('finish', () => {
-        resolve();
-      })
-      .on('error', (err) => {
-        reject(err);
-      });
+        .pipe(
+          fs.createWriteStream(this.changelogFile, {
+            flags: 'a'
+          })
+        )
+        .on('finish', () => {
+          resolve();
+        })
+        .on('error', (err) => {
+          reject(err);
+        });
     });
   }
 
@@ -94,12 +98,13 @@ class Changelog {
       const stream = this._getChangelogStreem();
       stream.on('error', (err) => reject(err));
       let result = '';
-      stream.on('data', (chunk) => {
-        result += chunk.toString();
-      })
-      .on('end', () => {
-        resolve(result.trim());
-      });
+      stream
+        .on('data', (chunk) => {
+          result += chunk.toString();
+        })
+        .on('end', () => {
+          resolve(result.trim());
+        });
     });
   }
 }

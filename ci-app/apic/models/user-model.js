@@ -1,5 +1,5 @@
 const uuidv4 = require('uuid/v4');
-const {BaseModel} = require('./base-model');
+const { BaseModel } = require('./base-model');
 
 class UserModel extends BaseModel {
   /**
@@ -33,10 +33,7 @@ class UserModel extends BaseModel {
   createUserKey(id) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.userKind,
-        id
-      ]
+      path: [this.userKind, id]
     });
   }
 
@@ -49,12 +46,7 @@ class UserModel extends BaseModel {
   createUserTokenKey(userId, tokenId) {
     return this.store.key({
       namespace: this.namespace,
-      path: [
-        this.userKind,
-        userId,
-        this.tokenKind,
-        tokenId
-      ]
+      path: [this.userKind, userId, this.tokenKind, tokenId]
     });
   }
   /**
@@ -64,8 +56,7 @@ class UserModel extends BaseModel {
    */
   getUser(id) {
     const key = this.createUserKey(id);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }
@@ -135,27 +126,33 @@ class UserModel extends BaseModel {
     const id = profile.id;
     const copy = this.extractOauthProfile(profile);
     const key = this.createUserKey(id);
-    const results = [{
-      name: 'displayName',
-      value: copy.displayName,
-      excludeFromIndexes: true
-    }, {
-      name: 'orgUser',
-      value: copy.orgUser,
-      excludeFromIndexes: true
-    }, {
-      name: 'superUser',
-      value: copy.superUser,
-      excludeFromIndexes: true
-    }, {
-      name: 'imageUrl',
-      value: copy.imageUrl,
-      excludeFromIndexes: true
-    }, {
-      name: 'tos', // terms of service
-      value: false,
-      excludeFromIndexes: true
-    }];
+    const results = [
+      {
+        name: 'displayName',
+        value: copy.displayName,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'orgUser',
+        value: copy.orgUser,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'superUser',
+        value: copy.superUser,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'imageUrl',
+        value: copy.imageUrl,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'tos', // terms of service
+        value: false,
+        excludeFromIndexes: true
+      }
+    ];
     if (refreshToken) {
       results[results.length] = {
         name: 'refreshToken',
@@ -167,8 +164,7 @@ class UserModel extends BaseModel {
       key,
       data: results
     };
-    return this.store.upsert(entity)
-    .then(() => {
+    return this.store.upsert(entity).then(() => {
       return id;
     });
   }
@@ -179,8 +175,7 @@ class UserModel extends BaseModel {
    * @return {Promise<Object>} Promise resolved to user profile info.
    */
   findOrCreateUser(profile, refreshToken) {
-    return this.getUser(profile.id)
-    .then((user) => {
+    return this.getUser(profile.id).then((user) => {
       if (!user) {
         return this.createUser(profile, refreshToken).then(() => this.getUser(profile.id));
       }
@@ -208,8 +203,7 @@ class UserModel extends BaseModel {
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query)
-    .then((result) => {
+    return this.store.runQuery(query).then((result) => {
       const entities = result[0].map(this.fromDatastore.bind(this));
       const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
       return [entities, hasMore];
@@ -223,8 +217,7 @@ class UserModel extends BaseModel {
    */
   getToken(userId, tokenId) {
     const key = this.createUserTokenKey(userId, tokenId);
-    return this.store.get(key)
-    .then((entity) => {
+    return this.store.get(key).then((entity) => {
       if (entity && entity[0]) {
         return this.fromDatastore(entity[0]);
       }
@@ -242,26 +235,31 @@ class UserModel extends BaseModel {
     const id = uuidv4();
     const key = this.createUserTokenKey(user.id, id);
 
-    const results = [{
-      name: 'token',
-      value: token,
-      excludeFromIndexes: false
-    }, {
-      name: 'scopes',
-      value: tokenInfo.scopes,
-      excludeFromIndexes: true
-    }, {
-      name: 'issuer',
-      value: {
-        id: user.id,
-        displayName: user.displayName || ''
+    const results = [
+      {
+        name: 'token',
+        value: token,
+        excludeFromIndexes: false
       },
-      excludeFromIndexes: true
-    }, {
-      name: 'created',
-      value: Date.now(),
-      excludeFromIndexes: false
-    }];
+      {
+        name: 'scopes',
+        value: tokenInfo.scopes,
+        excludeFromIndexes: true
+      },
+      {
+        name: 'issuer',
+        value: {
+          id: user.id,
+          displayName: user.displayName || ''
+        },
+        excludeFromIndexes: true
+      },
+      {
+        name: 'created',
+        value: Date.now(),
+        excludeFromIndexes: false
+      }
+    ];
     if (tokenInfo.exp) {
       results[results.length] = {
         name: 'expires',
@@ -280,8 +278,7 @@ class UserModel extends BaseModel {
       key,
       data: results
     };
-    return this.store.upsert(entity)
-    .then(() => {
+    return this.store.upsert(entity).then(() => {
       return this.getToken(user.id, id);
     });
   }
@@ -294,22 +291,23 @@ class UserModel extends BaseModel {
   revokeUserToken(userId, tokenId) {
     const transaction = this.store.transaction();
     const key = this.createUserTokenKey(userId, tokenId);
-    return transaction.run()
-    .then(() => transaction.get(key))
-    .then((data) => {
-      const [token] = data;
-      token.revoked = true;
-      transaction.save({
-        key,
-        data: token,
-        excludeFromIndexes: this.excludedIndexesToken
+    return transaction
+      .run()
+      .then(() => transaction.get(key))
+      .then((data) => {
+        const [token] = data;
+        token.revoked = true;
+        transaction.save({
+          key,
+          data: token,
+          excludeFromIndexes: this.excludedIndexesToken
+        });
+        return transaction.commit();
+      })
+      .catch((cause) => {
+        transaction.rollback();
+        return Promise.reject(cause);
       });
-      return transaction.commit();
-    })
-    .catch((cause) => {
-      transaction.rollback();
-      return Promise.reject(cause);
-    });
   }
 
   deleteUserToken(userId, tokenId) {

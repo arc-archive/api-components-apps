@@ -1,10 +1,10 @@
-const {BaseApi} = require('./base-api');
+const { BaseApi } = require('./base-api');
 const cors = require('cors');
 const express = require('express');
 const bodyParser = require('body-parser');
-const {TestsModel} = require('../models/test-model');
-const {TestsComponentModel} = require('../models/test-component-model');
-const {TestsLogsModel} = require('../models/test-logs-model');
+const { TestsModel } = require('../models/test-model');
+const { TestsComponentModel } = require('../models/test-component-model');
+const { TestsLogsModel } = require('../models/test-logs-model');
 const logging = require('../../lib/logging');
 
 const router = express.Router();
@@ -40,46 +40,46 @@ class TestApiRoute extends BaseApi {
 
   createTest(req, res) {
     return this.isValidAccess(req, 'create-test')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        const o = {
-          message: 'Unauthorized',
-          status: 401
+      .then((hasAccess) => {
+        if (!hasAccess) {
+          const o = {
+            message: 'Unauthorized',
+            status: 401
+          };
+          throw o;
+        }
+        const errors = this.validateCreateTest(req);
+        if (errors) {
+          const o = {
+            message: errors,
+            status: 400
+          };
+          throw o;
+        }
+        const body = req.body;
+        const info = {
+          branch: body.branch,
+          type: body.type
         };
-        throw o;
-      }
-      const errors = this.validateCreateTest(req);
-      if (errors) {
-        const o = {
-          message: errors,
-          status: 400
-        };
-        throw o;
-      }
-      const body = req.body;
-      const info = {
-        branch: body.branch,
-        type: body.type,
-      };
-      if (body.commit) {
-        info.commit = body.commit;
-      }
-      if (body.component) {
-        info.component = body.component;
-      }
-      if (body.includeDev) {
-        info.includeDev = body.includeDev;
-      }
-      return this.testModel.insertTest(info);
-    })
-    .then((testId) => {
-      res.send({id: testId});
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      const status = cause.status || 500;
-      this.sendError(res, cause.message, status);
-    });
+        if (body.commit) {
+          info.commit = body.commit;
+        }
+        if (body.component) {
+          info.component = body.component;
+        }
+        if (body.includeDev) {
+          info.includeDev = body.includeDev;
+        }
+        return this.testModel.insertTest(info);
+      })
+      .then((testId) => {
+        res.send({ id: testId });
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        const status = cause.status || 500;
+        this.sendError(res, cause.message, status);
+      });
   }
 
   listTest(req, res) {
@@ -88,66 +88,68 @@ class TestApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    let {limit, nextPageToken} = req.query;
-    this.testModel.listTests(limit, nextPageToken)
-    .then((result) => this.sendListResult(result, res))
-    .catch((cause) => {
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    let { limit, nextPageToken } = req.query;
+    this.testModel
+      .listTests(limit, nextPageToken)
+      .then((result) => this.sendListResult(result, res))
+      .catch((cause) => {
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   getTest(req, res) {
-    const {testId} = req.params;
-    this.testModel.getTest(testId)
-    .then((resource) => {
-      if (resource) {
-        res.send(resource);
-      } else {
-        this.sendError(res, 'Test not found', 404);
-      }
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      this.sendError(res, cause.message, 500);
-    });
+    const { testId } = req.params;
+    this.testModel
+      .getTest(testId)
+      .then((resource) => {
+        if (resource) {
+          res.send(resource);
+        } else {
+          this.sendError(res, 'Test not found', 404);
+        }
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   deleteTest(req, res) {
-    const {testId} = req.params;
+    const { testId } = req.params;
     return this.isValidAccess(req, 'delete-test')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        const o = {
-          message: 'Unauthorized',
-          status: 401
-        };
-        throw o;
-      }
-      return this.testModel.getTest(testId);
-    })
-    .then((resource) => {
-      if (!resource) {
-        const o = {
-          message: 'Test not found',
-          status: 404
-        };
-        throw o;
-      }
-      return this.testModel.deleteTest(testId);
-    })
-    .then(() => {
-      res.sendStatus(204).end();
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      const status = cause.status || 500;
-      this.sendError(res, cause.message, status);
-    });
+      .then((hasAccess) => {
+        if (!hasAccess) {
+          const o = {
+            message: 'Unauthorized',
+            status: 401
+          };
+          throw o;
+        }
+        return this.testModel.getTest(testId);
+      })
+      .then((resource) => {
+        if (!resource) {
+          const o = {
+            message: 'Test not found',
+            status: 404
+          };
+          throw o;
+        }
+        return this.testModel.deleteTest(testId);
+      })
+      .then(() => {
+        res.sendStatus(204).end();
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        const status = cause.status || 500;
+        this.sendError(res, cause.message, status);
+      });
   }
   /**
    * An edpoint to reset test state and re-run the test.
@@ -155,26 +157,26 @@ class TestApiRoute extends BaseApi {
    * @param {Object} res
    */
   restartTest(req, res) {
-    const {testId} = req.params;
+    const { testId } = req.params;
     this.isValidAccess(req, 'create-test')
-    .then((hasAccess) => {
-      if (!hasAccess) {
-        const o = {
-          message: 'Unauthorized',
-          status: 401
-        };
-        throw o;
-      }
-      return this.testModel.resetTest(testId);
-    })
-    .then(() => {
-      res.sendStatus(204).end();
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      const status = cause.status || 500;
-      this.sendError(res, cause.message, status);
-    });
+      .then((hasAccess) => {
+        if (!hasAccess) {
+          const o = {
+            message: 'Unauthorized',
+            status: 401
+          };
+          throw o;
+        }
+        return this.testModel.resetTest(testId);
+      })
+      .then(() => {
+        res.sendStatus(204).end();
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        const status = cause.status || 500;
+        this.sendError(res, cause.message, status);
+      });
   }
 
   listTestComponents(req, res) {
@@ -183,34 +185,36 @@ class TestApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    const {testId} = req.params;
-    let {limit, nextPageToken} = req.query;
-    this.testsComponentModel.list(testId, limit, nextPageToken)
-    .then((result) => this.sendListResult(result, res))
-    .catch((cause) => {
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    const { testId } = req.params;
+    let { limit, nextPageToken } = req.query;
+    this.testsComponentModel
+      .list(testId, limit, nextPageToken)
+      .then((result) => this.sendListResult(result, res))
+      .catch((cause) => {
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   getTestComponent(req, res) {
-    const {testId, componentName} = req.params;
-    this.testsComponentModel.get(testId, componentName)
-    .then((resource) => {
-      if (resource) {
-        res.send(resource);
-      } else {
-        this.sendError(res, 'Test component not found', 404);
-      }
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      this.sendError(res, cause.message, 500);
-    });
+    const { testId, componentName } = req.params;
+    this.testsComponentModel
+      .get(testId, componentName)
+      .then((resource) => {
+        if (resource) {
+          res.send(resource);
+        } else {
+          this.sendError(res, 'Test component not found', 404);
+        }
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   listLogs(req, res) {
@@ -219,34 +223,36 @@ class TestApiRoute extends BaseApi {
       this.sendError(res, errors);
       return;
     }
-    const {testId, componentName} = req.params;
-    let {limit, nextPageToken} = req.query;
-    this.testsLogsModel.list(testId, componentName, limit, nextPageToken)
-    .then((result) => this.sendListResult(result, res))
-    .catch((cause) => {
-      logging.error(cause);
-      if (cause.code === 3) {
-        this.sendError(res, 'Inavlid nextPageToken parameter');
-        return;
-      }
-      this.sendError(res, cause.message, 500);
-    });
+    const { testId, componentName } = req.params;
+    let { limit, nextPageToken } = req.query;
+    this.testsLogsModel
+      .list(testId, componentName, limit, nextPageToken)
+      .then((result) => this.sendListResult(result, res))
+      .catch((cause) => {
+        logging.error(cause);
+        if (cause.code === 3) {
+          this.sendError(res, 'Inavlid nextPageToken parameter');
+          return;
+        }
+        this.sendError(res, cause.message, 500);
+      });
   }
 
   getLog(req, res) {
-    const {testId, componentName, logId} = req.params;
-    this.testsLogsModel.get(testId, componentName, logId)
-    .then((resource) => {
-      if (resource) {
-        res.send(resource);
-      } else {
-        this.sendError(res, 'Test log not found', 404);
-      }
-    })
-    .catch((cause) => {
-      logging.error(cause);
-      this.sendError(res, cause.message, 500);
-    });
+    const { testId, componentName, logId } = req.params;
+    this.testsLogsModel
+      .get(testId, componentName, logId)
+      .then((resource) => {
+        if (resource) {
+          res.send(resource);
+        } else {
+          this.sendError(res, 'Test log not found', 404);
+        }
+      })
+      .catch((cause) => {
+        logging.error(cause);
+        this.sendError(res, cause.message, 500);
+      });
   }
 }
 
