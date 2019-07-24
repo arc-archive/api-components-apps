@@ -13,6 +13,14 @@ const path = require('path');
 const { GitBuild } = require('./builds/git-build');
 /**
  * A class responsible for running API comsponents tests in a worker.
+ *
+ * This class:
+ * - manages temp working directory
+ * - lists components to test
+ * - clones repository to a tmp folder and manages branch selection
+ * - updates components state in the datastore
+ * - determines test type (wct/karma) and runs test in an appropieate runner.
+ * - cleans up after the test run.
  */
 class ApicTestRunner extends GitBuild {
   constructor(id, testConfig) {
@@ -42,7 +50,7 @@ class ApicTestRunner extends GitBuild {
   }
 
   get skipBottomUpComponents() {
-    return ['api-components-autotest', 'api-console-default-theme'];
+    return ['api-components-apps', 'api-console-default-theme'];
   }
 
   async run() {
@@ -129,74 +137,92 @@ class ApicTestRunner extends GitBuild {
     }
     setImmediate(() => this._next());
   }
-
-  prepare(name) {
+  /**
+   * Prepares a component for tests.
+   * @param {String} component Component name
+   * @return {Promise}
+   */
+  async prepare(component) {
     if (this.abort) {
       return Promise.resolve();
     }
-    logging.verbose(`Preparing ${name} component to run in test`);
-    return this._clone({
-      branch: 'master',
-      sshUrl: `git@github.com:advanced-rest-client/${name}.git`,
-      componentDir: path.join(this.workingDir, name)
-    })
-      .catch((cause) => {
-        logging.error('Unable to process component sources   ' + name);
-        logging.error(cause.stack || cause.message);
-        throw cause;
-      })
-      .then(() => {
-        switch (this.config.type) {
-          case 'amf-build':
-            return this.updateModels(name);
-        }
-      })
-      .then(() => {
-        if (this.abort) {
-          return;
-        }
-        const dm = new DependendenciesManager(path.join(this.workingDir, name));
-        let extra;
-        if (this.config.type === 'bottom-up') {
-          extra = {
-            component: this.config.component,
-            branch: this.config.branch,
-            commit: this.config.commit
-          };
-        }
-        return dm.installDependencies(extra).catch((cause) => {
-          logging.error('Cannot Install dependencies for   ' + name);
-          logging.error(cause.stack || cause.message);
-          throw cause;
-        });
-      })
-      .then(() => {
-        if (this.abort) {
-          return;
-        }
-        logging.verbose(`Component ${name} is ready`);
-      });
+    logging.verbose(`Preparing ${component} component to run in test`);
+    await this._prepareClone(component);
+    if (this.config.type === 'amf-build') {
+      await this.updateModels(component);
+    }
+    await this._prepareDependencies(component);
+    logging.verbose(`Component ${component} is ready`);
   }
-
-  updateModels(name) {
+  /**
+   * Clones a component into a working directory
+   * @param {String} component Component to clone
+   * @return {Promise}
+   */
+  async _prepareClone(component) {
     if (this.abort) {
       return Promise.resolve();
     }
-    logging.verbose('Generating API models for ' + name);
-    const updater = new AmfModelGenerator(this.workingDir, name);
-    return updater
-      .generate()
-      .catch((cause) => {
-        logging.error('Cannot generate AMF model for  ' + name);
-        logging.error(cause.stack || cause.message);
-        throw cause;
-      })
-      .then(() => {
-        if (this.abort) {
-          return;
-        }
-        logging.verbose('API model generated.');
+    logging.verbose(`Cloning ${component} component into ${this.workingDir}`);
+    try {
+      await this._clone({
+        branch: 'master',
+        sshUrl: `git@github.com:advanced-rest-client/${name}.git`,
+        componentDir: path.join(this.workingDir, component)
       });
+    } catch (e) {
+      logging.error(`Unable to process component sources ${component}`);
+      logging.error(e.stack || e.message);
+      throw e;
+    }
+  }
+  /**
+   * Installs dependnecies of a component.
+   * @param {String} component Component name
+   * @return {Promise}
+   */
+  async _prepareDependencies(component) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
+    logging.verbose(`Installing dependencies for ${component}`);
+    const dm = new DependendenciesManager(path.join(this.workingDir, component));
+    let extra;
+    if (this.config.type === 'bottom-up') {
+      extra = {
+        component: this.config.component,
+        branch: this.config.branch,
+        commit: this.config.commit
+      };
+    }
+    try {
+      await dm.installDependencies(extra);
+    } catch (cause) {
+      logging.error(`Cannot Install dependencies for ${component}`);
+      logging.error(cause.stack || cause.message);
+      throw cause;
+    }
+  }
+  /**
+   * Generates AMF model for AMF type test.
+   *
+   * @param {String} component Component name
+   * @return {Promise}
+   */
+  async updateModels(component) {
+    if (this.abort) {
+      return Promise.resolve();
+    }
+    logging.verbose(`Generating API models for ${component}`);
+    const updater = new AmfModelGenerator(this.workingDir, component);
+    try {
+      await updater.generate();
+    } catch (cause) {
+      logging.error(`Cannot generate AMF model for ${component}`);
+      logging.error(cause.stack || cause.message);
+      throw cause;
+    }
+    logging.verbose('API model generated.');
   }
   /**
    * Tries to run xvbt. It retries twice before giving up.
@@ -204,22 +230,20 @@ class ApicTestRunner extends GitBuild {
    * won't fail because of that.
    * @return {Promise}
    */
-  _ensureXvfb() {
+  async _ensureXvfb() {
     if (this._xvfbRunning) {
       return Promise.resolve();
     }
-    let attempt = 0;
-    return this.__startXvfb()
-      .catch((cause) => {
-        if (attempt < 3) {
-          attempt++;
-          return this._ensureXvfb();
-        }
-        throw cause;
-      })
-      .then(() => {
-        this._xvfbRunning = true;
-      });
+    try {
+      await this.__startXvfb();
+    } catch (cause) {
+      if (this.__xvfbCounter < 3) {
+        this.__xvfbCounter++;
+        await this._ensureXvfb();
+      }
+      throw cause;
+    }
+    this._xvfbRunning = true;
   }
 
   __startXvfb() {
@@ -248,6 +272,7 @@ class ApicTestRunner extends GitBuild {
     if (this.abort) {
       return Promise.resolve();
     }
+    this.__xvfbCounter = 0;
     return this._ensureXvfb().then(() => {
       const runner = new ComponentTestRunner(name, this.workingDir);
       return runner.run();

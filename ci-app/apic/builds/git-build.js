@@ -17,8 +17,8 @@ class GitBuild extends EventEmitter {
    */
   async createWorkingDir() {
     const path = await this.createTempDir();
-    const dir = fs.realpath(path);
-    logging.verbose('Created working directory ' + dir);
+    const dir = await fs.realpath(path);
+    logging.verbose(`Created working directory ${dir}`);
     this.workingDir = dir;
     return dir;
   }
@@ -33,7 +33,7 @@ class GitBuild extends EventEmitter {
     logging.debug('Cleaning up temporaty dir...');
     const exists = await fs.pathExists(this.workingDir);
     if (exists) {
-      logging.debug('Removing ' + this.workingDir);
+      logging.debug(`Removing ${this.workingDir}`);
       await fs.remove(this.workingDir);
     }
   }
@@ -46,7 +46,7 @@ class GitBuild extends EventEmitter {
     return new Promise((resolve, reject) => {
       tmp.dir((err, _path) => {
         if (err) {
-          reject(new Error('Unable to create a temp dir: ' + err.message));
+          reject(new Error(`Unable to create a temp dir: ${err.message}`));
         } else {
           resolve(_path);
         }
@@ -76,7 +76,7 @@ class GitBuild extends EventEmitter {
     if (current !== info.branch) {
       await this._checkoutBranch(info.branch);
     }
-    ref = this.repo.getCurrentBranch();
+    ref = await this.repo.getCurrentBranch();
     logging.verbose('On branch ' + ref.shorthand());
   }
 
