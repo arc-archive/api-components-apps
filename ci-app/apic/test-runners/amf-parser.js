@@ -1,5 +1,5 @@
 const path = require('path');
-const logging = require('../lib/logging');
+const logging = require('../../lib/logging');
 
 const args = process.argv;
 let workingDir;

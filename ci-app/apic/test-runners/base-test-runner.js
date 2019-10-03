@@ -1,6 +1,6 @@
 const path = require('path');
 const { GitBuild } = require('../builds/git-build');
-const { AmfModelGenerator } = require('../amf-model-generator.js');
+const { AmfModelGenerator } = require('./amf-model-generator.js');
 const { DependendenciesManager } = require('../dependencies-manager');
 const logging = require('../../lib/logging');
 
@@ -26,7 +26,9 @@ class BaseTestRunner extends GitBuild {
    * @return {Promise}
    */
   async run() {
-    await this.createWorkingDir();
+    if (!this.workingDir) {
+      await this.createWorkingDir();
+    }
     this.componentDir = path.join(this.workingDir, this.component);
     await this._prepareComponent();
     const result = await this._run();
@@ -107,7 +109,7 @@ class BaseTestRunner extends GitBuild {
    */
   async updateModels(component) {
     if (this.abort) {
-      return Promise.resolve();
+      return;
     }
     logging.verbose(`Generating API models for ${component}`);
     const updater = new AmfModelGenerator(this.workingDir, component);

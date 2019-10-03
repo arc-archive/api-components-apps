@@ -185,7 +185,10 @@ class ComponentModel extends BaseModel {
           return result;
         }
         for (let i = 0, len = components.length; i < len; i++) {
-          result[result.length] = components[i].name;
+          result[result.length] = {
+            org: components[i].org || 'advanced-test-client',
+            name: components[i].name
+          };
         }
         return result;
       });

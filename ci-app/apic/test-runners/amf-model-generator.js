@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { fork } = require('child_process');
-const logging = require('../lib/logging');
+const logging = require('../../lib/logging');
 /**
  * A class representing a model definition in `apis.json` file.
  * The file contains a map of API file location to API spec type.

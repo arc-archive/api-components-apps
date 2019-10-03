@@ -15,67 +15,86 @@ class TestsLogsModel extends BaseModel {
     return browser.browser + browser.version;
   }
 
-  addLogs(testId, componentName, results) {
+  async addLogs(testId, componentName, results) {
     const transaction = this.store.transaction();
-    return transaction
-      .run()
-      .then(() => {
-        const entities = [];
-        for (let i = 0, len = results.length; i < len; i++) {
-          const browser = results[i];
-          const id = this._makeBrowserId(browser);
-          const key = this.createTestLogKey(testId, componentName, id);
-          const data = [
-            {
-              name: 'browser',
-              value: browser.browser,
-              excludeFromIndexes: true
-            },
-            {
-              name: 'version',
-              value: browser.version,
-              excludeFromIndexes: true
-            },
-            {
-              name: 'endTime',
-              value: browser.endTime,
-              excludeFromIndexes: true
-            },
-            {
-              name: 'startTime',
-              value: browser.startTime,
-              excludeFromIndexes: true
-            }
-          ];
-          if (browser.message) {
-            data[data.length] = {
-              name: 'message',
-              value: browser.message,
-              excludeFromIndexes: true
-            };
+    try {
+      await transaction.run();
+
+      const entities = [];
+      for (let i = 0, len = results.length; i < len; i++) {
+        const browser = results[i];
+        const id = this._makeBrowserId(browser);
+        const key = this.createTestLogKey(testId, componentName, id);
+        const data = [
+          {
+            name: 'browser',
+            value: browser.browser,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'endTime',
+            value: browser.endTime,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'startTime',
+            value: browser.startTime,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'total',
+            value: browser.total,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'success',
+            value: browser.success,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'failed',
+            value: browser.failed,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'skipped',
+            value: browser.skipped,
+            excludeFromIndexes: true
+          },
+          {
+            name: 'error',
+            value: browser.error,
+            excludeFromIndexes: true
           }
-          if (browser.logs) {
-            data[data.length] = {
-              name: 'logs',
-              value: browser.logs,
-              excludeFromIndexes: true
-            };
-          }
-          entities[entities.length] = {
-            key,
-            data
+        ];
+        if (browser.message) {
+          data[data.length] = {
+            name: 'message',
+            value: browser.message,
+            excludeFromIndexes: true
           };
         }
+        if (browser.logs) {
+          data[data.length] = {
+            name: 'logs',
+            value: browser.logs,
+            excludeFromIndexes: true
+          };
+        }
+        entities[entities.length] = {
+          key,
+          data
+        };
+      }
 
-        transaction.save(entities);
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        console.error('Error adding test logs', cause);
-        console.log(results);
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
+      transaction.save(entities);
+      return transaction.commit();
+    } catch (cause) {
+      console.error('Error adding test logs', cause);
+      console.log(results);
+      transaction.rollback();
+      throw cause;
+    }
   }
 
   list(testId, componentName, limit, nextPageToken) {

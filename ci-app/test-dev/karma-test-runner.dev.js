@@ -6,7 +6,7 @@ const testConfig = {
   includeDev: false
 };
 
-const runner = new KarmaTestRunner('advanced-rest-client', 'star-rating', testConfig);
+const runner = new KarmaTestRunner('advanced-rest-client', 'file-drop', testConfig);
 runner.run()
 .then(() => console.log('Finished'))
 .catch((cause) => console.log(cause));

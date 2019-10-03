@@ -221,39 +221,37 @@ class TestsModel extends BaseModel {
       });
   }
 
-  updateComponentResult(id, report) {
+  async updateComponentResult(id, report) {
     const transaction = this.store.transaction();
     const key = this.createTestKey(id);
-    return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [test] = data;
-        if (test.status === 'queued') {
-          test.status = 'running';
+    try {
+      await transaction.run();
+      const data = await transaction.get(key);
+      const [test] = data;
+      if (test.status === 'queued') {
+        test.status = 'running';
+      }
+      if (!report.error) {
+        if (!test.passed) {
+          test.passed = 0;
         }
-        if (report.passing) {
-          if (!test.passed) {
-            test.passed = 0;
-          }
-          test.passed++;
-        } else {
-          if (!test.failed) {
-            test.failed = 0;
-          }
-          test.failed++;
+        test.passed++;
+      } else {
+        if (!test.failed) {
+          test.failed = 0;
         }
-        transaction.save({
-          key: key,
-          data: test,
-          excludeFromIndexes: this.excludedIndexes
-        });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
+        test.failed++;
+      }
+      transaction.save({
+        key: key,
+        data: test,
+        excludeFromIndexes: this.excludedIndexes
       });
+      return await transaction.commit();
+    } catch (cause) {
+      transaction.rollback();
+      throw cause;
+    }
   }
 
   finishTest(id, message) {

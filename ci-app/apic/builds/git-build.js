@@ -28,7 +28,7 @@ class GitBuild extends EventEmitter {
    */
   async cleanup() {
     if (!this.workingDir) {
-      return Promise.resolve();
+      return;
     }
     logging.debug('Cleaning up temporaty dir...');
     const exists = await fs.pathExists(this.workingDir);

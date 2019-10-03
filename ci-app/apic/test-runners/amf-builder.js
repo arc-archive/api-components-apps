@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 const path = require('path');
-const logging = require('../lib/logging');
+const logging = require('../../lib/logging');
 
 function prepareAmfBuild(workingDir, branch, sha) {
   return new Promise((resolve, reject) => {

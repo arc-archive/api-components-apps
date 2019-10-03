@@ -55,62 +55,52 @@ class TestsComponentModel extends BaseModel {
     });
   }
 
-  updateComponent(testId, componentName, report) {
+  async updateComponent(testId, componentName, report) {
     const transaction = this.store.transaction();
     const key = this.createTestComponentKey(testId, componentName);
-    return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [component] = data;
-        component.status = report.passing ? 'passed' : 'failed';
-        if (report.retry) {
-          component.retries = report.retry;
-        }
-        component.passed = report.passed;
-        component.failed = report.failed;
-        component.endTime = report.endTime;
-        component.hasLogs = !!report.results.length;
-        if (report.message) {
-          component.message = report.message;
-        }
-        transaction.save({
-          key: key,
-          data: component,
-          excludeFromIndexes: ['passed', 'failed', 'endTime', 'retries', 'status', 'hasLogs', 'message']
-        });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
+    try {
+      await transaction.run();
+      const data = await transaction.get(key);
+      const [component] = data;
+      component.status = report.error ? 'failed' : 'passed';
+      component.total = report.total;
+      component.success = report.success;
+      component.failed = report.failed;
+      component.skipped = report.skipped;
+      component.hasLogs = !!report.results.length;
+      transaction.save({
+        key: key,
+        data: component,
+        excludeFromIndexes: ['total', 'success', 'failed', 'skipped', 'status', 'hasLogs']
       });
+      return await transaction.commit();
+    } catch (cause) {
+      transaction.rollback();
+      throw cause;
+    }
   }
 
-  updateComponentError(testId, componentName, message) {
+  async updateComponentError(testId, componentName, message) {
     const transaction = this.store.transaction();
     const key = this.createTestComponentKey(testId, componentName);
-    return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [component] = data;
-        component.status = 'failed';
-        component.error = true;
-        component.endTime = Date.now();
-        component.hasLogs = false;
-        component.message = message;
-        transaction.save({
-          key: key,
-          data: component,
-          excludeFromIndexes: ['passed', 'failed', 'endTime', 'retries', 'status', 'hasLogs', 'message', 'error']
-        });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        transaction.rollback();
+    try {
+      await transaction.run();
+      const data = await transaction.get(key);
+      const [component] = data;
+      component.status = 'failed';
+      component.error = true;
+      component.hasLogs = false;
+      component.message = message;
+      transaction.save({
+        key: key,
+        data: component,
+        excludeFromIndexes: ['total', 'success', 'failed', 'skipped', 'status', 'hasLogs', 'message', 'error']
       });
+      return await transaction.commit();
+    } catch (cause) {
+      logging.error(cause);
+      transaction.rollback();
+    }
   }
 
   list(testId, limit, nextPageToken) {
