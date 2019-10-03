@@ -186,7 +186,7 @@ class ComponentModel extends BaseModel {
         }
         for (let i = 0, len = components.length; i < len; i++) {
           result[result.length] = {
-            org: components[i].org || 'advanced-test-client',
+            org: components[i].org || 'advanced-rest-client',
             name: components[i].name
           };
         }

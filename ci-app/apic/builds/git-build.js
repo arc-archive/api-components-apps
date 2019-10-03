@@ -62,12 +62,12 @@ class GitBuild extends EventEmitter {
    * @return {Promise}
    */
   async _clone(cloneOpts) {
-    logging.verbose('Cloning the repository...');
     const opts = {
       fetchOpts: this._getFetchOptions()
     };
     const info = Object.assign({}, this.info || {}, cloneOpts || {});
     const componentDir = info.componentDir || this.workingDir;
+    logging.verbose(`Cloning ${info.sshUrl}...`);
     const repo = await Git.Clone(info.sshUrl, componentDir, opts);
     this.repo = repo;
     let ref = await repo.getCurrentBranch();

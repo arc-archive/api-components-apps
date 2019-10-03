@@ -1,4 +1,4 @@
-const Datastore = require('@google-cloud/datastore');
+const { Datastore } = require('@google-cloud/datastore');
 const decamelize = require('decamelize');
 const slug = require('slug');
 const config = require('../../config');

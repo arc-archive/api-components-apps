@@ -46,7 +46,7 @@ class BaseTestRunner extends GitBuild {
   async _prepareComponent() {
     const { component } = this;
     logging.verbose(`Preparing ${component} component to run in test`);
-    await this._prepareClone(component);
+    await this._prepareClone();
     if (this.testConfig.type === 'amf-build') {
       await this.updateModels(component);
     }
@@ -55,18 +55,18 @@ class BaseTestRunner extends GitBuild {
   }
   /**
    * Clones a component into a working directory
-   * @param {String} component Component to clone
    * @return {Promise}
    */
-  async _prepareClone(component) {
+  async _prepareClone() {
     if (this.abort) {
-      return Promise.resolve();
+      return;
     }
-    logging.verbose(`Cloning ${component} component into ${this.workingDir}`);
+    const { repoName, component } = this;
+    logging.verbose(`Cloning ${repoName} component into ${this.workingDir}`);
     try {
       await this._clone({
         branch: 'master',
-        sshUrl: `git@github.com:${this.repoName}.git`,
+        sshUrl: `git@github.com:${repoName}.git`,
         componentDir: path.join(this.workingDir, component)
       });
     } catch (e) {
@@ -82,7 +82,7 @@ class BaseTestRunner extends GitBuild {
    */
   async _prepareDependencies(component) {
     if (this.abort) {
-      return Promise.resolve();
+      return;
     }
     logging.verbose(`Installing dependencies for ${component}`);
     const dm = new DependendenciesManager(path.join(this.workingDir, component));

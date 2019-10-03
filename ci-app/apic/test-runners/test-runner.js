@@ -82,9 +82,11 @@ class ApicTestRunner extends GitBuild {
   async _prepareAmfTest() {
     await this.createWorkingDir();
     logging.verbose('Preparing AMF test...');
+    logging.verbose('Listing AMF components...');
     const result = await this.catalogModel.listApiComponents();
     const skip = this.skipComponents;
-    this.cmps = result.filter((item) => skip.indexOf(item) === -1);
+    this.cmps = result.filter((item) => skip.indexOf(item.name) === -1);
+    logging.verbose(`Found ${this.cmps.length} components to test.`);
     await this.testsModel.updateTestScope(this.entryId, this.cmps.length);
     this.emit('status', this.config.type, 'running');
     return await prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha);
