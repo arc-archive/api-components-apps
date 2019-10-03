@@ -98,22 +98,15 @@ class ApicTestRunner extends GitBuild {
    * @return {Promise}
    */
   async _prepareBottomUpTest() {
-    logging.verbose('Preparing bottom-up test...');
+    logging.verbose(`Preparing bottom-up test for ${this.config.component}...`);
     const data = await this.dependencyModel.listParentComponents(this.config.component, this.config.includeDev);
     const skip = this.skipBottomUpComponents;
-    const thisCmp = this.config.component.split('/');
-    if (thisCmp[0][0] === '@') {
-      thisCmp[0] = thisCmp[0].substr(1);
-    }
-    const result = [{
-      org: thisCmp[0],
-      name: thisCmp[1]
-    }];
+    const result = [];
     for (let i = 0, len = data.length; i < len; i++) {
       const item = data[i].id;
       if (skip.indexOf(item) === -1) {
         const parts = item.split('/');
-        if (parts.length === 0) {
+        if (parts.length === 1) {
           parts.unshift('advanced-rest-client');
         }
         if (parts[0][0] === '@') {
@@ -126,6 +119,7 @@ class ApicTestRunner extends GitBuild {
       }
     }
     this.cmps = result;
+    logging.verbose(`Has ${result.length} dependencies`);
     logging.verbose('Updating test scope...');
     return await this.testsModel.updateTestScope(this.entryId, this.cmps.length);
   }
