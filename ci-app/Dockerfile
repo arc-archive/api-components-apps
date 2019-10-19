@@ -9,9 +9,6 @@ RUN /usr/local/bin/install_node '>=8.12.0'
 
 RUN apt-get update
 
-# Install xvfb.
-RUN apt-get install -y xvfb fluxbox wget wmctrl
-
 #=========
 # Chrome
 #=========
