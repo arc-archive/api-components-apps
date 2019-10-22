@@ -187,7 +187,7 @@ class TestComponentListItem extends PolymerElement {
         <template is="dom-if" if="[[item.hasLogs]]">
           <component-logs-viewer
             test-id="[[testId]]"
-            component-name="[[item.component]]"
+            component-name="[[_computeComponentId(item.component)]]"
             api-base="[[apiBase]]"
             class="viewer"
           ></component-logs-viewer>
@@ -214,8 +214,8 @@ class TestComponentListItem extends PolymerElement {
 
   _computePassed(record) {
     const item = record && record.base;
-    const passed = item && item.passed;
-    return passed || '0';
+    const success = item && item.success;
+    return success || '0';
   }
 
   _computeFailed(record) {
@@ -226,13 +226,13 @@ class TestComponentListItem extends PolymerElement {
 
   _computePassRatio(record) {
     const item = record && record.base;
-    const passed = (item && item.passed) || 0;
+    const success = (item && item.success) || 0;
     const failed = (item && item.failed) || 0;
-    const size = passed + failed;
-    if (!passed || !size) {
+    const size = success + failed;
+    if (!success || !size) {
       return 0;
     }
-    return Math.round((passed / size) * 100);
+    return Math.round((success / size) * 100);
   }
 
   toggleDetails() {
@@ -241,11 +241,17 @@ class TestComponentListItem extends PolymerElement {
 
   _computeResult(status) {
     switch (status) {
-      case 'passed':
+      case 'success':
       case 'failed':
         return status;
       default:
         return 'Unknown';
+    }
+  }
+
+  _computeComponentId(name) {
+    if (name) {
+      return name.replace(/[^a-zA-Z0-9\-]/g, '');
     }
   }
 }

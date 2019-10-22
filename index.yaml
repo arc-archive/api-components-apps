@@ -38,3 +38,9 @@ indexes:
     properties:
     - name: tags
     - name: name
+# dependencies listing
+  - kind: Dependency
+    properties:
+    - name: dependencies
+    - name: org
+    - name: pkg

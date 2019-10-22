@@ -1,12 +1,13 @@
 const { KarmaTestRunner } = require('../apic/test-runners/karma-test-runner.js');
+/* eslint-disable no-console */
 const testConfig = {
-  component: 'events-target-mixin',
+  component: 'arc-icons',
   branch: 'master',
   type: 'bottom-up',
   includeDev: false
 };
 
-const runner = new KarmaTestRunner('advanced-rest-client', 'file-drop', testConfig);
+const runner = new KarmaTestRunner('advanced-rest-client', testConfig.component, testConfig);
 runner.run()
-.then(() => console.log('Finished'))
+.then((result) => console.log(result))
 .catch((cause) => console.log(cause));

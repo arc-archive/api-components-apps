@@ -1,13 +1,12 @@
-'use strict';
-const nconf = (module.exports = require('nconf'));
-const path = require('path');
+import nconf from 'nconf';
+import path from 'path';
+export default nconf;
 
 nconf
   // 1. Command-line arguments
   .argv()
   // 2. Environment variables
   .env([
-    // 'CLOUD_BUCKET',
     'GCLOUD_PROJECT',
     'NODE_ENV',
     'OAUTH2_CLIENT_ID',

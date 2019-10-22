@@ -11,11 +11,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-'use strict';
-const EventEmitter = require('events');
-const { PubSub } = require('@google-cloud/pubsub');
-const config = require('../config');
-const logging = require('./logging');
+import EventEmitter from 'events';
+import { PubSub } from '@google-cloud/pubsub';
+import config from '../config';
+import logging from './logging';
 
 class Background extends EventEmitter {
   constructor() {
@@ -38,76 +37,64 @@ class Background extends EventEmitter {
    * @param {String} name Topic name
    * @return {Promise<Topic>}
    */
-  getTopic(name) {
-    return this.pubsub
-      .topic(name)
-      .get()
-      .then((data) => data[0])
-      .catch(() => {
-        logging.verbose('Creating new topic ' + name);
-        return this.pubsub.createTopic(name).then((data) => data[0]);
-      });
+  async getTopic(name) {
+    try {
+      const [topic] = await this.pubsub.topic(name).get();
+      return topic;
+    } catch (e) {
+      logging.verbose(`Creating new topic ${name}`);
+      const [topic] = await this.pubsub.createTopic(name);
+      return topic;
+    }
   }
   /**
-   * Gets or creates subscription.
+   * Gets or creates Pub/Sub subscription.
    * @param {Topic} topic Existing topic.
    * @param {String} name Subscription name.
    * @return {Promise<Subscription>}
    */
-  getSubscription(topic, name) {
-    return this.pubsub
-      .subscription(name)
-      .get()
-      .then((data) => data[0])
-      .catch(() => {
-        logging.verbose('Creating new subscription ' + name);
-        return this.pubsub
-          .createSubscription(topic, name, {
-            pushConfig: undefined
-          })
-          .then((data) => data[0]);
+  async getSubscription(topic, name) {
+    try {
+      const [subscription] = await this.pubsub.subscription(name).get();
+      return subscription;
+    } catch (e) {
+      logging.verbose(`Creating new subscription ${name}`);
+      const [subscription] = await this.pubsub.createSubscription(topic, name, {
+        pushConfig: undefined
       });
+      return subscription;
+    }
   }
 
-  subscribe() {
-    return this.getTopic(this.topicTestProcess)
-      .then((topic) => this.getSubscription(topic, this.subBuildWorker))
-      .then((subscription) => {
-        subscription.on('message', this.handleMessage.bind(this, this.topicTestProcess));
-        subscription.on('error', this.handleError.bind(this, this.topicTestProcess));
-        logging.verbose(
-          'Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker
-        );
-        this.subscriptions.push(subscription);
-      });
+  async subscribe() {
+    const topic = await this.getTopic(this.topicTestProcess);
+    const subscription = await this.getSubscription(topic, this.subBuildWorker);
+    subscription.on('message', this.handleMessage.bind(this, this.topicTestProcess));
+    subscription.on('error', this.handleError.bind(this, this.topicTestProcess));
+    logging.verbose(
+      'Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker
+    );
+    this.subscriptions.push(subscription);
   }
 
-  subscribeGithubBuild() {
-    return this.getTopic(this.topicGhWebhook)
-      .then((topic) => this.getSubscription(topic, this.subGhCi))
-      .then((subscription) => {
-        subscription.on('message', this.handleMessage.bind(this, this.topicGhWebhook));
-        subscription.on('error', this.handleError.bind(this, this.topicGhWebhook));
-        logging.verbose('Subscribed to a topic: ' + this.topicGhWebhook + ' with subscription ' + this.subGhCi);
-        this.subscriptions.push(subscription);
-      })
-      .catch((cause) => {
-        console.error(cause);
-        throw cause;
-      });
+  async subscribeGithubBuild() {
+    const topic = await this.getTopic(this.topicGhWebhook);
+    const subscription = await this.getSubscription(topic, this.subGhCi);
+    subscription.on('message', this.handleMessage.bind(this, this.topicGhWebhook));
+    subscription.on('error', this.handleError.bind(this, this.topicGhWebhook));
+    logging.verbose('Subscribed to a topic: ' + this.topicGhWebhook + ' with subscription ' + this.subGhCi);
+    this.subscriptions.push(subscription);
   }
 
-  subscribeTestsResults() {
-    return this.getTopic(this.topicTestResult)
-      .then((topic) => this.getSubscription(topic, this.this.subWorkerTestResult))
-      .then((subscription) => {
-        subscription.on('message', this.handleMessage.bind(this, this.topicTestResult));
-        subscription.on('error', this.handleError.bind(this, this.topicTestResult));
-        logging.verbose(
-          'Subscribed to a topic: ' + this.topicTestResult + ' with subscription ' + this.subWorkerTestResult
-        );
-        this.subscriptions.push(subscription);
-      });
+  async subscribeTestsResults() {
+    const topic = await this.getTopic(this.topicTestResult);
+    const subscription = await this.getSubscription(topic, this.subWorkerTestResult);
+    subscription.on('message', this.handleMessage.bind(this, this.topicTestResult));
+    subscription.on('error', this.handleError.bind(this, this.topicTestResult));
+    logging.verbose(
+      'Subscribed to a topic: ' + this.topicTestResult + ' with subscription ' + this.subWorkerTestResult
+    );
+    this.subscriptions.push(subscription);
   }
 
   handleMessage(topic, message) {
@@ -128,100 +115,95 @@ class Background extends EventEmitter {
     this.subscriptions = [];
   }
 
-  publish(payload, topicName) {
-    return this.getTopic(topicName)
-      .then((topic) => {
-        return topic.publisher.publish(Buffer.from(JSON.stringify(payload)));
-      })
-      .then(() => {
-        logging.info('Message published to topic ' + topicName);
-      })
-      .catch((cause) => {
-        console.error(cause);
-        logging.error('Error occurred while queuing background task', cause);
-      });
+  async publish(payload, topicName) {
+    try {
+      const topic = await this.getTopic(topicName);
+      await topic.publisher.publish(Buffer.from(JSON.stringify(payload)));
+      logging.info(`Message published to topic ${topicName}`);
+    } catch (e) {
+      logging.error('Error occurred while queuing background task', e);
+    }
   }
   /**
    * Queues a test to be performed by the worker
    * @param {String} id Datastore id of the test
    * @return {Promise}
    */
-  queueTest(id) {
+  async queueTest(id) {
     const data = {
       action: 'runTest',
       id
     };
-    return this.publish(data, this.topicTestProcess);
+    await this.publish(data, this.topicTestProcess);
   }
 
-  dequeueTest(id) {
+  async dequeueTest(id) {
     const data = {
       action: 'removeTest',
       id
     };
-    return this.publish(data, this.topicTestProcess);
+    await this.publish(data, this.topicTestProcess);
   }
   /**
    * Sends information to the background worker to queue a build
    * @param {String} id Build id
    * @return {Promise}
    */
-  queueStageBuild(id) {
+  async queueStageBuild(id) {
     const data = {
       action: 'process-build',
       id
     };
-    return this.publish(data, this.topicGhWebhook);
+    await this.publish(data, this.topicGhWebhook);
   }
   /**
    * Sends information to the background worker to remove build from it's queue.
    * @param {String} id Build id
    * @return {Promise}
    */
-  dequeueBuild(id) {
+  async dequeueBuild(id) {
     const data = {
       action: 'remove-build',
       id
     };
-    return this.publish(data, this.topicGhWebhook);
+    await this.publish(data, this.topicGhWebhook);
   }
 
-  sendComponentTestResult(id, result) {
+  async sendComponentTestResult(id, result) {
     const data = {
       action: 'component-test-result-ready',
       id,
       result
     };
-    return this.publish(data, this.topicTestResult);
+    await this.publish(data, this.topicTestResult);
   }
 
-  sendBuildingAmfStatus(id, status) {
+  async sendBuildingAmfStatus(id, status) {
     const data = {
       action: 'amd-building-status',
       id,
       status
     };
-    return this.publish(data, this.topicTestResult);
+    await this.publish(data, this.topicTestResult);
   }
 
-  sendTestError(id, message) {
+  async sendTestError(id, message) {
     const data = {
       action: 'test-running-error',
       id,
       message
     };
-    return this.publish(data, this.topicTestResult);
+    await this.publish(data, this.topicTestResult);
   }
 
-  sendTestFinished(id, result) {
+  async sendTestFinished(id, result) {
     const data = {
       action: 'test-running-finished',
       id,
       result
     };
-    return this.publish(data, this.topicTestResult);
+    await this.publish(data, this.topicTestResult);
   }
 }
-
 const instance = new Background();
-module.exports = instance;
+export default instance;

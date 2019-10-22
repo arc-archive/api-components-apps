@@ -1,14 +1,14 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config');
+import jwt from 'jsonwebtoken';
+import config from '../config';
 
-const scopes = (module.exports.scopes = [
+export const scopes = [
   'all',
   'create-test',
   'delete-test',
   'create-message',
   'delete-message',
   'schedule-component-build'
-]);
+];
 const tokenIssuer = 'urn:arc-ci';
 
 /**
@@ -19,7 +19,7 @@ const tokenIssuer = 'urn:arc-ci';
  * - expiresIn: {String} Describes when the token expires, optional.
  * @return {String} Generated token.
  */
-function generateToken(user, createInfo) {
+export function generateToken(user, createInfo) {
   const secret = config.get('SECRET');
   const data = {
     uid: user.id,
@@ -33,9 +33,8 @@ function generateToken(user, createInfo) {
   }
   return jwt.sign(data, secret, opts);
 }
-module.exports.generateToken = generateToken;
 
-function verifyToken(token) {
+export function verifyToken(token) {
   return new Promise((resolve, reject) => {
     jwt.verify(token, config.get('SECRET'), function(err, decoded) {
       if (err) {
@@ -74,32 +73,26 @@ function verifyToken(token) {
     });
   });
 }
-module.exports.verifyToken = verifyToken;
 
-function verifyTokenSync(token) {
+export function verifyTokenSync(token) {
   return jwt.verify(token, config.get('SECRET'));
 }
-module.exports.verifyTokenSync = verifyTokenSync;
 
-function hasScope(token, required) {
+export function hasScope(token, required) {
   const scopes = token.scopes || [];
   return scopes.indexOf(required) !== -1;
 }
-module.exports.hasScope = hasScope;
 
-function isValidScope(scope) {
+export function isValidScope(scope) {
   return scopes.indexOf(scope) !== -1;
 }
-module.exports.isValidScope = isValidScope;
 
-function areScopesValid(userScopes) {
+export function areScopesValid(userScopes) {
   const missing = userScopes.some((scope) => scopes.indexOf(scope) === -1);
   return !missing;
 }
-module.exports.areScopesValid = areScopesValid;
 
-function isTokenExpired(token) {
+export function isTokenExpired(token) {
   const now = Date.now() / 1000;
   return token.expires <= now;
 }
-module.exports.isTokenExpired = isTokenExpired;

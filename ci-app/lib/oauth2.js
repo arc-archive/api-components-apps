@@ -1,11 +1,11 @@
-'use strict';
+import express from 'express';
+import config from '../config';
+import { UserModel } from '../models/user-model.js';
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 
-const express = require('express');
-const config = require('../config');
-const { UserModel } = require('../apic/models/user-model');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const model = new UserModel();
+
 // Configure the Google strategy for use by Passport.js.
 //
 // OAuth 2-based strategies require a `verify` function which receives the
@@ -37,26 +37,26 @@ passport.use(
 passport.serializeUser((user, cb) => {
   cb(null, user.id);
 });
-passport.deserializeUser((id, cb) => {
-  model
-    .getUser(id)
-    .then((user) => {
-      cb(null, user || false);
-    })
-    .catch((cause) => {
-      cb(cause);
-    });
+
+passport.deserializeUser(async (id, cb) => {
+  try {
+    const user = await model.getUser(id);
+    cb(null, user || false);
+  } catch (e) {
+    cb(e);
+  }
 });
 
-const router = express.Router();
+export const router = express.Router();
 
 // Middleware that requires the user to be logged in. If the user is not logged
 // in, it will redirect the user to authorize the application and then return
 // them to the original URL they requested.
-function authRequired(req, res, next) {
+export function authRequired(req, res, next) {
   if (!req.user) {
     req.session.oauth2return = req.originalUrl;
-    return res.redirect('/auth/login');
+    res.redirect('/auth/login');
+    return;
   }
   next();
 }
@@ -105,8 +105,3 @@ router.get('/auth/logout', (req, res) => {
   req.logout();
   res.redirect('/');
 });
-
-module.exports = {
-  router: router,
-  required: authRequired
-};
