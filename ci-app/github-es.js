@@ -130,11 +130,9 @@ const worker = new GithubBuild();
 app.get('/:id', worker.routeRun.bind(worker));
 app.use(logging.errorLogger);
 
-if (module === require.main) {
-  const server = app.listen(config.get('PORT'), () => {
-    const port = server.address().port;
-    /* eslint-disable no-console */
-    console.log(`GitHub worker listening on port ${port}`);
-  });
-  worker.subscribe();
-}
+const server = app.listen(config.get('PORT'), () => {
+  const port = server.address().port;
+  /* eslint-disable no-console */
+  console.log(`GitHub worker listening on port ${port}`);
+});
+worker.subscribe();
