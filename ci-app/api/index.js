@@ -7,6 +7,7 @@ import githubRoute from './github-api.js';
 import groupsRoute from './groups-api.js';
 import componentsRoute from './components-api.js';
 import messagesRoute from './messages-api.js';
+import analyticsRoute from './analytics-api.js';
 
 const router = express.Router();
 export default router;
@@ -25,6 +26,8 @@ router.use('/groups', groupsRoute);
 router.use('/components', componentsRoute);
 // ARC info messages
 router.use('/messages', messagesRoute);
+// ARC analytics route
+router.use('/analytics', analyticsRoute);
 // Errors
 router.use((req, res) => {
   const message = `Route ${req.url} not found`;
