@@ -1,19 +1,20 @@
 'use strict';
 
-const winston = require('winston');
-const expressWinston = require('express-winston');
-const StackdriverTransport = require('@google-cloud/logging-winston').LoggingWinston;
+import winston from 'winston';
+import expressWinston from 'express-winston';
+import { LoggingWinston } from '@google-cloud/logging-winston';
+import config from '../config';
 
-const colorize = process.env.NODE_ENV !== 'production';
+const colorize = config.get('NODE_ENV') !== 'production';
 
 // Logger to capture all requests and output them to the console.
 const requestLogger = expressWinston.logger({
   level: 'warn',
   transports: [
-    new StackdriverTransport(),
+    new LoggingWinston(),
     new winston.transports.Console({
       json: false,
-      colorize: colorize,
+      colorize
     })
   ],
   expressFormat: true,
@@ -24,10 +25,10 @@ const requestLogger = expressWinston.logger({
 const errorLogger = expressWinston.errorLogger({
   level: 'warn',
   transports: [
-    new StackdriverTransport(),
+    new LoggingWinston(),
     new winston.transports.Console({
       json: true,
-      colorize: colorize,
+      colorize
     })
   ]
 });
@@ -37,14 +38,13 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.Console({
       json: false,
-      colorize: colorize
+      colorize
     })
   ]
 });
-
-module.exports = {
-  requestLogger: requestLogger,
-  errorLogger: errorLogger,
+export default {
+  errorLogger,
+  requestLogger,
   error: logger.error.bind(logger),
   warn: logger.warn.bind(logger),
   info: logger.info.bind(logger),

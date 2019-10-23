@@ -38,12 +38,53 @@
     "husky": "^1.0.0",
     "lint-staged": "^8.0.0",
     "mocha": "^6.2.0",
-    "sinon": "^7.4.2"
+    "sinon": "^7.4.1",
+    "prettier": "^1.15.0"
   },
   "lint-staged": {
     "*.js": [
       "eslint --fix",
       "git add"
     ]
+  },
+  "eslintConfig": {
+    "extends": [
+      "eslint-config-google"
+    ],
+    "parserOptions": {
+      "sourceType": "module",
+      "ecmaVersion": 8
+    },
+    "env": {
+      "browser": true,
+      "mocha": true,
+      "node": true,
+      "es6": true
+    },
+    "rules": {
+      "no-undef": "error",
+      "require-jsdoc": 0,
+      "comma-dangle": 0,
+      "new-cap": [
+        "error",
+        {
+          "properties": false,
+          "capIsNew": false
+        }
+      ],
+      "max-len": [
+        "error",
+        {
+          "code": 120
+        }
+      ],
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ],
+      "no-console": [
+        "error"
+      ]
+    }
   }
 }

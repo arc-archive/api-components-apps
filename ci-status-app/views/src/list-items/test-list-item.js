@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import 'time-elements/dist/time-elements.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/paper-button/paper-button.js';
@@ -8,107 +8,107 @@ class TestListItem extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        @apply --paper-font-body1;
-      }
-
-      .item-container,
-      .data-container {
-        @apply --layout-horizontal;
-      }
-
-      .data-container {
-        @apply --layout-flex;
-      }
-
-      .item:first-child {
-        margin-left: 0;
-      }
-
-      .item:last-of-type {
-        margin-right: 0;
-      }
-
-      .item {
-        @apply --layout-vertical;
-        padding: 4px 8px;
-        margin: 4px 24px;
-        width: 30%;
-      }
-
-      .item.max {
-        @apply --layout-flex;
-      }
-
-      .item label {
-        display: block;
-        color: #757575;
-        @apply --paper-font-caption;
-      }
-
-      .item > div {
-        display: block;
-      }
-
-      .result-status {
-        color: #2E7D32;
-      }
-
-      :host([failed]) .result-status {
-        color: #F44336;
-      }
-
-      .test-status {
-        text-transform: capitalize;
-      }
-
-      .source-commit {
-        color: #9E9E9E;
-        font-size: 12px;
-        max-width: 120px;
-        @apply --paper-font-common-nowrap;
-      }
-
-      .component {
-        width: 120px;
-        @apply --paper-font-common-nowrap;
-      }
-
-      a {
-        color: currentColor;
-      }
-
-      .time-item {
-        width: 120px;
-        @apply --paper-font-common-nowrap;
-      }
-
-      @media (max-width: 760px) {
-        .item {
-          @apply --layout-vertical;
-          margin: 4px 0;
-          width: 100%;
+        :host {
+          display: block;
+          @apply --paper-font-body1;
         }
 
-        .item.detail-result {
-          display: none !important;
-        }
-
-        .item.narrow {
-          @apply --layout-vertical;
+        .item-container,
+        .data-container {
+          @apply --layout-horizontal;
         }
 
         .data-container {
+          @apply --layout-flex;
+        }
+
+        .item:first-child {
+          margin-left: 0;
+        }
+
+        .item:last-of-type {
+          margin-right: 0;
+        }
+
+        .item {
           @apply --layout-vertical;
-          @apply --layout-start;
-          width: 100%;
+          padding: 4px 8px;
+          margin: 4px 24px;
+          width: 30%;
         }
 
         .item.max {
-          @apply --layout-flex-none;
+          @apply --layout-flex;
         }
-      }
+
+        .item label {
+          display: block;
+          color: #757575;
+          @apply --paper-font-caption;
+        }
+
+        .item > div {
+          display: block;
+        }
+
+        .result-status {
+          color: #2e7d32;
+        }
+
+        :host([failed]) .result-status {
+          color: #f44336;
+        }
+
+        .test-status {
+          text-transform: capitalize;
+        }
+
+        .source-commit {
+          color: #9e9e9e;
+          font-size: 12px;
+          max-width: 120px;
+          @apply --paper-font-common-nowrap;
+        }
+
+        .component {
+          width: 120px;
+          @apply --paper-font-common-nowrap;
+        }
+
+        a {
+          color: currentColor;
+        }
+
+        .time-item {
+          width: 120px;
+          @apply --paper-font-common-nowrap;
+        }
+
+        @media (max-width: 760px) {
+          .item {
+            @apply --layout-vertical;
+            margin: 4px 0;
+            width: 100%;
+          }
+
+          .item.detail-result {
+            display: none !important;
+          }
+
+          .item.narrow {
+            @apply --layout-vertical;
+          }
+
+          .data-container {
+            @apply --layout-vertical;
+            @apply --layout-start;
+            width: 100%;
+          }
+
+          .item.max {
+            @apply --layout-flex-none;
+          }
+        }
       </style>
       <div class="item-container">
         <div class="data-container">
@@ -152,11 +152,11 @@ class TestListItem extends PolymerElement {
   static get properties() {
     return {
       item: Object,
-      isAmfBuild: {type: Boolean, computed: '_computeIsAmfBuid(item.type)'},
-      isFinished: {type: Boolean, value: false, computed: '_computeIsFinished(item.status)'},
-      failed: {type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)'},
-      queued: {type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)'},
-      running: {type: Boolean, reflectToAttribute: true, computed: '_computeRunning(item.status)'},
+      isAmfBuild: { type: Boolean, computed: '_computeIsAmfBuid(item.type)' },
+      isFinished: { type: Boolean, value: false, computed: '_computeIsFinished(item.status)' },
+      failed: { type: Boolean, value: false, reflectToAttribute: true, computed: '_computeIsFailed(item)' },
+      queued: { type: Boolean, reflectToAttribute: true, computed: '_computeIsQueued(item.status)' },
+      running: { type: Boolean, reflectToAttribute: true, computed: '_computeRunning(item.status)' },
       resultLabel: {
         type: String,
         computed: '_computeResultLabel(isFinished, failed)'
@@ -169,10 +169,14 @@ class TestListItem extends PolymerElement {
       return '';
     }
     switch (item.status) {
-      case 'queued': return 'Scheduled';
-      case 'running': return 'Started';
-      case 'finished': return 'Ended';
-      default: return '';
+      case 'queued':
+        return 'Scheduled';
+      case 'running':
+        return 'Started';
+      case 'finished':
+        return 'Ended';
+      default:
+        return '';
     }
   }
 
@@ -182,9 +186,15 @@ class TestListItem extends PolymerElement {
     }
     let time;
     switch (item.status) {
-      case 'queued': time = item.created; break;
-      case 'running': time = item.startTime; break;
-      case 'finished': time = item.endTime; break;
+      case 'queued':
+        time = item.created;
+        break;
+      case 'running':
+        time = item.startTime;
+        break;
+      case 'finished':
+        time = item.endTime;
+        break;
     }
     if (!time || isNaN(time)) {
       return;
@@ -257,7 +267,7 @@ class TestListItem extends PolymerElement {
     if (!passed || !size) {
       return 0;
     }
-    return Math.round(passed/size * 100);
+    return Math.round((passed / size) * 100);
   }
 }
 

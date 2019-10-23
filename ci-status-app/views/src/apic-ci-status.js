@@ -1,6 +1,6 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
-import {setPassiveTouchGestures, setRootPath} from '@polymer/polymer/lib/utils/settings.js';
+import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
+import { setPassiveTouchGestures, setRootPath } from '@polymer/polymer/lib/utils/settings.js';
 import '@polymer/app-layout/app-header/app-header.js';
 import '@polymer/app-layout/app-header-layout/app-header-layout.js';
 import '@polymer/app-layout/app-toolbar/app-toolbar.js';
@@ -46,7 +46,7 @@ class ApicCiStatus extends PolymerElement {
           background-color: var(--primary-background-color);
           @apply --layout-fit;
           @apply --paper-font-body1;
-          --primary-color: #00A2DF;
+          --primary-color: #00a2df;
           --primary-text-color: rgba(0, 0, 0, 0.87);
           --primary-background-color: #ffffff;
           --secondary-text-color: #737373;
@@ -55,10 +55,10 @@ class ApicCiStatus extends PolymerElement {
 
           --light-primary-color: var(--paper-indygo-100);
           --dark-primary-color: var(--paper-blue-700);
-          --accent-color: #2196F3;
+          --accent-color: #2196f3;
           --accent-text-color: #fff;
-          --light-accent-color: #64B5F6;
-          --dark-accent-color: #1565C0;
+          --light-accent-color: #64b5f6;
+          --dark-accent-color: #1565c0;
 
           --toolbar-color: #ffffff;
           --toolbar-background-color: var(--primary-color);
@@ -69,12 +69,12 @@ class ApicCiStatus extends PolymerElement {
           --paper-tabs-content: {
             color: #fff;
             font-weight: 400;
-          };
+          }
 
           --paper-tab-content-unselected: {
             color: #fff;
             font-weight: 400;
-          };
+          }
 
           --app-screen-max-width: 1200px;
           --app-screen-margin: 24px auto;
@@ -145,7 +145,7 @@ class ApicCiStatus extends PolymerElement {
         }
 
         .login-button {
-          background-color: #FAFAFA;
+          background-color: #fafafa;
           color: #00a2df;
         }
 
@@ -184,12 +184,17 @@ class ApicCiStatus extends PolymerElement {
       <app-location id="loc" route="{{route}}" use-hash-as-path url-space-regex="^((?!/auth).)*$"></app-location>
       <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
       <app-route route="{{subroute}}" pattern="/:id" data="{{pageData}}" tail="{{pageTail}}"></app-route>
-      <user-data-factory api-base="[[apiBase]]" user="{{user}}" logged-in="{{loggedIn}}" api-token="[[apiToken]]"></user-data-factory>
+      <user-data-factory
+        api-base="[[apiBase]]"
+        user="{{user}}"
+        logged-in="{{loggedIn}}"
+        api-token="[[apiToken]]"
+      ></user-data-factory>
       <app-header-layout has-scrolling-region id="scrollingRegion">
         <app-header fixed shadow scroll-target="scrollingRegion" slot="header">
           <app-toolbar>
             <a href="#/status" class="main-link">
-              <img src="images/arc-icon.png" class="app-icon" alt="ARC logo"/>
+              <img src="images/arc-icon.png" class="app-icon" alt="ARC logo" />
             </a>
             <div main-title>API components CI</div>
             <paper-tabs attr-for-selected="name" selected="{{routeData.page}}">
@@ -199,7 +204,12 @@ class ApicCiStatus extends PolymerElement {
             <div class="tabs-spacer"></div>
             <template is="dom-if" if="[[loggedIn]]">
               <paper-menu-button horizontal-align="right">
-                <paper-icon-button src="[[user.imageUrl]]" icon="[[_computeUserIcon(user)]]" slot="dropdown-trigger" class="user-icon"></paper-icon-button>
+                <paper-icon-button
+                  src="[[user.imageUrl]]"
+                  icon="[[_computeUserIcon(user)]]"
+                  slot="dropdown-trigger"
+                  class="user-icon"
+                ></paper-icon-button>
                 <paper-listbox slot="dropdown-content">
                   <a href="#/tokens">
                     <paper-item>Tokens</paper-item>
@@ -223,15 +233,33 @@ class ApicCiStatus extends PolymerElement {
         <div class="content">
           <iron-pages role="main" attr-for-selected="name" selected="[[page]]" selected-attribute="opened">
             <arc-status name="status" api-base="[[apiBase]]" loading="{{loading}}"></arc-status>
-            <arc-test-details name="test-details" test-id="[[pageData.id]]" api-base="[[apiBase]]" loading="{{loading}}" can-create="[[canCreate]]" api-token="[[apiToken]]"></arc-test-details>
+            <arc-test-details
+              name="test-details"
+              test-id="[[pageData.id]]"
+              api-base="[[apiBase]]"
+              loading="{{loading}}"
+              can-create="[[canCreate]]"
+              api-token="[[apiToken]]"
+            ></arc-test-details>
             <arc-add-test name="add-test" api-base="[[apiBase]]" loading="{{loading}}"></arc-add-test>
             <arc-tokens name="tokens" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-tokens>
             <arc-add-token name="add-token" api-base="[[apiBase]]" api-token="[[apiToken]]"></arc-add-token>
-            <arc-changelog name="changelog" api-base="[[apiBase]]" api-token="[[apiToken]]" loading="{{loading}}"></arc-changelog>
+            <arc-changelog
+              name="changelog"
+              api-base="[[apiBase]]"
+              api-token="[[apiToken]]"
+              loading="{{loading}}"
+            ></arc-changelog>
             <arc-404 name="arc-404"></arc-404>
           </iron-pages>
           <template is="dom-if" if="[[canCreate]]">
-            <paper-fab class="status-add-test" title="Schedule a test" icon="apic:add" on-click="_createTestHandler" away$="[[!isStatusPage]]"></paper-fab>
+            <paper-fab
+              class="status-add-test"
+              title="Schedule a test"
+              icon="apic:add"
+              on-click="_createTestHandler"
+              away$="[[!isStatusPage]]"
+            ></paper-fab>
           </template>
         </div>
       </app-header-layout>
@@ -260,12 +288,12 @@ class ApicCiStatus extends PolymerElement {
       // True if application drawer is opened.
       drawerOpened: Boolean,
       apiBase: String,
-      loading: {type: Boolean},
+      loading: { type: Boolean },
       testsList: Array,
       componentsList: Array,
       hasMoreTests: Boolean,
       hasMoreComponents: Boolean,
-      loggedIn: {type: Boolean, observer: '_loggedInChanged'},
+      loggedIn: { type: Boolean, observer: '_loggedInChanged' },
       user: Object,
       canCreate: {
         type: Boolean,
@@ -282,9 +310,7 @@ class ApicCiStatus extends PolymerElement {
   }
 
   static get observers() {
-    return [
-      '_routePageChanged(routeData.page)'
-    ];
+    return ['_routePageChanged(routeData.page)'];
   }
 
   constructor() {
@@ -359,12 +385,12 @@ class ApicCiStatus extends PolymerElement {
     }
     /* global gtag */
     gtag('config', 'UA-71458341-7', {
-      'page_path': '/' + page
+      page_path: '/' + page
     });
   }
 
   _computeUserIcon(user) {
-    return (user && user.imageUrl) ? undefined : 'apic:account-circle';
+    return user && user.imageUrl ? undefined : 'apic:account-circle';
   }
 
   _computeCanCreate(loggedIn, orgUser) {

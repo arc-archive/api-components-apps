@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 import '@polymer/paper-item/paper-item.js';
@@ -14,52 +14,52 @@ class ArcAddTest extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        position: relative;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      a {
-        color: currentColor;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      .submit {
-        background-color: var(--accent-color);
-        color: var(--accent-text-color);
-      }
-
-      .dev-option {
-        margin: 20px 0;
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
+          display: block;
+          position: relative;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-      }
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        a {
+          color: currentColor;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        .submit {
+          background-color: var(--accent-color);
+          color: var(--accent-text-color);
+        }
+
+        .dev-option {
+          margin: 20px 0;
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+        }
       </style>
       <header>
         <a href="#/">
@@ -67,7 +67,13 @@ class ArcAddTest extends PolymerElement {
         </a>
         <h1>Schedule a test</h1>
       </header>
-      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" on-iron-form-presubmit="_presubmit" id="iform" with-credentials>
+      <iron-form
+        on-iron-form-response="_handleResponse"
+        on-iron-form-error="_handleError"
+        on-iron-form-presubmit="_presubmit"
+        id="iform"
+        with-credentials
+      >
         <form id="form" method="POST" action="[[apiBase]]tests" enctype="application/json">
           <paper-dropdown-menu label="Test type" name="type" required>
             <paper-listbox slot="dropdown-content" selected="{{selectedType}}">
@@ -133,25 +139,29 @@ class ArcAddTest extends PolymerElement {
   }
 
   _handleResponse(e) {
-    const {id} = e.detail.response;
+    const { id } = e.detail.response;
     if (!id) {
       this._renderError('Something went wrong. Unexpected response.');
       return;
     }
-    this.dispatchEvent(new CustomEvent('test-added', {
-      composed: true,
-      bubbles: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('test-added', {
+        composed: true,
+        bubbles: true
+      })
+    );
     this.loading = false;
     this.$.form.reset();
     this.selectedType = -1;
-    this.dispatchEvent(new CustomEvent('navigate', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        path: '/status'
-      }
-    }));
+    this.dispatchEvent(
+      new CustomEvent('navigate', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          path: '/status'
+        }
+      })
+    );
   }
 }
 window.customElements.define('arc-add-test', ArcAddTest);

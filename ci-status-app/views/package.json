@@ -2,7 +2,7 @@
   "name": "api-components-status-frontend",
   "description": "Frontend for API components integration tests",
   "dependencies": {
-    "@polymer/app-layout": "^3.0.2",
+    "@polymer/app-layout": "^3.1.0",
     "@polymer/app-route": "^3.0.2",
     "@polymer/iron-ajax": "^3.0.1",
     "@polymer/iron-flex-layout": "^3.0.1",
@@ -17,23 +17,23 @@
     "@polymer/paper-checkbox": "^3.1.0",
     "@polymer/paper-dropdown-menu": "^3.0.1",
     "@polymer/paper-fab": "^3.0.1",
-    "@polymer/paper-icon-button": "^3.0.1",
-    "@polymer/paper-input": "^3.0.1",
+    "@polymer/paper-icon-button": "^3.0.2",
+    "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-item": "^3.0.1",
     "@polymer/paper-listbox": "^3.0.1",
     "@polymer/paper-menu-button": "^3.0.1",
     "@polymer/paper-progress": "github:PolymerElements/paper-progress",
-    "@polymer/paper-tabs": "^3.0.1",
+    "@polymer/paper-tabs": "^3.1.0",
     "@polymer/paper-toast": "^3.0.1",
     "@polymer/paper-toggle-button": "^3.0.1",
-    "@polymer/polymer": "^3.0.0",
+    "@polymer/polymer": "^3.3.0",
     "time-elements": "^1.2.0"
   },
   "devDependencies": {
     "@polymer/test-fixture": "^4.0.2",
-    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "@webcomponents/webcomponentsjs": "^2.3.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0",
-    "wct-mocha": "^1.0.0"
+    "wct-mocha": "^1.0.1"
   }
 }

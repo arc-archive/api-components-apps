@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
 import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 import '@polymer/paper-item/paper-item.js';
@@ -15,62 +15,62 @@ class ArcAddToken extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        position: relative;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      a {
-        color: currentColor;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      .submit {
-        background-color: var(--accent-color);
-        color: var(--accent-text-color);
-      }
-
-      .scopes-selector,
-      .time-selector {
-        @apply --layout-vertical;
-        margin: 12px 0;
-      }
-
-      .scopes-selector paper-checkbox {
-        margin: 8px 0;
-      }
-
-      .time-settings-row {
-        @apply --layout-horizontal;
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
+          display: block;
+          position: relative;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-      }
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        a {
+          color: currentColor;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        .submit {
+          background-color: var(--accent-color);
+          color: var(--accent-text-color);
+        }
+
+        .scopes-selector,
+        .time-selector {
+          @apply --layout-vertical;
+          margin: 12px 0;
+        }
+
+        .scopes-selector paper-checkbox {
+          margin: 8px 0;
+        }
+
+        .time-settings-row {
+          @apply --layout-horizontal;
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+        }
       </style>
       <header>
         <a href="#/tokens">
@@ -78,7 +78,13 @@ class ArcAddToken extends PolymerElement {
         </a>
         <h1>Create API token</h1>
       </header>
-      <iron-form on-iron-form-response="_handleResponse" on-iron-form-error="_handleError" on-iron-form-presubmit="_presubmitHandler" id="iform" with-credentials>
+      <iron-form
+        on-iron-form-response="_handleResponse"
+        on-iron-form-error="_handleError"
+        on-iron-form-presubmit="_presubmitHandler"
+        id="iform"
+        with-credentials
+      >
         <form id="form" method="POST" action="[[apiBase]]me/tokens" enctype="application/json">
           <paper-input label="Token name (optional)" name="name"></paper-input>
 
@@ -87,15 +93,29 @@ class ArcAddToken extends PolymerElement {
             <paper-checkbox name="scopes" value="all" checked="{{allScopes}}">All</paper-checkbox>
             <paper-checkbox name="scopes" value="create-test" disabled="[[allScopes]]">create-test</paper-checkbox>
             <paper-checkbox name="scopes" value="delete-test" disabled="[[allScopes]]">delete-test</paper-checkbox>
-            <paper-checkbox name="scopes" value="create-message" disabled="[[allScopes]]">create-message</paper-checkbox>
-            <paper-checkbox name="scopes" value="delete-message" disabled="[[allScopes]]">delete-message</paper-checkbox>
-            <paper-checkbox name="scopes" value="schedule-component-build" disabled="[[allScopes]]">schedule-component-build</paper-checkbox>
+            <paper-checkbox name="scopes" value="create-message" disabled="[[allScopes]]"
+              >create-message</paper-checkbox
+            >
+            <paper-checkbox name="scopes" value="delete-message" disabled="[[allScopes]]"
+              >delete-message</paper-checkbox
+            >
+            <paper-checkbox name="scopes" value="schedule-component-build" disabled="[[allScopes]]"
+              >schedule-component-build</paper-checkbox
+            >
           </div>
 
           <div class="time-selector">
             <paper-toggle-button checked="{{expiresEnabled}}">Token expires</paper-toggle-button>
             <div class="time-settings-row">
-              <paper-input label="Expires in" name="ei" type="number" value="1" required auto-validate disabled="[[!expiresEnabled]]"></paper-input>
+              <paper-input
+                label="Expires in"
+                name="ei"
+                type="number"
+                value="1"
+                required
+                auto-validate
+                disabled="[[!expiresEnabled]]"
+              ></paper-input>
               <paper-dropdown-menu label="Time unit" name="tu" required disabled="[[!expiresEnabled]]">
                 <paper-listbox slot="dropdown-content" selected="0">
                   <paper-item role="option" label="y">years</paper-item>
@@ -149,24 +169,28 @@ class ArcAddToken extends PolymerElement {
   }
 
   _handleResponse(e) {
-    const {id} = e.detail.response;
+    const { id } = e.detail.response;
     if (!id) {
       this._renderError('Something went wrong. Unexpected response.');
       return;
     }
     this.loading = false;
     this.$.form.reset();
-    this.dispatchEvent(new CustomEvent('navigate', {
-      composed: true,
-      bubbles: true,
-      detail: {
-        path: '/tokens'
-      }
-    }));
-    this.dispatchEvent(new CustomEvent('data-model-refresh-tokens', {
-      composed: true,
-      bubbles: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent('navigate', {
+        composed: true,
+        bubbles: true,
+        detail: {
+          path: '/tokens'
+        }
+      })
+    );
+    this.dispatchEvent(
+      new CustomEvent('data-model-refresh-tokens', {
+        composed: true,
+        bubbles: true
+      })
+    );
   }
 
   _presubmitHandler(e) {

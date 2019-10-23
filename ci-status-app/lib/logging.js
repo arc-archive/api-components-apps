@@ -12,7 +12,7 @@ const requestLogger = expressWinston.logger({
     new StackdriverTransport(),
     new winston.transports.Console({
       json: false,
-      colorize: colorize,
+      colorize: colorize
     })
   ],
   expressFormat: true,
@@ -25,7 +25,7 @@ const errorLogger = expressWinston.errorLogger({
     new StackdriverTransport(),
     new winston.transports.Console({
       json: true,
-      colorize: colorize,
+      colorize: colorize
     })
   ]
 });
@@ -49,5 +49,5 @@ module.exports = {
   log: logger.log,
   verbose: logger.verbose,
   debug: logger.debug,
-  silly: logger.silly,
+  silly: logger.silly
 };

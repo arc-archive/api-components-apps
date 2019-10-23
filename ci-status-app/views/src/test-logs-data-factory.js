@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-ajax/iron-ajax';
 
 // [testId][componentName] = {hasMore, data}
@@ -10,7 +10,9 @@ class TestLogsDataFactory extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {display: none !important;}
+        :host {
+          display: none !important;
+        }
       </style>
       <iron-ajax
         id="request"
@@ -20,7 +22,9 @@ class TestLogsDataFactory extends PolymerElement {
         params="[[requestParams]]"
         on-response="_handleResponse"
         with-credentials
-        debounce-duration="300">
+        debounce-duration="300"
+      >
+      </iron-ajax>
     `;
   }
 
@@ -29,17 +33,15 @@ class TestLogsDataFactory extends PolymerElement {
       apiBase: String,
       testId: String,
       componentName: String,
-      list: {type: Array, notify: true},
-      hasMore: {type: Boolean, notify: true},
-      loading: {type: Boolean, notify: true},
+      list: { type: Array, notify: true },
+      hasMore: { type: Boolean, notify: true },
+      loading: { type: Boolean, notify: true },
       requestParams: Object
     };
   }
 
   static get observers() {
-    return [
-      '_paramsChanged(testId, componentName)'
-    ];
+    return ['_paramsChanged(testId, componentName)'];
   }
 
   connectedCallback() {

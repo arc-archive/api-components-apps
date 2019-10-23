@@ -1,11 +1,13 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-ajax/iron-ajax';
 
 class UserDataFactory extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {display: none !important;}
+        :host {
+          display: none !important;
+        }
       </style>
       <iron-ajax
         id="request"
@@ -17,7 +19,9 @@ class UserDataFactory extends PolymerElement {
         with-credentials
         on-response="_handleResponse"
         with-credentials
-        debounce-duration="300">
+        debounce-duration="300"
+      >
+      </iron-ajax>
     `;
   }
 
@@ -34,16 +38,16 @@ class UserDataFactory extends PolymerElement {
        * checks authentication when creating / deleting data.
        * @type {Object}
        */
-      user: {type: Object, notify: true, readOnly: true},
+      user: { type: Object, notify: true, readOnly: true },
       /**
        * True when data being loaded.
        */
-      loading: {type: Boolean, notify: true},
+      loading: { type: Boolean, notify: true },
       /**
        * A flag determining if the user is logged in.
        */
-      loggedIn: {type: Boolean, notify: true, readOnly: true},
-      apiToken: {type: String, observer: '_tokenChanged'},
+      loggedIn: { type: Boolean, notify: true, readOnly: true },
+      apiToken: { type: String, observer: '_tokenChanged' },
       requestHeaders: Object
     };
   }
@@ -63,7 +67,7 @@ class UserDataFactory extends PolymerElement {
     if (!token) {
       this.requestHeaders = undefined;
     } else {
-      this.requestHeaders = {'authorization': 'Bearer ' + token};
+      this.requestHeaders = { authorization: 'Bearer ' + token };
     }
   }
 }

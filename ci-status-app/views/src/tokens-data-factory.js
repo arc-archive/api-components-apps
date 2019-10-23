@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-ajax/iron-ajax';
 
 let cachedData = [];
@@ -8,7 +8,9 @@ class TokensDataFactory extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {display: none !important;}
+        :host {
+          display: none !important;
+        }
       </style>
       <iron-ajax
         id="request"
@@ -19,18 +21,20 @@ class TokensDataFactory extends PolymerElement {
         headers="[[requestHeaders]]"
         on-response="_handleResponse"
         with-credentials
-        debounce-duration="300">
+        debounce-duration="300"
+      >
+      </iron-ajax>
     `;
   }
 
   static get properties() {
     return {
       apiBase: String,
-      list: {type: Array, notify: true},
-      hasMore: {type: Boolean, value: true, notify: true},
-      loading: {type: Boolean, notify: true},
+      list: { type: Array, notify: true },
+      hasMore: { type: Boolean, value: true, notify: true },
+      loading: { type: Boolean, notify: true },
       requestParams: Object,
-      apiToken: {type: String, observer: '_tokenChanged'},
+      apiToken: { type: String, observer: '_tokenChanged' },
       requestHeaders: Object
     };
   }
@@ -100,7 +104,7 @@ class TokensDataFactory extends PolymerElement {
     if (!token) {
       this.requestHeaders = undefined;
     } else {
-      this.requestHeaders = {'authorization': 'Bearer ' + token};
+      this.requestHeaders = { authorization: 'Bearer ' + token };
     }
   }
 }

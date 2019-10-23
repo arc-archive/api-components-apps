@@ -1,5 +1,5 @@
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
+import { PolymerElement } from '../../@polymer/polymer/polymer-element.js';
+import { html } from '../../@polymer/polymer/lib/utils/html-tag.js';
 
 /**
  * This is test component.
@@ -15,8 +15,10 @@ class TestComponent extends PolymerElement {
     return 'test-component';
   }
   static get template() {
-    return html`<style></style>
-    <h1>Test</h1>`;
+    return html`
+      <style></style>
+      <h1>Test</h1>
+    `;
   }
 }
 window.customElements.define(TestComponent.is, TestComponent);

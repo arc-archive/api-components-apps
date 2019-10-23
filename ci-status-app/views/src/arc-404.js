@@ -1,28 +1,28 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 
 class Arc404 extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
+        :host {
+          display: block;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
 
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
 
-      a {
-        color: currentColor;
-      }
+        a {
+          color: currentColor;
+        }
       </style>
       <header>
         <a href="#/">

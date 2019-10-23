@@ -1,5 +1,5 @@
-const {CatalogDataGenerator} = require('../apic/builds/catalog-data-generator.js');
-const {assert} = require('chai');
+const { CatalogDataGenerator } = require('../apic/builds/catalog-data-generator.js');
+const { assert } = require('chai');
 const path = require('path');
 const sinon = require('sinon');
 
@@ -58,28 +58,27 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Sets polymerVersion', () => {
-      return instance.isComponent()
-      .then(() => {
+      return instance.isComponent().then(() => {
         assert.equal(instance.polymerVersion, 'polymer-2');
       });
     });
 
     it('Results to true', () => {
-      return instance.isComponent()
-      .then((result) => {
+      return instance.isComponent().then((result) => {
         assert.isTrue(result);
       });
     });
 
     it('Throws when no package.json file', () => {
       instance.workingDir = __dirname;
-      return instance.isComponent()
-      .then(() => {
-        throw new Error('Should not result');
-      })
-      .catch((cause) => {
-        assert.equal(cause.message.indexOf('ENOENT'), 0);
-      });
+      return instance
+        .isComponent()
+        .then(() => {
+          throw new Error('Should not result');
+        })
+        .catch((cause) => {
+          assert.equal(cause.message.indexOf('ENOENT'), 0);
+        });
     });
   });
 
@@ -100,15 +99,13 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Sets polymerVersion', () => {
-      return instance.isComponent()
-      .then(() => {
+      return instance.isComponent().then(() => {
         assert.equal(instance.polymerVersion, 'polymer-3');
       });
     });
 
     it('Results to true', () => {
-      return instance.isComponent()
-      .then((result) => {
+      return instance.isComponent().then((result) => {
         assert.isTrue(result);
       });
     });
@@ -122,8 +119,7 @@ describe('CatalogDataGenerator class', () => {
       const cmp = 'test-component';
       const tv = '1.0.0';
       instance = new CatalogDataGenerator(wd, cmp, tv);
-      return instance.analyzer.analyzePackage()
-      .then((analysis) => {
+      return instance.analyzer.analyzePackage().then((analysis) => {
         instance.analysis = analysis;
       });
     });
@@ -143,8 +139,7 @@ describe('CatalogDataGenerator class', () => {
       const cmp = 'test-component';
       const tv = '1.0.0';
       instance = new CatalogDataGenerator(wd, cmp, tv);
-      return instance.analyzer.analyzePackage()
-      .then((analysis) => {
+      return instance.analyzer.analyzePackage().then((analysis) => {
         instance.analysis = analysis;
       });
     });
@@ -172,19 +167,19 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Returns default value when group name', () => {
-      instance.tags = [{title: 'demo', description: 'test'}];
+      instance.tags = [{ title: 'demo', description: 'test' }];
       const result = instance._getGroupName();
       assert.equal(result, 'ApiElements');
     });
 
     it('Returns value for group', () => {
-      instance.tags = [{title: 'group', description: 'test'}];
+      instance.tags = [{ title: 'group', description: 'test' }];
       const result = instance._getGroupName();
       assert.equal(result, 'test');
     });
 
     it('Returns value for memberof', () => {
-      instance.tags = [{title: 'memberof', description: 'test'}];
+      instance.tags = [{ title: 'memberof', description: 'test' }];
       const result = instance._getGroupName();
       assert.equal(result, 'test');
     });
@@ -209,10 +204,7 @@ describe('CatalogDataGenerator class', () => {
     it('Calls _cleanItem() on elements array items', () => {
       const spy = sinon.spy(instance, '_cleanItem');
       instance._cleanStoreData({
-        elements: [
-          {id: 1},
-          {id: 2}
-        ]
+        elements: [{ id: 1 }, { id: 2 }]
       });
       assert.equal(spy.callCount, 2);
       assert.equal(spy.args[0][0].id, 1);
@@ -224,10 +216,7 @@ describe('CatalogDataGenerator class', () => {
       instance._cleanStoreData({
         metadata: {
           polymer: {
-            behaviors: [
-              {id: 2},
-              {id: 1}
-            ]
+            behaviors: [{ id: 2 }, { id: 1 }]
           }
         }
       });
@@ -256,20 +245,14 @@ describe('CatalogDataGenerator class', () => {
     it('Calls cleanArray() for "events"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
       instance._cleanItem({
-        events: [
-          {id: 1},
-          {id: 2}
-        ]
+        events: [{ id: 1 }, { id: 2 }]
       });
       assert.isTrue(spy.called);
     });
 
     it('Calls cleanArray() for "events"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const events = [
-        {id: 1},
-        {id: 2}
-      ];
+      const events = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         events
       });
@@ -279,10 +262,7 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanArray() for "methods"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const methods = [
-        {id: 1},
-        {id: 2}
-      ];
+      const methods = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         methods
       });
@@ -292,10 +272,7 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanArray() for "properties"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const properties = [
-        {id: 1},
-        {id: 2}
-      ];
+      const properties = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         properties
       });
@@ -305,10 +282,7 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanArray() for "slots"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const slots = [
-        {id: 1},
-        {id: 2}
-      ];
+      const slots = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         slots
       });
@@ -318,12 +292,9 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanArray() for "cssVariables"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const cssVariables = [
-        {id: 1},
-        {id: 2}
-      ];
+      const cssVariables = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
-        styling: {cssVariables}
+        styling: { cssVariables }
       });
       assert.isTrue(spy.called);
       assert.deepEqual(spy.args[4][0], cssVariables);
@@ -331,12 +302,9 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanArray() for "selectors"', () => {
       const spy = sinon.spy(instance, 'cleanArray');
-      const selectors = [
-        {id: 1},
-        {id: 2}
-      ];
+      const selectors = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
-        styling: {selectors}
+        styling: { selectors }
       });
       assert.isTrue(spy.called);
       assert.deepEqual(spy.args[5][0], selectors);
@@ -344,10 +312,7 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanNames() for "methods"', () => {
       const spy = sinon.spy(instance, 'cleanNames');
-      const methods = [
-        {id: 1},
-        {id: 2}
-      ];
+      const methods = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         methods
       });
@@ -357,10 +322,7 @@ describe('CatalogDataGenerator class', () => {
 
     it('Calls cleanNames() for "properties"', () => {
       const spy = sinon.spy(instance, 'cleanNames');
-      const properties = [
-        {id: 1},
-        {id: 2}
-      ];
+      const properties = [{ id: 1 }, { id: 2 }];
       instance._cleanItem({
         properties
       });
@@ -412,9 +374,11 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Deletes sourceRange', () => {
-      const arg = [{
-        sourceRange: {}
-      }];
+      const arg = [
+        {
+          sourceRange: {}
+        }
+      ];
       const result = instance.cleanArray(arg);
       assert.deepEqual(result, [{}]);
     });
@@ -442,15 +406,20 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Filters out Polymer inheritance', () => {
-      const arg = [{
-        inheritedFrom: 'Polymer'
-      }, {
-        test: true
-      }];
+      const arg = [
+        {
+          inheritedFrom: 'Polymer'
+        },
+        {
+          test: true
+        }
+      ];
       const result = instance.cleanNames(arg);
-      assert.deepEqual(result, [{
-        test: true
-      }]);
+      assert.deepEqual(result, [
+        {
+          test: true
+        }
+      ]);
     });
   });
 });

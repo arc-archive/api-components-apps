@@ -58,8 +58,7 @@ describe('Changelog class', () => {
     });
 
     it('Resolves to a string', () => {
-      return instance._changelogString()
-      .then((result) => {
+      return instance._changelogString().then((result) => {
         assert.typeOf(result, 'string');
       });
     });
@@ -86,18 +85,18 @@ describe('Changelog class', () => {
     });
 
     it('Resolves to a string', () => {
-      return instance.get()
-      .then((result) => {
+      return instance.get().then((result) => {
         assert.typeOf(result, 'string');
       });
     });
 
     it('Creates CHANGELOG.md file', () => {
-      return instance.get()
-      .then(() => fs.exists(path.join(__dirname, '..', instance.changelogFile)))
-      .then((result) => {
-        assert.isTrue(result);
-      });
+      return instance
+        .get()
+        .then(() => fs.exists(path.join(__dirname, '..', instance.changelogFile)))
+        .then((result) => {
+          assert.isTrue(result);
+        });
     });
   });
 

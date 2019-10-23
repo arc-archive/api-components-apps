@@ -1,4 +1,4 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
 import '@polymer/iron-ajax/iron-ajax';
 
 let cachedData = [];
@@ -8,7 +8,9 @@ class TestsModel extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {display: none !important;}
+        :host {
+          display: none !important;
+        }
       </style>
       <iron-ajax
         id="request"
@@ -18,16 +20,18 @@ class TestsModel extends PolymerElement {
         params="[[requestParams]]"
         on-response="_handleResponse"
         with-credentials
-        debounce-duration="300">
+        debounce-duration="300"
+      >
+      </iron-ajax>
     `;
   }
 
   static get properties() {
     return {
       apiBase: String,
-      list: {type: Array, notify: true},
-      hasMore: {type: Boolean, value: true, notify: true},
-      loading: {type: Boolean, notify: true},
+      list: { type: Array, notify: true },
+      hasMore: { type: Boolean, value: true, notify: true },
+      loading: { type: Boolean, notify: true },
       requestParams: Object
     };
   }
@@ -103,36 +107,36 @@ class TestsModel extends PolymerElement {
       credentials: 'include'
     };
     return fetch(url, init)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Unable to refresh test data.');
-      }
-      return response.json();
-    })
-    .then((resource) => {
-      if (!this.list) {
-        this.list = [resource];
-        cachedData = [resource];
-      } else {
-        let updated = false;
-        for (let i = 0, len = cachedData.length; i < len; i++) {
-          if (cachedData[i].id === id) {
-            cachedData[i] = resource;
-            this.set(`list.${i}`, resource);
-            updated = true;
-            break;
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Unable to refresh test data.');
+        }
+        return response.json();
+      })
+      .then((resource) => {
+        if (!this.list) {
+          this.list = [resource];
+          cachedData = [resource];
+        } else {
+          let updated = false;
+          for (let i = 0, len = cachedData.length; i < len; i++) {
+            if (cachedData[i].id === id) {
+              cachedData[i] = resource;
+              this.set(`list.${i}`, resource);
+              updated = true;
+              break;
+            }
+          }
+          if (!updated) {
+            cachedData.push(resource);
+            this.push('list', resource);
           }
         }
-        if (!updated) {
-          cachedData.push(resource);
-          this.push('list', resource);
-        }
-      }
-    });
+      });
   }
 
   _testDeletedHandler(e) {
-    const {id} = e.detail;
+    const { id } = e.detail;
     const list = this.list || [];
     for (let i = 0, len = list.length; i < len; i++) {
       if (list[i].id === id) {
@@ -144,7 +148,7 @@ class TestsModel extends PolymerElement {
   }
 
   _testUpdatedHandler(e) {
-    const {id} = e.detail;
+    const { id } = e.detail;
     this.refreshTest(id);
   }
 

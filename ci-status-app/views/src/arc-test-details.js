@@ -1,5 +1,5 @@
-import {PolymerElement, html} from '@polymer/polymer/polymer-element.js';
-import {afterNextRender} from '@polymer/polymer/lib/utils/render-status.js';
+import { PolymerElement, html } from '@polymer/polymer/polymer-element.js';
+import { afterNextRender } from '@polymer/polymer/lib/utils/render-status.js';
 import '@polymer/paper-styles/typography.js';
 import '@polymer/iron-flex-layout/iron-flex-layout.js';
 import '@polymer/paper-icon-button/paper-icon-button.js';
@@ -14,142 +14,142 @@ class ArcTestDetails extends PolymerElement {
   static get template() {
     return html`
       <style>
-      :host {
-        display: block;
-        max-width: 1200px;
-        margin: 24px auto;
-      }
-
-      header {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
-
-      h1 {
-        @apply --paper-font-headline;
-        @apply --layout-flex;
-      }
-
-      .li {
-        border: 1px #E0E0E0 solid;
-        border-radius: 3px;
-        margin: 8px 0;
-      }
-
-      .desc > span.passed-count,
-      .desc > span.result-value[passing] {
-        color: #2E7D32;
-      }
-
-      .desc > span.failed-count,
-      .desc > span.result-value {
-        color: #F44336;
-      }
-
-      .error-message {
-        color: #F44336;
-        margin: 24px 0;
-        padding: 8px;
-        background-color: #ECEFF1;
-      }
-
-      .result-value {
-        margin-right: 8px;
-      }
-
-      .status-value {
-        text-transform: capitalize;
-      }
-
-      .desc {
-        color: #616161;
-        font-size: 18px;
-        line-height: 24px;
-        letter-spacing: 0.011em;
-      }
-
-      .desc > span {
-        color: #212121;
-      }
-
-      .queue-empty-state {
-        @apply --layout-horizontal;
-        @apply --layout-center;
-        margin: 40px auto;
-        max-width: 800px;
-      }
-
-      .circle {
-        border-radius: 50%;
-        border: solid 12px #E0E0E0;
-        width: 80px;
-        height: 80px;
-        color: #9E9E9E;
-        font-size: 16px;
-        @apply --layout-vertical;
-        @apply --layout-center-center;
-      }
-
-      .circle.ready {
-        border-color: #2196f3;
-        color: #212121;
-      }
-
-      .graph-line {
-        flex: 1;
-        height: 4px;
-        border: 4px #E0E0E0 solid;
-        margin: 0 24px;
-      }
-
-      a {
-        color: currentColor;
-      }
-
-      .delete-test {
-        background-color: var(--accent-color);
-        color: var(--accent-text-color);
-      }
-
-      .test-actions {
-        margin: 24px 0;
-      }
-
-      .error-toast {
-        background-color: #FF5722;
-        color: #fff;
-      }
-
-      .reset-test-container {
-        margin: 12px 0;
-      }
-
-      .restart-button {
-        background-color: var(--accent-color);
-        color: var(--accent-text-color);
-      }
-
-      @media (max-width: 1248px) {
         :host {
-          margin: 0 24px 24px 24px;
-        };
-      }
+          display: block;
+          max-width: 1200px;
+          margin: 24px auto;
+        }
 
-      @media (max-width: 762px) {
+        header {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+
+        h1 {
+          @apply --paper-font-headline;
+          @apply --layout-flex;
+        }
+
+        .li {
+          border: 1px #e0e0e0 solid;
+          border-radius: 3px;
+          margin: 8px 0;
+        }
+
+        .desc > span.passed-count,
+        .desc > span.result-value[passing] {
+          color: #2e7d32;
+        }
+
+        .desc > span.failed-count,
+        .desc > span.result-value {
+          color: #f44336;
+        }
+
+        .error-message {
+          color: #f44336;
+          margin: 24px 0;
+          padding: 8px;
+          background-color: #eceff1;
+        }
+
+        .result-value {
+          margin-right: 8px;
+        }
+
+        .status-value {
+          text-transform: capitalize;
+        }
+
+        .desc {
+          color: #616161;
+          font-size: 18px;
+          line-height: 24px;
+          letter-spacing: 0.011em;
+        }
+
+        .desc > span {
+          color: #212121;
+        }
+
         .queue-empty-state {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+          margin: 40px auto;
+          max-width: 800px;
+        }
+
+        .circle {
+          border-radius: 50%;
+          border: solid 12px #e0e0e0;
+          width: 80px;
+          height: 80px;
+          color: #9e9e9e;
+          font-size: 16px;
           @apply --layout-vertical;
-        };
+          @apply --layout-center-center;
+        }
+
+        .circle.ready {
+          border-color: #2196f3;
+          color: #212121;
+        }
 
         .graph-line {
-          margin: 8px 0;
-        };
-      }
+          flex: 1;
+          height: 4px;
+          border: 4px #e0e0e0 solid;
+          margin: 0 24px;
+        }
 
-      @media (max-width: 420px) {
-        :host {
-          margin: 0 12px 12px 12px;
-        };
-      }
+        a {
+          color: currentColor;
+        }
+
+        .delete-test {
+          background-color: var(--accent-color);
+          color: var(--accent-text-color);
+        }
+
+        .test-actions {
+          margin: 24px 0;
+        }
+
+        .error-toast {
+          background-color: #ff5722;
+          color: #fff;
+        }
+
+        .reset-test-container {
+          margin: 12px 0;
+        }
+
+        .restart-button {
+          background-color: var(--accent-color);
+          color: var(--accent-text-color);
+        }
+
+        @media (max-width: 1248px) {
+          :host {
+            margin: 0 24px 24px 24px;
+          }
+        }
+
+        @media (max-width: 762px) {
+          .queue-empty-state {
+            @apply --layout-vertical;
+          }
+
+          .graph-line {
+            margin: 8px 0;
+          }
+        }
+
+        @media (max-width: 420px) {
+          :host {
+            margin: 0 12px 12px 12px;
+          }
+        }
       </style>
       <header>
         <a href="#/">
@@ -163,74 +163,86 @@ class ArcTestDetails extends PolymerElement {
       </header>
 
       <div class="details">
-        <div class="desc status">
-          Status: <span class="status-value">[[testDetail.status]]</span>
-        </div>
+        <div class="desc status">Status: <span class="status-value">[[testDetail.status]]</span></div>
         <template is="dom-if" if="[[finished]]">
           <div class="desc result">
-            Result: <span class="result-value" passing$=[[testPassed]]>[[_computeTestResult(testPassed)]]</span> (<span class="passed-count">[[passed]]</span>/<span class="failed-count">[[failed]]</span>)
+            Result:
+            <span class="result-value" passing$="[[testPassed]]">[[_computeTestResult(testPassed)]]</span> (<span
+              class="passed-count"
+              >[[passed]]</span
+            >/<span class="failed-count">[[failed]]</span>)
           </div>
         </template>
         <template is="dom-if" if="[[isAmfTest]]">
-          <div class="desc type">
-            AMF: <span class="branch-value">[[testDetail.branch]]</span>
-          </div>
+          <div class="desc type">AMF: <span class="branch-value">[[testDetail.branch]]</span></div>
         </template>
         <template is="dom-if" if="[[!isAmfTest]]">
-          <div class="desc type">
-            [[testDetail.component]]: <span class="branch-value">[[testDetail.branch]]</span>
-          </div>
+          <div class="desc type">[[testDetail.component]]: <span class="branch-value">[[testDetail.branch]]</span></div>
         </template>
-      <div>
+        <div>
+          <template is="dom-if" if="[[testDetail.error]]">
+            <p class="error-message">[[testDetail.message]]</p>
+          </template>
 
-      <template is="dom-if" if="[[testDetail.error]]">
-        <p class="error-message">[[testDetail.message]]</p>
-      </template>
+          <template is="dom-if" if="[[renderRestart]]">
+            <div class="reset-test-container">
+              <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
+            </div>
+          </template>
 
-      <template is="dom-if" if="[[renderRestart]]">
-        <div class="reset-test-container">
-          <paper-button on-click="restartTest" class="restart-button" raised>Restart test</paper-button>
+          <template is="dom-repeat" items="[[componentsList]]">
+            <test-component-list-item
+              class="li"
+              item="[[item]]"
+              test-id="[[testId]]"
+              api-base="[[apiBase]]"
+            ></test-component-list-item>
+          </template>
+          <template is="dom-if" if="[[hasMore]]">
+            <div class="more-container">
+              <paper-button on-click="loadNext" class="more-button" raised>Load more</paper-button>
+            </div>
+          </template>
+
+          <template is="dom-if" if="[[isQueued]]">
+            <div class="queue-empty-state">
+              <div class="circle ready">Queued</div>
+              <div class="graph-line"></div>
+              <div class="circle">Executed</div>
+              <div class="graph-line"></div>
+              <div class="circle">Results</div>
+            </div>
+          </template>
+
+          <template is="dom-if" if="[[startedRunning]]">
+            <div class="queue-empty-state">
+              <div class="circle ready">Queued</div>
+              <div class="graph-line"></div>
+              <div class="circle ready">Executing</div>
+              <div class="graph-line"></div>
+              <div class="circle">Results</div>
+            </div>
+          </template>
+
+          <test-model
+            id="testModel"
+            api-base="[[apiBase]]"
+            test-id="[[testId]]"
+            api-token="[[apiToken]]"
+            result="{{testDetail}}"
+            on-error="_testFetchError"
+          ></test-model>
+          <test-components-data-factory
+            id="request"
+            api-base="[[apiBase]]"
+            test-id="[[testId]]"
+            list="{{componentsList}}"
+            has-more="{{hasMore}}"
+            loading="{{loading}}"
+          ></test-components-data-factory>
+          <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
         </div>
-      </template>
-
-      <template is="dom-repeat" items="[[componentsList]]">
-        <test-component-list-item class="li" item="[[item]]" test-id="[[testId]]" api-base="[[apiBase]]"></test-component-list-item>
-      </template>
-      <template is="dom-if" if="[[hasMore]]">
-        <div class="more-container">
-          <paper-button on-click="loadNext" class="more-button" raised>Load more</paper-button>
-        </div>
-      </template>
-
-      <template is="dom-if" if="[[isQueued]]">
-        <div class="queue-empty-state">
-          <div class="circle ready">Queued</div>
-          <div class="graph-line"></div>
-          <div class="circle">Executed</div>
-          <div class="graph-line"></div>
-          <div class="circle">Results</div>
-        </div>
-      </template>
-
-      <template is="dom-if" if="[[startedRunning]]">
-        <div class="queue-empty-state">
-          <div class="circle ready">Queued</div>
-          <div class="graph-line"></div>
-          <div class="circle ready">Executing</div>
-          <div class="graph-line"></div>
-          <div class="circle">Results</div>
-        </div>
-      </template>
-
-      <test-model id="testModel" api-base="[[apiBase]]" test-id="[[testId]]" api-token="[[apiToken]]" result="{{testDetail}}" on-error="_testFetchError"></test-model>
-      <test-components-data-factory
-        id="request"
-        api-base="[[apiBase]]"
-        test-id="[[testId]]"
-        list="{{componentsList}}"
-        has-more="{{hasMore}}"
-        loading="{{loading}}"></test-components-data-factory>
-      <paper-toast class="error-toast" id="err" duration="7000"></paper-toast>
+      </div>
     `;
   }
 
@@ -241,7 +253,7 @@ class ArcTestDetails extends PolymerElement {
       opened: Boolean,
       testsList: Array,
       componentsList: Array,
-      loading: {type: Boolean, notify: true},
+      loading: { type: Boolean, notify: true },
       apiToken: String,
       testDetail: {
         type: Object
@@ -291,9 +303,7 @@ class ArcTestDetails extends PolymerElement {
   }
 
   static get observers() {
-    return [
-      '_requestDataObserver(opened, hasMore, testId)'
-    ];
+    return ['_requestDataObserver(opened, hasMore, testId)'];
   }
 
   _testFetchError(e) {
@@ -370,26 +380,30 @@ class ArcTestDetails extends PolymerElement {
   }
 
   removeTest() {
-    return this.$.testModel.delete()
-    .then(() => {
-      this.dispatchEvent(new CustomEvent('navigate', {
-        composed: true,
-        bubbles: true,
-        detail: {
-          path: '/status'
-        }
-      }));
-    })
-    .catch(() => {});
+    return this.$.testModel
+      .delete()
+      .then(() => {
+        this.dispatchEvent(
+          new CustomEvent('navigate', {
+            composed: true,
+            bubbles: true,
+            detail: {
+              path: '/status'
+            }
+          })
+        );
+      })
+      .catch(() => {});
   }
 
   restartTest() {
-    return this.$.testModel.restart()
-    .then(() => {
-      this.componentsList = undefined;
-      return this.$.testModel.get();
-    })
-    .catch(() => {});
+    return this.$.testModel
+      .restart()
+      .then(() => {
+        this.componentsList = undefined;
+        return this.$.testModel.get();
+      })
+      .catch(() => {});
   }
 }
 window.customElements.define('arc-test-details', ArcTestDetails);
