@@ -53,25 +53,37 @@ export class KarmaTestRunner extends BaseTestRunner {
     return report;
   }
 
-  async _run() {
+  clearResults() {
     runResult = {};
+  }
+
+  async _run() {
+    this.clearResults();
     const orig = process.cwd();
     process.chdir(this.componentDir);
     logging.verbose(`Changed dir to ${this.componentDir}`);
     logging.verbose(`Running karma tests for ${this.component}`);
-    const opts = await this.createConfig();
-    this.server = new Server(opts, (exitCode) => {
-      process.chdir(orig);
-      logging.verbose(`Karma has exited with ${exitCode}`);
-      this._resolve(this.getReport());
-    });
-    this._addListeners(this.server);
-    const result = new Promise((resolve, reject) => {
-      this._resolve = resolve;
-      this._reject = reject;
-    });
-    this.server.start();
-    return result;
+    try {
+      const opts = await this.createConfig();
+      const port = 9876;
+      opts.port = port;
+      this.server = new Server(opts, (exitCode) => {
+        process.chdir(orig);
+        logging.verbose(`Karma has exited with ${exitCode}`);
+        this._resolve(this.getReport());
+        this.server = null;
+      });
+      this._addListeners(this.server);
+      const result = new Promise((resolve, reject) => {
+        this._resolve = resolve;
+        this._reject = reject;
+      });
+      this.server.start();
+      return result;
+    } catch (e) {
+      logging.verbose(`Error running karma tests: ${e.essage}`);
+      throw e;
+    }
   }
 
   async createConfig() {

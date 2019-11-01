@@ -61,7 +61,11 @@ export class TestsComponentModel extends BaseModel {
       await transaction.run();
       const data = await transaction.get(key);
       const [component] = data;
-      component.status = report.error ? 'failed' : 'passed';
+      let status = report.error ? 'failed' : 'passed';
+      if (!report.error && report.failed) {
+        status = 'failed';
+      }
+      component.status = status;
       component.total = report.total;
       component.success = report.success;
       component.failed = report.failed;

@@ -12,10 +12,6 @@ export class BaseTestRunner extends GitBuild {
     this.pkgName = pkgName;
     this.repoName = `${org}/${component}`;
     this.testConfig = config;
-
-    this.results = {};
-    this.passing = undefined;
-    this.retry = 0;
   }
   /**
    * 1. Create tmp dir
@@ -64,7 +60,7 @@ export class BaseTestRunner extends GitBuild {
     try {
       await this._clone({
         branch: 'master',
-        sshUrl: `git@github.com:${repoName}.git`,
+        sshUrl: `https://github.com/${repoName}.git`,
         componentDir: path.join(this.workingDir, component)
       });
     } catch (e) {
@@ -83,6 +79,7 @@ export class BaseTestRunner extends GitBuild {
       return;
     }
     logging.verbose(`Installing dependencies for ${component}`);
+    process.env.NODE_ENV = false;
     const dm = new DependendenciesManager(path.join(this.workingDir, component));
     let extra;
     if (this.testConfig.type === 'bottom-up') {

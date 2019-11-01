@@ -6,7 +6,7 @@ function prepareAmfBuild(workingDir, branch, sha) {
     const amf = spawn(path.join(__dirname, 'amf-compiler.sh'), [workingDir, branch, sha]);
 
     amf.stdout.on('data', (data) => {
-      console.info(`[AMF BUILD]: ${data}`);
+      // console.info(`[AMF BUILD]: ${data}`);
     });
 
     amf.stderr.on('data', (data) => {

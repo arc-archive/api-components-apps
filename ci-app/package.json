@@ -1,6 +1,6 @@
 {
   "name": "api-components-ci",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "start-api": "node --inspect=9227 api.js --PORT=8080",
     "start-worker": "node --inspect=9225 worker.js --PORT=8083",
     "start-github": "node --inspect=9224 github.js --PORT=8084",
-    "test": "mocha test/*.spec.js --require esm",
+    "test": "mocha test/*.spec.js --require esm --timeout 90000",
     "gke:build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:$npm_package_version .",
     "gke:deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:$npm_package_version",
     "gke:deploy-config": "npm run deploy-tests && npm run deploy-github && npm run deploy-api",
@@ -20,18 +20,18 @@
   "dependencies": {
     "@google-cloud/datastore": "^4.4.1",
     "@google-cloud/debug-agent": "^4.0.4",
-    "@google-cloud/logging-winston": "^2.1.0",
+    "@google-cloud/logging-winston": "^3.0.0",
     "@google-cloud/pubsub": "^1.1.5",
-    "@google-cloud/storage": "^4.0.0",
+    "@google-cloud/storage": "^4.0.1",
     "@google-cloud/trace-agent": "^4.2.2",
-    "@open-wc/testing": "^2.3.6",
-    "@open-wc/testing-karma": "^3.1.41",
+    "@open-wc/testing": "^2.3.8",
+    "@open-wc/testing-karma": "^3.1.48",
     "body-parser": "^1.19.0",
     "connect-memcached": "^1.0.0",
     "conventional-changelog": "^3.1.12",
     "cors": "^2.8.5",
     "decamelize": "^3.2.0",
-    "deepmerge": "^4.2.1",
+    "deepmerge": "^4.2.2",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
@@ -43,7 +43,7 @@
     "moment": "^2.24.0",
     "nconf": "^0.10.0",
     "nodegit": "^0.26.2",
-    "npm": "^6.12.0",
+    "npm": "^6.12.1",
     "openpgp": "^4.6.2",
     "passport": "^0.4.0",
     "passport-google-oauth20": "^2.0.0",
@@ -56,7 +56,8 @@
   },
   "devDependencies": {
     "eslint-config-google": "^0.14.0",
-    "express-http-proxy": "^1.6.0"
+    "express-http-proxy": "^1.6.0",
+    "sinon": "^7.5.0"
   },
   "license": "Apache-2.0",
   "repository": {

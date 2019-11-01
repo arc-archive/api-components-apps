@@ -1,4 +1,4 @@
-const { Changelog } = require('../apic/builds/changelog.js');
+const { Changelog } = require('../builds/changelog.js');
 const { assert } = require('chai');
 const { exec } = require('child_process');
 const path = require('path');

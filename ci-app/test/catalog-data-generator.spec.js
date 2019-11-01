@@ -1,4 +1,4 @@
-const { CatalogDataGenerator } = require('../apic/builds/catalog-data-generator.js');
+const { CatalogDataGenerator } = require('../builds/catalog-data-generator.js');
 const { assert } = require('chai');
 const path = require('path');
 const sinon = require('sinon');
@@ -7,36 +7,38 @@ describe('CatalogDataGenerator class', () => {
   describe('Constructor', () => {
     let wd;
     let cmp;
+    let org;
     let tv;
 
     beforeEach(() => {
       wd = path.join(__dirname, '..');
+      org = 'advanced-rest-client';
       cmp = 'test-cmp';
       tv = '1.0.0';
     });
 
     it('Sets component property', () => {
-      const instance = new CatalogDataGenerator(wd, cmp, tv);
+      const instance = new CatalogDataGenerator(wd, org, cmp, tv);
       assert.equal(instance.component, cmp);
     });
 
     it('Sets version property', () => {
-      const instance = new CatalogDataGenerator(wd, cmp, tv);
+      const instance = new CatalogDataGenerator(wd, org, cmp, tv);
       assert.equal(instance.version, tv);
     });
 
     it('Sets workingDir property', () => {
-      const instance = new CatalogDataGenerator(wd, cmp, tv);
+      const instance = new CatalogDataGenerator(wd, org, cmp, tv);
       assert.equal(instance.workingDir, wd);
     });
 
     it('Sets urlResolver property', () => {
-      const instance = new CatalogDataGenerator(wd, cmp, tv);
+      const instance = new CatalogDataGenerator(wd, org, cmp, tv);
       assert.typeOf(instance.urlResolver, 'object');
     });
 
     it('Sets analyzer property', () => {
-      const instance = new CatalogDataGenerator(wd, cmp, tv);
+      const instance = new CatalogDataGenerator(wd, org, cmp, tv);
       assert.typeOf(instance.analyzer, 'object');
     });
   });
@@ -45,109 +47,36 @@ describe('CatalogDataGenerator class', () => {
     let instance;
 
     beforeEach(() => {
-      const wd = path.join(__dirname, 'test-component');
-      const cmp = 'test-component';
-      const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
-    });
-
-    it('Returns a promise', () => {
-      const result = instance.isComponent();
-      assert.typeOf(result, 'promise');
-      return result;
-    });
-
-    it('Sets polymerVersion', () => {
-      return instance.isComponent().then(() => {
-        assert.equal(instance.polymerVersion, 'polymer-2');
-      });
-    });
-
-    it('Results to true', () => {
-      return instance.isComponent().then((result) => {
-        assert.isTrue(result);
-      });
-    });
-
-    it('Throws when no package.json file', () => {
-      instance.workingDir = __dirname;
-      return instance
-        .isComponent()
-        .then(() => {
-          throw new Error('Should not result');
-        })
-        .catch((cause) => {
-          assert.equal(cause.message.indexOf('ENOENT'), 0);
-        });
-    });
-  });
-
-  describe('isComponent() - ESM', () => {
-    let instance;
-
-    beforeEach(() => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
-    it('Returns a promise', () => {
-      const result = instance.isComponent();
-      assert.typeOf(result, 'promise');
-      return result;
-    });
-
-    it('Sets polymerVersion', () => {
-      return instance.isComponent().then(() => {
-        assert.equal(instance.polymerVersion, 'polymer-3');
-      });
-    });
-
-    it('Results to true', () => {
-      return instance.isComponent().then((result) => {
-        assert.isTrue(result);
-      });
+    it('returns true when has polymer.json', async () => {
+      const result = await instance.isComponent();
+      assert.isTrue(result);
     });
   });
 
   describe('_extractComponentTags()', () => {
     let instance;
+    let analysis;
 
-    beforeEach(() => {
-      const wd = path.join(__dirname, 'test-component');
-      const cmp = 'test-component';
-      const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
-      return instance.analyzer.analyzePackage().then((analysis) => {
-        instance.analysis = analysis;
-      });
-    });
-
-    it('Sets tags property', () => {
-      instance._extractComponentTags();
-      assert.typeOf(instance.tags, 'array');
-      assert.lengthOf(instance.tags, 5);
-    });
-  });
-
-  describe('_extractComponentTags() - ESM', () => {
-    let instance;
-
-    beforeEach(() => {
+    beforeEach(async () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
-      return instance.analyzer.analyzePackage().then((analysis) => {
-        instance.analysis = analysis;
-      });
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
+      analysis = await instance.analyzer.analyzePackage();
     });
 
-    it('Sets tags property', () => {
-      instance._extractComponentTags();
-      assert.typeOf(instance.tags, 'array');
-      assert.lengthOf(instance.tags, 5);
+    it('returns tags array', () => {
+      const result = instance._extractComponentTags(analysis);
+      assert.typeOf(result, 'array');
+      assert.lengthOf(result, 5);
     });
   });
 
@@ -158,7 +87,8 @@ describe('CatalogDataGenerator class', () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
     it('Returns default value when no tags', () => {
@@ -167,20 +97,20 @@ describe('CatalogDataGenerator class', () => {
     });
 
     it('Returns default value when group name', () => {
-      instance.tags = [{ title: 'demo', description: 'test' }];
-      const result = instance._getGroupName();
+      const tags = [{ title: 'demo', description: 'test' }];
+      const result = instance._getGroupName(tags);
       assert.equal(result, 'ApiElements');
     });
 
     it('Returns value for group', () => {
-      instance.tags = [{ title: 'group', description: 'test' }];
-      const result = instance._getGroupName();
+      const tags = [{ title: 'group', description: 'test' }];
+      const result = instance._getGroupName(tags);
       assert.equal(result, 'test');
     });
 
     it('Returns value for memberof', () => {
-      instance.tags = [{ title: 'memberof', description: 'test' }];
-      const result = instance._getGroupName();
+      const tags = [{ title: 'memberof', description: 'test' }];
+      const result = instance._getGroupName(tags);
       assert.equal(result, 'test');
     });
   });
@@ -192,7 +122,8 @@ describe('CatalogDataGenerator class', () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
     it('Returns the same object', () => {
@@ -233,7 +164,8 @@ describe('CatalogDataGenerator class', () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
     it('Returns the same object', () => {
@@ -359,7 +291,8 @@ describe('CatalogDataGenerator class', () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
     it('Returns undefined for no argument', () => {
@@ -391,7 +324,8 @@ describe('CatalogDataGenerator class', () => {
       const wd = path.join(__dirname, 'test-component-esm');
       const cmp = 'test-component';
       const tv = '1.0.0';
-      instance = new CatalogDataGenerator(wd, cmp, tv);
+      const org = 'advanced-rest-client';
+      instance = new CatalogDataGenerator(wd, org, cmp, tv);
     });
 
     it('Returns undefined for no argument', () => {

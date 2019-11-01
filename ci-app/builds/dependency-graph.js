@@ -21,7 +21,7 @@ export class DependencyGraph {
   async buildGraph() {
     logging.verbose('Building dependency graph...');
     const pkg = await this.readPackage();
-    const [deps, dev] = this.readProjectDependencies(pkg);
+    const [deps, dev] = await this.readProjectDependencies(pkg);
     await this.processDepenedencies(deps, dev, pkg.name);
     logging.verbose('Dependency graph ready.');
   }
