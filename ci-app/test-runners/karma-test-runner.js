@@ -60,13 +60,14 @@ export class KarmaTestRunner extends BaseTestRunner {
   async _run() {
     this.clearResults();
     const orig = process.cwd();
+    logging.verbose(`Changing dir to ${this.componentDir}...`);
     process.chdir(this.componentDir);
-    logging.verbose(`Changed dir to ${this.componentDir}`);
     logging.verbose(`Running karma tests for ${this.component}`);
     try {
       const opts = await this.createConfig();
       const port = 9876;
       opts.port = port;
+      logging.verbose('Creating karma server...');
       this.server = new Server(opts, (exitCode) => {
         process.chdir(orig);
         logging.verbose(`Karma has exited with ${exitCode}`);
@@ -78,16 +79,19 @@ export class KarmaTestRunner extends BaseTestRunner {
         this._resolve = resolve;
         this._reject = reject;
       });
+      logging.verbose('Starting karma server...');
       this.server.start();
       return result;
     } catch (e) {
-      logging.verbose(`Error running karma tests: ${e.essage}`);
+      logging.verbose(`Error running karma tests: ${e.message}`);
       throw e;
     }
   }
 
   async createConfig() {
-    const cnf = config.parseConfig(path.resolve('./karma.conf.js'), {
+    const cnfFile = path.resolve('./karma.conf.js');
+    logging.verbose(`Reading tests configuration from ${cnfFile}`);
+    const cnf = config.parseConfig(cnfFile, {
       reporters: ['arcci']
     });
     if (!cnf.plugins) {
@@ -96,6 +100,7 @@ export class KarmaTestRunner extends BaseTestRunner {
     cnf.plugins.push({
       'reporter:arcci': ['type', ArcCiReporter]
     });
+    logging.verbose('Configuration is ready.');
     return cnf;
   }
 
