@@ -1,11 +1,12 @@
 import logging from '../lib/logging';
-import { GitBuild } from './git-build';
+import { BaseBuild } from './base-build.js';
 import { CatalogDataGenerator } from './catalog-data-generator';
 import { DependencyGraph } from './dependency-graph';
+import { GitSourceControl } from '../github/git-source-control.js';
 /**
  * A class responsible for processing the component after tag is created.
  */
-export class TagBuild extends GitBuild {
+export class TagBuild extends BaseBuild {
   constructor(info) {
     super();
     this.info = info;
@@ -50,7 +51,7 @@ export class TagBuild extends GitBuild {
       return;
     }
     try {
-      await this.createWorkingDir();
+      this.workingDir = await this.createWorkingDir();
       await this._clone();
       await this._generateCatalogModel();
       await this._generateGrpah();
@@ -59,6 +60,11 @@ export class TagBuild extends GitBuild {
     } catch (cause) {
       logging.error('Tag build error: ' + cause.message);
     }
+  }
+
+  async _clone() {
+    const github = new GitSourceControl(this.workingDir, this.cmpOrg, this.cmpName);
+    await github.clone(false);
   }
 
   async _generateCatalogModel() {

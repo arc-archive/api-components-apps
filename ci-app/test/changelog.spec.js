@@ -41,9 +41,24 @@ describe('Changelog class', () => {
     let instance;
     let startDir;
 
+    before((done) => {
+      const file = path.join(__dirname, 'create-test-repo.sh');
+      exec(file, (error) => {
+        if (error) {
+          done(error);
+        } else {
+          done();
+        }
+      });
+    });
+
+    after(async () => {
+      await fs.remove(path.join(__dirname, 'test-repo'));
+    });
+
     beforeEach(() => {
-      instance = new Changelog(path.join(__dirname, '..'));
       startDir = process.cwd();
+      instance = new Changelog(path.join(__dirname, 'test-repo'));
       process.chdir(instance.workingDir);
     });
 

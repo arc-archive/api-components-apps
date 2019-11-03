@@ -1,10 +1,11 @@
 import path from 'path';
-import { GitBuild } from '../builds/git-build';
+import { BaseBuild } from '../builds/base-build.js';
 import { AmfModelGenerator } from './amf-model-generator.js';
-import { DependendenciesManager } from './dependencies-manager';
+import { DependendenciesManager } from './dependencies-manager.js';
 import logging from '../lib/logging';
+import { GitSourceControl } from '../github/git-source-control.js';
 
-export class BaseTestRunner extends GitBuild {
+export class BaseTestRunner extends BaseBuild {
   constructor(org, component, pkgName, config) {
     super();
     this.org = org;
@@ -40,34 +41,13 @@ export class BaseTestRunner extends GitBuild {
   async _prepareComponent() {
     const { component } = this;
     logging.verbose(`Preparing ${component} component to run in test`);
-    await this._prepareClone();
+    const github = new GitSourceControl(this.workingDir, this.org, this.component);
+    await github.clone(false);
     if (this.testConfig.type === 'amf-build') {
       await this.updateModels(component);
     }
     await this._prepareDependencies(component);
     logging.verbose(`Component ${component} is ready`);
-  }
-  /**
-   * Clones a component into a working directory
-   * @return {Promise}
-   */
-  async _prepareClone() {
-    if (this.abort) {
-      return;
-    }
-    const { repoName, component } = this;
-    logging.verbose(`Cloning ${repoName} component into ${this.workingDir}`);
-    try {
-      await this._clone({
-        branch: 'master',
-        sshUrl: `https://github.com/${repoName}.git`,
-        componentDir: path.join(this.workingDir, component)
-      });
-    } catch (e) {
-      logging.error(`Unable to process component sources ${component}`);
-      logging.error(e.stack || e.message);
-      throw e;
-    }
   }
   /**
    * Installs dependnecies of a component.
