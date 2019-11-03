@@ -1,13 +1,11 @@
 {
   "name": "@advanced-rest-client/test-component",
-  "dependencies": {
-    "lit-element": "^2.0.1",
-    "lit-html": "^1.1.2"
-  },
   "devDependencies": {
     "@open-wc/testing": "^2.3.8",
     "@open-wc/testing-karma": "^3.1.46",
     "deepmerge": "^4.2.2",
-    "karma": "^4.4.1"
+    "karma": "^4.4.1",
+    "lit-element": "^2.0.1",
+    "lit-html": "^1.1.2"
   }
 }

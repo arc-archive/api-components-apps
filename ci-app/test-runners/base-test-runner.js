@@ -59,7 +59,6 @@ export class BaseTestRunner extends BaseBuild {
       return;
     }
     logging.verbose(`Installing dependencies for ${component}`);
-    process.env.NODE_ENV = false;
     const dm = new DependendenciesManager(path.join(this.workingDir, component));
     let extra;
     if (this.testConfig.type === 'bottom-up') {

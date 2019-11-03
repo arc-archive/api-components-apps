@@ -6,9 +6,8 @@
  */
 import fs from 'fs-extra';
 import path from 'path';
-import npm from 'npm';
-import { Installer } from 'npm/lib/install.js';
 import logging from '../lib/logging';
+const { exec } = require('child_process');
 /**
  * A class responsible for installing component dependencies.
  */
@@ -49,36 +48,14 @@ export class DependendenciesManager {
   _processNodeDependencies() {
     logging.verbose('Installing npm dependencies...');
     return new Promise((resolve, reject) => {
-      npm.load({
-        'loaded': false,
-        'progress': false,
-        'no-audit': true
-      }, (err) => {
-        if (err) {
-          reject(err);
-          return;
+      const file = path.join(__dirname, 'install-npm-deps.sh');
+      exec(`"${file}" ${this.workingDir}`, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
         }
-        const opts = {
-          dev: true,
-          prod: true,
-        };
-        new Installer(this.workingDir, false, [], opts).run((err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-        // npm.commands.install(this.workingDir, [], (err) => {
-        //   if (err) {
-        //     reject(err);
-        //   } else {
-        //     resolve();
-        //   }
-        // });
       });
-    }).then(() => {
-      logging.verbose('Dependencies installed.');
     });
   }
 

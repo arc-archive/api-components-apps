@@ -104,23 +104,22 @@ describe('KarmaTestRunner', () => {
     });
   });
 
-  describe('_run()', () => {
+  describe.only('run()', () => {
     let instance;
     let testConfig;
+    const org = 'advanced-rest-client';
+    const component = 'api-url-editor';
+    const pkgName = '@advanced-rest-client/api-url-editor';
     before(() => {
       testConfig = {
         type: 'amf-build'
       };
       instance = new KarmaTestRunner(org, component, pkgName, testConfig);
-      instance.componentDir = esmComponent;
-    });
-
-    after(async () => {
-      await setPackageFile();
+      instance.updateModels = async () => {};
     });
 
     it('performs the test', async () => {
-      const result = await instance._run();
+      const result = await instance.run();
       assert.typeOf(result, 'object');
       assert.typeOf(result.total, 'number');
       assert.typeOf(result.success, 'number');
