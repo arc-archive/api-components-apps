@@ -17,12 +17,14 @@ mkdir ${AMF_DIR}
 cd $AMF_DIR
 
 git clone --depth=50 https://github.com/aml-org/amf.git src
-
 cd src
+
 if [ -z ${BRANCH+x} ]; then
-  git checkout ${BRANCH}
-else
+  echo "Checking out commit $COMMIT_SHA"
   git checkout ${COMMIT_SHA}
+else
+  echo "Checking out branch $BRANCH"
+  git checkout ${BRANCH}
 fi
 
 SHA=`git rev-parse HEAD`

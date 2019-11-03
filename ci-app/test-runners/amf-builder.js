@@ -2,6 +2,9 @@ const { spawn } = require('child_process');
 const path = require('path');
 /* eslint-disable no-console */
 function prepareAmfBuild(workingDir, branch, sha) {
+  if (branch === 'master') {
+    branch = 'HEAD';
+  }
   return new Promise((resolve, reject) => {
     const amf = spawn(path.join(__dirname, 'amf-compiler.sh'), [workingDir, branch, sha]);
 
