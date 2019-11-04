@@ -67,7 +67,7 @@ class TestApiRoute extends BaseApi {
         this.sendError(res, errors, 400);
         return;
       }
-      const body = req.body;
+      const { body, user } = req;
       const info = {
         branch: body.branch,
         type: body.type
@@ -84,6 +84,10 @@ class TestApiRoute extends BaseApi {
       if (body.includeDev) {
         info.includeDev = body.includeDev;
       }
+      info.creator = {
+        id: user.id,
+        displayName: user.displayName || ''
+      };
       const id = await this.testModel.insertTest(info);
       res.send({ id });
     } catch (cause) {

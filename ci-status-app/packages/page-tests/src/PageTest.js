@@ -1,0 +1,302 @@
+import { html, css, LitElement } from 'lit-element';
+import '@anypoint-web-components/anypoint-button/anypoint-button.js';
+import '@anypoint-web-components/anypoint-item/anypoint-item.js';
+import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
+import '@github/time-elements/dist/time-elements.js';
+import '../../apic-ci-status/app-message.js';
+// import { classMap } from 'lit-html/directives/class-map.js';
+import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
+// import { computeIsoDate } from '../../utils.js';
+import { refresh, arrowBack } from '../../Icons.js';
+
+export const computeTestResult = (status) => status ? 'Passed' : 'Failed';
+
+/**
+ * A screen page that lists tokens.
+ */
+export class PageTest extends LitElement {
+  static get styles() {
+    return [
+      baseStyles,
+      headersStyles,
+      progressCss,
+      css`
+      :host {
+        display: block;
+      }
+    `];
+  }
+
+  static get properties() {
+    return {
+      /**
+       * An instance of `UserStatus` class.
+       */
+      userStatus: { type: Object },
+      /**
+       * Current loading state.
+       */
+      loading: { type: Boolean },
+      /**
+       * API base URI
+       */
+      apiBase: { type: String },
+      /**
+       * Tokens pagination `pageToken`.
+       * This is returned by the API and used in subsequent requests
+       * to get next page of results.
+       */
+      pageToken: { type: String },
+      /**
+       * When set to `false` it means that the API won't return more results.
+       */
+      hasMore: { type: Boolean },
+      /**
+       * List of items to render.
+       */
+      items: { type: Array },
+      /**
+       * True when the user is logged in
+       */
+      loggedIn: { type: Boolean },
+      /**
+       * Last error mesage to render to the user.
+       */
+      lastError: { type: String },
+      /**
+       * A tests id to reder details for.
+       */
+      testId: { type: String },
+      /**
+       * A test details object.
+       */
+      testDetail: { type: Object }
+    };
+  }
+
+  /**
+   * @return {Boolean} True when `items` are set.
+   */
+  get hasResult() {
+    const { items } = this;
+    return !!(items && items.length);
+  }
+
+  get isFinished() {
+    const { testDetail } = this;
+    return testDetail.status === 'finished';
+  }
+
+  get isQueued() {
+    const { testDetail } = this;
+    return testDetail.status === 'queued';
+  }
+
+  get isRunning() {
+    const { testDetail } = this;
+    return testDetail.status === 'running';
+  }
+
+  get isPassed() {
+    const { testDetail } = this;
+    return testDetail.status === 'finished' && !testDetail.failed;
+  }
+
+  constructor() {
+    super();
+    this.hasMore = true;
+    this.loggedIn = false;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this._initialize();
+  }
+
+  /**
+   * Initializes the page.
+   * It ensures the user is authorized and then requests token list.
+   * @return {Promise}
+   */
+  async _initialize() {
+    await this.loadTest();
+    await this.loadNextResults();
+    await this._initUser();
+  }
+
+  async _initUser() {
+    const { userStatus } = this;
+    if (!userStatus) {
+      return;
+    }
+    if (!userStatus.loggedIn) {
+      this.loading = true;
+      await userStatus.getUser();
+      this.loading = false;
+    }
+    if (!userStatus.loggedIn) {
+      return;
+    }
+    this.loggedIn = true;
+  }
+
+  async loadTest() {
+    const { apiBase, testId } = this;
+    const url = `${apiBase}tests/${testId}`;
+    const init = {
+      credentials: 'include'
+    };
+    this.loading = true;
+    const response = await fetch(url, init);
+    const success = response.ok;
+    const data = await response.json();
+    this.loading = false;
+    if (!success) {
+      this.lastError = data.message;
+      return;
+    }
+    this.testDetail = data;
+  }
+
+  /**
+   * Creates token list request URL that includes pagination parameters.
+   * @return {String} Token request URL
+   */
+  getRequestUrl() {
+    const { apiBase, testId } = this;
+    let url = `${apiBase}tests/${testId}/components`;
+    const { pageToken } = this;
+    if (pageToken) {
+      url += `?nextPageToken=${pageToken}`;
+    }
+    return url;
+  }
+
+  /**
+   * Loads next page of tokens and updates `tokens` array.
+   * @return {Promise}
+   */
+  async loadNextResults() {
+    const url = this.getRequestUrl();
+    const init = {
+      credentials: 'include'
+    };
+    this.loading = true;
+    const response = await fetch(url, init);
+    const success = response.ok;
+    const data = await response.json();
+    this.loading = false;
+    if (!success) {
+      this.lastError = data.message;
+      return;
+    }
+
+    const pageToken = data.nextPageToken;
+    this.pageToken = pageToken;
+
+    const { hasMore } = this;
+
+    if (pageToken && !hasMore) {
+      this.hasMore = true;
+    } else if (!pageToken && hasMore) {
+      this.hasMore = false;
+    }
+    if (!data.items) {
+      return;
+    }
+    let items = this.items || [];
+    items = items.concat(data.items);
+    this.items = items;
+    this.requestUpdate();
+  }
+
+  /**
+   * Click handle on the refresh list button.
+   * @param {Event} e
+   */
+  _refreshHandler() {
+    this.refresh();
+  }
+
+  /**
+   * Refreshes current list of tokens.
+   * If `pageToken` and `tokens` are set then they are cleared.
+   * @return {Promise}
+   */
+  async refresh() {
+    this.pageToken = null;
+    this.items = null;
+    this.testDetail = null;
+    await this.loadTest();
+    await this.loadNextResults();
+  }
+
+  /**
+   * Removes `lastError` message.
+   */
+  closeError() {
+    this.lastError = undefined;
+  }
+
+  render() {
+    const { lastError, hasResult, loading, testDetail } = this;
+    return html`
+    ${lastError ? html`<app-message
+      type="error"
+      @close="${this.closeError}"
+    >${lastError}</app-message>` : ''}
+
+    <div class="page-header">
+      <a href="/tests">
+        <anypoint-icon-button
+          title="Back to tests list page"
+          aria-label="Activate to go back to tests list"
+        >
+          <span class="icon">${arrowBack}</span>
+        </anypoint-icon-button>
+      </a>
+      <h3 class="title">Test details</h3>
+      <anypoint-icon-button
+        title="Refresh the list"
+        aria-label="Activate to refresh the list"
+        @click="${this._refreshHandler}"
+      >
+        <span class="icon">${refresh}</span>
+      </anypoint-icon-button>
+    </div>
+    ${loading ? html`<progress></progress>` : ''}
+    ${testDetail ? this._testDetailTemplate() : ''}
+    ${hasResult ? this._resultsTemplate() : ''}
+    `;
+  }
+
+  _testDetailTemplate() {
+    const { testDetail, isFinished, isPassed } = this;
+    return html`
+    <section class="details">
+      <div class="desc status">
+        Status: <span class="status-value">${testDetail.status}</span>
+      </div>
+      ${isFinished ? html`
+      <div class="desc result">
+        Result:
+        <span
+          class="result-value"
+          passing="${isPassed}"
+        >${computeTestResult(isPassed)}</span> (<span
+          class="passed-count"
+          >${testDetail.passed || 0}</span
+        >/<span class="failed-count">${testDetail.failed || 0}</span>)
+      </div>` : ''}
+    </section>
+    `;
+  }
+
+  _resultsTemplate() {
+    const items = this.items || [];
+    return html`
+    ${items.map((item) => html`<p>${item.component}</p>`)}
+    `;
+  }
+
+}

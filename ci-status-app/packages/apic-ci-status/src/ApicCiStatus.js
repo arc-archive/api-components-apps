@@ -13,6 +13,8 @@ import '../../page-main/page-main.js';
 import '../../page-tokens/page-tokens.js';
 import '../../page-tokens/page-add-token.js';
 import '../../page-changelog/page-changelog.js';
+import '../../page-tests/page-tests.js';
+import '../../page-tests/page-test.js';
 
 const defaultTitle = 'API Components status';
 const gaId = 'UA-71458341-7';
@@ -41,6 +43,16 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'changelog',
         pattern: '/changelog',
         data: { title: 'Changelog' },
+      },
+      {
+        name: 'tests',
+        pattern: '/tests',
+        data: { title: 'Scheduled tests' },
+      },
+      {
+        name: 'test',
+        pattern: '/tests/:id',
+        data: { title: 'Scheduled test' },
       },
       {
         name: 'not-found',
@@ -85,6 +97,10 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
        * property should be removed from `fetch` configuration.
        */
       apiToken: { type: String },
+      /**
+       * Current route parameters, if any
+       */
+      params: { type: Object }
     };
   }
 
@@ -139,6 +155,9 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     if (!href) {
       return;
     }
+    if (anhor.href.indexOf(window.location.host) === -1) {
+      return;
+    }
     e.preventDefault();
     e.stopPropagation();
     this.navigate(href);
@@ -167,6 +186,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     }
     this.title = title;
     this.page = finalRoute;
+    this.params = params;
     document.head.querySelector('title').innerText = title;
     if (!this.__gaRouteInitialized) {
       // prohibits sending pageview when initializing
@@ -204,6 +224,23 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .apiBase="${this.apiBase}"
             .apiToken="${this.apiToken}"
           ></page-changelog>
+        `;
+      case 'tests':
+        return html`
+          <page-tests
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
+          ></page-tests>
+        `;
+      case 'test':
+        return html`
+          <page-test
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
+            .testId="${this.params.id}"
+          ></page-test>
         `;
       default:
         return html`
