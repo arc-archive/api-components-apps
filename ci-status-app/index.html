@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  <title>API Components CI status</title>
+  <meta name="description" content="Frontend for API components integration tests">
+  <link rel="icon" href="images/favicon.ico">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#00A2DF">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Advanced REST Client">
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="APIC status">
+  <!-- Homescreen icons -->
+  <link rel="apple-touch-icon" href="images/manifest/icon-48x48.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="images/manifest/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="96x96" href="images/manifest/icon-96x96.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="images/manifest/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="images/manifest/icon-192x192.png">
+  <!-- Tile icon for Windows 8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/manifest/icon-144x144.png">
+  <meta name="msapplication-TileColor" content="#00A2DF">
+  <meta name="msapplication-tap-highlight" content="no">
+  <base href="/">
+
+  <link rel="stylesheet" type="text/css" crossorigin="anonymous" href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,300,300italic,400italic,500,500italic,700,700italic">
+  <link rel="stylesheet" type="text/css" href="index.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: #161b1f;
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 1680px;
+      overflow-x: hidden;
+      min-width: 320px;
+      background-color: white;
+
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-size: 16px;
+      line-height: 28px;
+      font-family: 'Roboto', sans-serif;
+      font-weight: 400;
+      color: #3e4348;
+    }
+
+    *:last-child {
+      margin-bottom: 0;
+    }
+
+    *:first-child {
+      margin-top: 0;
+    }
+  </style>
+  <script>
+    let apiBase;
+    if (window.location.port) {
+      // Dev mode,
+      apiBase = window.location.origin.replace(window.location.port, '8080');
+    } else {
+      apiBase = window.location.origin.replace('ci.', 'api.');
+    }
+    apiBase = `${apiBase}/v1/`;
+    window.ApicCiStatus = {
+      apiBase
+    };
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-71458341-7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(...args){ window.dataLayer.push(args); }
+    gtag('js', new Date());
+    gtag('config', 'UA-71458341-7');
+  </script>
+</head>
+
+<body>
+  <apic-ci-status></apic-ci-status>
+  <script type="module" src="./packages/apic-ci-status/apic-ci-status.js"></script>
+</body>
+
+</html>
