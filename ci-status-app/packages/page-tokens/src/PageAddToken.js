@@ -242,7 +242,7 @@ export class PageAddToken extends LitElement {
           <span class="icon">${arrowBack}</span>
         </anypoint-icon-button>
       </a>
-      <h3 class="title">Create API token</h3>
+      <h2 class="title">Create API token</h2>
     </div>
 
     ${tokenInfo ? this._tokenInfoTemplate(tokenInfo) : this._formTemplate()}

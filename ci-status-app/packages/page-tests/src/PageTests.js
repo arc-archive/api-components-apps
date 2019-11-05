@@ -30,7 +30,7 @@ export class PageTests extends LitElement {
       }
 
       [secondary] {
-        font-size: 13px;
+        font-size: 0.88rem;
         color: #616161;
       }
 
@@ -245,7 +245,7 @@ export class PageTests extends LitElement {
     >${lastError}</app-message>` : ''}
 
     <div class="page-header">
-      <h3 class="title">API components tests</h3>
+      <h2 class="title">API components tests</h2>
       <anypoint-icon-button
         title="Refresh the list"
         aria-label="Activate to refresh the list"
@@ -273,7 +273,7 @@ export class PageTests extends LitElement {
 
   _resultsTemplate() {
     const { items } = this;
-    return html`<section class="results">
+    return html`<section class="results" role="list">
     ${items.map((item, index) => this._testItemTemplate(item, index))}
     </section>`;
   }
@@ -288,6 +288,7 @@ export class PageTests extends LitElement {
       data-index="${index}"
       class=${classMap(classes)}
       @click="${this._toggleDetails}"
+      role="listitem"
     >
       <anypoint-item-body threeline>
         <div>

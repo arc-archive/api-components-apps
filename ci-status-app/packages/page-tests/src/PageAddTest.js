@@ -258,7 +258,7 @@ export class PageAddTest extends LitElement {
           <span class="icon">${arrowBack}</span>
         </anypoint-icon-button>
       </a>
-      <h3 class="title">Schedule a test</h3>
+      <h2 class="title">Schedule a test</h2>
     </div>
 
     ${testInfo ? this._testInfoTemplate(testInfo) : this._formTemplate()}

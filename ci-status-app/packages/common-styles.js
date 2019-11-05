@@ -39,7 +39,7 @@ ul {
 
 export const headersStyles = css`
 h2 {
-  font-size: 48px;
+  font-size: 28px;
   color: #202124;
   font-weight: 400;
   line-height: 1.2;

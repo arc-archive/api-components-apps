@@ -12,7 +12,7 @@ export const changelogTemplate = (item) => {
   const created = computeIsoDate(item.created);
   const hasTags = !!item.tags;
   return html`<div class="changelog-item card">
-    <h4>${item.name} v${item.id}</h4>
+    <h3>${item.name} v${item.id}</h3>
     <div class="description-line">
       <label>Published</label
       ><relative-time class="value" datetime="${created}"></relative-time>
@@ -260,7 +260,7 @@ export class PageChangelog extends LitElement {
   _formTemplate() {
     const { since, until, tags } = this;
     return html`<section class="config card">
-      <h3>Search options</h3>
+      <h2>Search options</h2>
       <p>All fields are optional</p>
       <div class="time-row">
         <anypoint-input

@@ -378,7 +378,7 @@ export class PageTokens extends LitElement {
     const { tokens } = this;
     return html`
     <div class="page-header">
-      <h3 class="title">Your tokens</h3>
+      <h2 class="title">Your tokens</h2>
       <anypoint-icon-button
         title="Refresh the list"
         aria-label="Activate to refresh the list"

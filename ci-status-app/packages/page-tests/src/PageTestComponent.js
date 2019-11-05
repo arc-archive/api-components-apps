@@ -271,7 +271,7 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
           <span class="icon">${arrowBack}</span>
         </anypoint-icon-button>
       </a>
-      <h3 class="title">${title}</h3>
+      <h2 class="title">${title}</h2>
     </div>
     ${loading ? html`<progress></progress>` : ''}
     ${info ? this._componentDetailTemplate() : ''}

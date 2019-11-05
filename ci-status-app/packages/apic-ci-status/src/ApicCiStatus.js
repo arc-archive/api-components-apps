@@ -316,7 +316,10 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     const img = userStatus.user && userStatus.user.imageUrl;
     return html`
     <anypoint-menu-button horizontalalign="right">
-      <anypoint-icon-button slot="dropdown-trigger">
+      <anypoint-icon-button
+        slot="dropdown-trigger"
+        aria-label="Activate to open user menu"
+      >
         ${img ? userImageTemplate(img) : userIconTemplate()}
       </anypoint-icon-button>
       <anypoint-listbox slot="dropdown-content" class="user-menu">

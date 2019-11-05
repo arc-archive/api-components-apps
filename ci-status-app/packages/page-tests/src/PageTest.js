@@ -61,7 +61,6 @@ export class PageTest extends routerLinkMixin(LitElement) {
       }
 
       .result-list {
-        margin: 40px 0;
       }
 
       .item-status {
@@ -454,7 +453,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
           <span class="icon">${arrowBack}</span>
         </anypoint-icon-button>
       </a>
-      <h3 class="title">Test details</h3>
+      <h2 class="title">Test details</h2>
       <anypoint-icon-button
         title="Refresh the list"
         aria-label="Activate to refresh the list"
@@ -528,8 +527,8 @@ export class PageTest extends routerLinkMixin(LitElement) {
   _resultsTemplate() {
     const items = this.items || [];
     return html`
-    <section class="result-list">
-      <h4>Components</h4>
+    <h3>Components</h3>
+    <section class="result-list" role="list">
       ${items.map((item) => this._componentListItem(item))}
     </section>
     `;
@@ -539,7 +538,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
     const { testDetail } = this;
     const classes = { passed: item.status === 'passed', running: item.status === 'running' };
     return html`
-    <anypoint-item class=${classMap(classes)}>
+    <anypoint-item class=${classMap(classes)} role="listitem">
       <div class="item-status">${item.status}</div>
       <div class="item-name">${item.component}</div>
       ${item.hasLogs ? html`<a href="/tests/${testDetail.id}/${item.id}">

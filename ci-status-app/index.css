@@ -1,7 +1,7 @@
 html {
-  --primary-color: #00A2DF;
+  --primary-color: #01579B;
   --accent-color: #4CAF50;
-  --error-color: #FF5722;
+  --error-color: #C62828;
   --anypoiont-dropdown-shaddow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   --anypoiont-autocomplete-dropdown-shaddow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   --anypoint-listbox-background-color: #fff;
@@ -9,6 +9,8 @@ html {
   --success-color: #2E7D32;
   --info-color: #2196F3;
   --inactive-color: #757575;
+  --anypoint-button-color: var(--primary-color);
+  --anypoint-icon-button-emphasis-low-color: var(--primary-color);
 }
 
 @media (prefers-color-scheme: dark) {
