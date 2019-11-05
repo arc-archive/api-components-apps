@@ -1,10 +1,10 @@
 {
   "name": "apic-ci-status",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "API components CI status web app",
   "main": "app.js",
   "scripts": {
-    "start": "node ${SCRIPT:-app.js} --PORT=8086",
+    "start": "node ${SCRIPT:-app.js}",
     "gke:build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version .",
     "gke:deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version",
     "gke:deploy-config": "kubectl apply -f deployment.yaml",
