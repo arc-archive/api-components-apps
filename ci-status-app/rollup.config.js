@@ -17,6 +17,8 @@ export default {
         './images/**/*.*',
         './manifest.json',
         './index.css',
+        './robots.txt',
+        './humans.txt',
         './node_modules/@polymer/app-storage/app-indexeddb-mirror/*.js',
       ],
       dest: 'dist',
