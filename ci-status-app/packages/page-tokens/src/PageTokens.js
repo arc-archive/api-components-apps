@@ -5,9 +5,9 @@ import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
 import '@github/time-elements/dist/time-elements.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
 import { classMap } from 'lit-html/directives/class-map.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
 import unauthorizedView from '../../UnauthorizedToast.js';
-import { computeIsoDate, scopeToLabel } from '../../utils.js';
+import { computeIsoDate, scopeToLabel, breadcrumbsGenerator } from '../../utils.js';
 import { expandMore, refresh, add } from '../../Icons.js';
 import '../../apic-ci-status/app-message.js';
 /**
@@ -74,6 +74,14 @@ export const detailsTemplate = (token) => {
     </div>
   </div>`;
 };
+
+const breadcrumbs = [
+  {
+    label: 'Tokens',
+    href: '/tokens',
+    current: true,
+  },
+];
 /**
  * A screen page that lists tokens.
  */
@@ -83,6 +91,7 @@ export class PageTokens extends LitElement {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -358,6 +367,7 @@ export class PageTokens extends LitElement {
   render() {
     const { loggedIn, lastError } = this;
     return html`
+    ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"

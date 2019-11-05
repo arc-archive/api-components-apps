@@ -6,9 +6,17 @@ import '@github/time-elements/dist/time-elements.js';
 import '@polymer/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.js';
 import '../../apic-ci-status/app-message.js';
 import { classMap } from 'lit-html/directives/class-map.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
-import { computeIsoDate } from '../../utils.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
+import { computeIsoDate, breadcrumbsGenerator } from '../../utils.js';
 import { refresh, add } from '../../Icons.js';
+
+const breadcrumbs = [
+  {
+    label: 'Tests',
+    href: '/tests',
+    current: true,
+  },
+];
 /**
  * A screen page that lists tokens.
  */
@@ -18,6 +26,7 @@ export class PageTests extends LitElement {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -239,6 +248,7 @@ export class PageTests extends LitElement {
   render() {
     const { lastError, hasResult, loggedIn, loading, _liveItems } = this;
     return html`
+    ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"

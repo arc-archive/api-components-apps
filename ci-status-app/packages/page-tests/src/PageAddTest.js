@@ -6,9 +6,10 @@ import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.j
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '../../apic-ci-status/app-message.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
 import { arrowBack } from '../../Icons.js';
 import unauthorizedView from '../../UnauthorizedToast.js';
+import { breadcrumbsGenerator } from '../../utils.js';
 
 const sourceComponentInputTemplate = () => html`<anypoint-input name="component" required autovalidate>
   <label slot="label">Source component</label>
@@ -41,6 +42,18 @@ const bottomUpFormItems = () => {
   ${includeDevInputTemplate()}
   `;
 }
+const breadcrumbs = [
+  {
+    label: 'Tests',
+    href: '/tests',
+    current: false,
+  },
+  {
+    label: 'Add',
+    href: '/tests/add',
+    current: true,
+  },
+];
 /**
  * A screen page that lists tokens.
  */
@@ -50,6 +63,7 @@ export class PageAddTest extends LitElement {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -238,6 +252,7 @@ export class PageAddTest extends LitElement {
   render() {
     const { loggedIn, lastError } = this;
     return html`
+    ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"

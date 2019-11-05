@@ -7,8 +7,8 @@ import '../../apic-ci-status/app-message.js';
 import '../browser-execution-logs.js';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { routerLinkMixin } from 'lit-element-router/router-mixin/router-mixin.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
-import { computeIsoDate } from '../../utils.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
+import { computeIsoDate, breadcrumbsGenerator } from '../../utils.js';
 import { arrowBack } from '../../Icons.js';
 
 export const resultBoxTemplate = (label, value, cls) => {
@@ -51,6 +51,7 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -79,8 +80,8 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
       }
 
       .tile-value {
-        font-size: 64px;
         display: block;
+        font-size: 64px;
         line-height: 64px;
       }
 
@@ -106,6 +107,16 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
 
       browser-execution-logs {
         margin-top: 24px;
+      }
+
+      :host([narrow]) .tile-value {
+        font-size: 32px;
+        line-height: 32px;
+      }
+
+      :host([narrow]) .info-tile {
+        width: 64px;
+        height: 60px;
       }
     `];
   }
@@ -151,6 +162,10 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
        * for processing
        */
       _liveComponentDetail: { type: Object },
+      /**
+       * When true it renders mobile friendly view.
+       */
+      narrow: { type: Boolean, reflect: true },
     };
   }
 
@@ -162,6 +177,30 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
   get logsKey() {
     const { testId, componentId } = this;
     return `tests/${testId}/${componentId}/logs`;
+  }
+
+  get breadcrumbs() {
+    const { testId, componentId } = this;
+    if (!testId || !componentId) {
+      return null;
+    }
+    return [
+      {
+        label: 'Tests',
+        href: '/tests',
+        current: false,
+      },
+      {
+        label: testId,
+        href: `/tests/${testId}`,
+        current: false,
+      },
+      {
+        label: componentId,
+        href: `/tests/${testId}/${componentId}`,
+        current: true,
+      },
+    ];
   }
 
   connectedCallback() {
@@ -256,6 +295,7 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
     const info = this.componentDetail || {};
     const title = info && info.component || 'Test results';
     return html`
+    ${breadcrumbsGenerator(this.breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"

@@ -7,11 +7,24 @@ import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
 import unauthorizedView from '../../UnauthorizedToast.js';
 import { arrowBack } from '../../Icons.js';
-import { scopeToLabel, scopes } from '../../utils.js';
+import { scopeToLabel, scopes, breadcrumbsGenerator } from '../../utils.js';
 import '../../apic-ci-status/app-message.js';
+
+const breadcrumbs = [
+  {
+    label: 'Tokens',
+    href: '/tokens',
+    current: false,
+  },
+  {
+    label: 'Add',
+    href: '/tokens/aff',
+    current: true,
+  },
+];
 
 /**
  * A screen page that lists tokens.
@@ -22,6 +35,7 @@ export class PageAddToken extends LitElement {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -35,6 +49,14 @@ export class PageAddToken extends LitElement {
         display: flex;
         flex-direction: row;
         align-items: center;
+      }
+
+      :host([narrow]) .time-settings-row {
+        display: block;
+      }
+
+      :host([narrow]) anypoint-input {
+        width: auto;
       }
 
       .token-label {
@@ -79,6 +101,10 @@ export class PageAddToken extends LitElement {
        * Ignores rendering success message when set.
        */
       ignoreSuccessInfo: { type: Boolean },
+      /**
+       * When true it renders mobile friendly view.
+       */
+      narrow: { type: Boolean, reflect: true },
     };
   }
 
@@ -222,6 +248,7 @@ export class PageAddToken extends LitElement {
   render() {
     const { loggedIn, lastError } = this;
     return html`
+    ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"

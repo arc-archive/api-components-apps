@@ -5,8 +5,16 @@ import '@anypoint-web-components/anypoint-input/anypoint-input.js';
 import '@github/time-elements/dist/time-elements.js';
 import '@advanced-rest-client/arc-marked/arc-marked.js';
 import '../../apic-ci-status/app-message.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
-import { computeIsoDate } from '../../utils.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
+import { computeIsoDate, breadcrumbsGenerator } from '../../utils.js';
+
+const breadcrumbs = [
+  {
+    label: 'Changelog',
+    href: '/changelog',
+    current: true,
+  },
+];
 
 export const changelogTemplate = (item) => {
   const created = computeIsoDate(item.created);
@@ -48,6 +56,7 @@ export class PageChangelog extends LitElement {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -246,6 +255,7 @@ export class PageChangelog extends LitElement {
   render() {
     const { lastError, hasResult, loading } = this;
     return html`
+    ${breadcrumbsGenerator(breadcrumbs)}
     ${this._formTemplate()}
     ${loading ? html`<progress></progress>` : ''}
     ${lastError ? html`<app-message

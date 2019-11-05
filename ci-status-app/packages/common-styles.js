@@ -69,3 +69,41 @@ progress {
   height: 3px;
 }
 `;
+
+export const breadcrumbsStyles = css`
+.breadcrumbs {
+  flex: 1 1;
+  border-bottom: 1px #e5e5e5 solid;
+}
+
+.breadcrumbs ol {
+  flex: 1 1;
+  font-size: .9rem;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumbs li {
+  display: inline;
+  hyphens: auto;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+.breadcrumbs li .breadcrumb-current {
+  color: var(--text-color);
+}
+
+.breadcrumbs li .breadcrumb-chevron:after {
+  display: inline-block;
+  content: '›';
+  color: #151515;
+  margin: 0 5px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+`;

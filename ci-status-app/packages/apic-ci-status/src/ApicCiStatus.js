@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit-element';
 import { routerMixin, routerLinkMixin } from 'lit-element-router/router-mixin/router-mixin.js';
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
+import '@anypoint-web-components/anypoint-item/anypoint-icon-item.js';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-menu-button/anypoint-menu-button.js';
 import '@anypoint-web-components/anypoint-button/anypoint-icon-button.js';
@@ -9,6 +10,8 @@ import '@anypoint-web-components/anypoint-styles/colors.js';
 
 import { UserStatus } from './UserStatus.js';
 import { userImageTemplate, userIconTemplate } from './utils.js';
+import { baseStyles } from '../../common-styles.js';
+import { menu, assignmentTurnedIn, list } from '../../Icons.js';
 import '../../page-main/page-main.js';
 import '../../page-tokens/page-tokens.js';
 import '../../page-tokens/page-add-token.js';
@@ -20,6 +23,12 @@ import '../../page-tests/page-add-test.js';
 
 const defaultTitle = 'API Components status';
 const gaId = 'UA-71458341-7';
+
+const appLogoTemplate = () => {
+  return html`<a href="/intro" class="main-link">
+    <img src="images/arc-icon.png" class="app-icon" alt="ARC logo" />
+  </a>`;
+}
 
 /* global gtag */
 
@@ -112,7 +121,15 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
       /**
        * Current route parameters, if any
        */
-      params: { type: Object }
+      params: { type: Object },
+      /**
+       * True when navigation is opened.
+       */
+      navigationOpened: { type: Boolean, reflect: true },
+      /**
+       * When true it renders mobile friendly view.
+       */
+      narrow: { type: Boolean, reflect: true },
     };
   }
 
@@ -126,7 +143,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
   get logoutReturn() {
     const rtn = encodeURIComponent(window.location.href);
     const base = this.apiBase.replace('/v1/', '');
-    const url = `${base}/auth/login?logout=${rtn}`;
+    const url = `${base}/auth/logout?logout=${rtn}`;
     return url;
   }
 
@@ -137,12 +154,14 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
 
     this.userStatus = new UserStatus(this.apiBase);
     this._clickHandler = this._clickHandler.bind(this);
+    this._mobileMatchHandler = this._mobileMatchHandler.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('click', this._clickHandler);
     this.loadUserState();
+    this.initializeMediaQueries();
   }
 
   async loadUserState() {
@@ -178,13 +197,20 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
   __clickPageLink(ev) {
     ev.preventDefault();
     let { target } = ev;
-    if (target.localName === 'anypoint-item') {
-      [target] = target.children;
+    if (target.localName === 'anypoint-icon-item') {
+      target = Array.from(target.children).find((item) => item.nodeName === 'A')
     }
-    if (!target.href) {
+    if (!target || !target.href) {
       return;
     }
     this.navigate(target.href);
+  }
+
+  __keydownPageLink(e) {
+    if (['Space', 'Enter'].indexOf(e.code) === -1) {
+      return;
+    }
+    this.__clickPageLink(e);
   }
 
   onRoute(route, params, query, data) {
@@ -208,6 +234,31 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     gtag('config', gaId, { page_path: `/${route}` });
   }
 
+  _closeDrawer() {
+    this.navigationOpened = false;
+  }
+
+  _toggleNavigation() {
+    this.navigationOpened = !this.navigationOpened;
+  }
+
+  /**
+   * Initializes variables related to viewport suuport.
+   */
+  initializeMediaQueries() {
+    this._mQmobile = window.matchMedia('(max-width: 800px)');
+    this._mQmobile.addEventListener('change', this._mobileMatchHandler);
+    this.narrow = this._mQmobile.matches;
+  }
+
+  /**
+   * A handler called when mobile media query event has been dispatched
+   * @param {MediaQueryListEvent} e
+   */
+  _mobileMatchHandler(e) {
+    this.narrow = e.matches;
+  }
+
   _renderPage() {
     switch (this.page) {
       case 'intro':
@@ -228,6 +279,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .userStatus="${this.userStatus}"
             .apiBase="${this.apiBase}"
             .apiToken="${this.apiToken}"
+            .narrow="${this.narrow}"
           ></page-add-token>
         `;
       case 'changelog':
@@ -270,6 +322,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .userStatus="${this.userStatus}"
             .testId="${this.params.id}"
             .componentId="${this.params.cmp}"
+            .narrow="${this.narrow}"
           ></page-test-component>
         `;
       default:
@@ -280,26 +333,35 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
   }
 
   render() {
-    const { userStatus, title, page } = this;
+    const { userStatus, title, narrow } = this;
     return html`
       <header>
-        <a href="/intro" class="main-link">
-          <img src="images/arc-icon.png" class="app-icon" alt="ARC logo" />
-        </a>
+        ${this._navToggleTemplate()}
+        ${narrow ? '' : appLogoTemplate()}
         <h1>${title}</h1>
         ${userStatus.loggedIn ? this._userHeaderTemplate() : this._logInTemplate()}
       </header>
       <div class="content">
-        <nav>
-          <anypoint-listbox role="menu" .selected="${page}" attrforselected="route">
-            ${this._navTemplate()}
-          </anypoint-listbox>
-        </nav>
+        ${this._navigationDrawerTemplate()}
         <main>
           ${this._renderPage()}
         </main>
       </div>
     `;
+  }
+
+  _navToggleTemplate() {
+    const { narrow } = this;
+    if (!narrow) {
+      return '';
+    }
+    return html`<anypoint-icon-button
+      slot="dropdown-trigger"
+      aria-label="Activate to open application menu"
+      @click="${this._toggleNavigation}"
+    >
+      <span class="icon">${menu}</span>
+    </anypoint-icon-button>`;
   }
 
   _logInTemplate() {
@@ -319,14 +381,22 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
       <anypoint-icon-button
         slot="dropdown-trigger"
         aria-label="Activate to open user menu"
+        aria-haspopup="true"
+        aria-controls="userMenu"
       >
         ${img ? userImageTemplate(img) : userIconTemplate()}
       </anypoint-icon-button>
-      <anypoint-listbox slot="dropdown-content" class="user-menu">
-        <a href="/tokens">
+      <anypoint-listbox
+        slot="dropdown-content"
+        class="user-menu"
+        role="menu"
+        aria-label="User menu"
+        id="userMenu"
+      >
+        <a role="menuitem" href="/tokens">
           <anypoint-item>Tokens</anypoint-item>
         </a>
-        <a href="${logoutReturn}">
+        <a role="menuitem" href="${logoutReturn}">
           <anypoint-item>Log out</anypoint-item>
         </a>
       </anypoint-listbox>
@@ -334,26 +404,44 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     `;
   }
 
+  _navigationDrawerTemplate() {
+    const { page, navigationOpened, narrow } = this;
+    return html`
+    ${navigationOpened ? html`<div class="nav-scrim" @click="${this._closeDrawer}"></div>` : ''}
+    <nav class="nav-drawer">
+      ${narrow ? appLogoTemplate() : ''}
+      <anypoint-listbox role="menu" .selected="${page}" attrforselected="route">
+        ${this._navTemplate()}
+      </anypoint-listbox>
+    </nav>`;
+  }
+
   _navTemplate() {
     const states = [
-      // ['/intro', 'intro', 'Introduction', 'Activate for introduction page'],
-      ['/tests', 'tests', 'Tests', 'Activate for list of tests'],
-      ['/changelog', 'changelog', 'Change log', 'Activate for components change log'],
+      ['/tests', 'tests', 'Tests', 'Activate for list of tests', assignmentTurnedIn],
+      ['/changelog', 'changelog', 'Change log', 'Activate for components change log', list],
     ];
 
     return states.map(
-      ([href, route, label, ariaLabel]) => html`
-        <anypoint-item role="none" tabindex="-1" @click="${this.__clickPageLink}" route="${route}">
+      ([href, route, label, ariaLabel, icon]) => html`
+        <anypoint-icon-item
+          role="none"
+          @click="${this.__clickPageLink}"
+          @keydown="${this.__keydownPageLink}"
+          route="${route}"
+        >
+          <span slot="item-icon" class="nav-icon icon">${icon}</span>
           <a href="${href}" tabindex="-1" role="menuitem" aria-label="${ariaLabel}">
             ${label}
           </a>
-        </anypoint-item>
+        </anypoint-icon-item>
       `,
     );
   }
 
   static get styles() {
     return [
+      baseStyles,
       css`
         :host {
           min-height: 100vh;
@@ -399,21 +487,34 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
           flex: 1;
         }
 
-        anypoint-listbox[role='menu'] {
-          width: 256px;
+        nav anypoint-listbox[role='menu'] {
           margin-right: 12px;
           height: 100%;
         }
 
-        anypoint-listbox[role='menu'] anypoint-item {
-          min-height: 32px;
+        nav anypoint-listbox[role='menu'] anypoint-icon-item {
+          min-height: 40px;
+          font-weight: 400;
+        }
+
+        nav anypoint-listbox[role='menu'] anypoint-icon-item.selected {
+          color: var(--primary-color);
+          font-weight: 500;
         }
 
         main {
           max-width: 1440px;
           background-color: #fff;
           padding: 0 40px;
+          margin-bottom: 20px;
           flex: 1;
+        }
+
+        :host([narrow]) main {
+          flex: auto;
+          max-width: auto;
+          padding: 0;
+          margin: 0 12px 20px 12px;
         }
 
         .app-icon {
@@ -431,6 +532,49 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
 
         .user-menu {
           background-color: #fff;
+        }
+
+        .nav-drawer {
+          width: var(--app-drawer-width, 256px);
+          display: block;
+          background-color: #fff;
+        }
+
+        :host([narrow]) .nav-drawer {
+          transform: translateX(-100%);
+          left: 0;
+          top: 0;
+          bottom: 0;
+          transition: transform 0.3s cubic-bezier(0.74, 0.03, 0.3, 0.97);
+          transform-origin: top right;
+          height: 100%;
+          position: absolute;
+          z-index: 5;
+        }
+
+        :host([navigationopened]) .nav-drawer {
+          transform: translateX(0);
+          box-shadow: var(--anypoiont-dropdown-shaddow);
+        }
+
+        .nav-scrim {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          height: 100%;
+          position: absolute;
+          z-index: 4;
+          transition-property: opacity;
+          -webkit-transform: translateZ(0);
+          transform:  translateZ(0);
+          opacity: 0;
+          background: var(--app-drawer-scrim-background, rgba(0, 0, 0, 0.5));
+        }
+
+        :host([navigationopened]) .nav-scrim {
+          opacity: 1;
         }
       `,
     ];

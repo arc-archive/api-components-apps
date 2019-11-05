@@ -7,8 +7,8 @@ import '@polymer/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.js';
 import '../../apic-ci-status/app-message.js';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { routerLinkMixin } from 'lit-element-router/router-mixin/router-mixin.js';
-import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
-import { computeIsoDate } from '../../utils.js';
+import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
+import { computeIsoDate, breadcrumbsGenerator } from '../../utils.js';
 import { refresh, arrowBack, deleteIcon } from '../../Icons.js';
 
 export const computeTestResult = (status) => status ? 'Passed' : 'Failed';
@@ -43,6 +43,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
       baseStyles,
       headersStyles,
       progressCss,
+      breadcrumbsStyles,
       css`
       :host {
         display: block;
@@ -190,6 +191,25 @@ export class PageTest extends routerLinkMixin(LitElement) {
   get renderRestart() {
     const { loggedIn, isFinished } = this;
     return !!loggedIn && isFinished;
+  }
+
+  get breadcrumbs() {
+    const { testId } = this;
+    if (!testId) {
+      return null;
+    }
+    return [
+      {
+        label: 'Tests',
+        href: '/tests',
+        current: false,
+      },
+      {
+        label: testId,
+        href: `/tests/${testId}`,
+        current: true,
+      },
+    ];
   }
 
   constructor() {
@@ -439,6 +459,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
       testComponentsKey
     } = this;
     return html`
+    ${breadcrumbsGenerator(this.breadcrumbs)}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"
