@@ -62,4 +62,4 @@ COPY . /app/
 
 RUN npm --unsafe-perm install
 
-CMD npm start
+CMD ["npm","start"]

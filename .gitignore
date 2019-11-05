@@ -58,3 +58,4 @@ node_modules
 views/build
 config.json
 coverage
+dist

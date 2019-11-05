@@ -1,9 +1,11 @@
 {
   "name": "API Components CI",
   "short_name": "APIC CI",
-  "description": "Frontend for API components integration tests",
+  "description": "An application to interact with API Components CI pipeline.",
   "start_url": "/",
   "display": "standalone",
+  "orientation" : "any",
+	"lang" : "English",
   "icons": [
     {
       "src": "images/manifest/icon-192x192.png",

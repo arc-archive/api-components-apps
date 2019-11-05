@@ -15,6 +15,7 @@ import '../../page-tokens/page-add-token.js';
 import '../../page-changelog/page-changelog.js';
 import '../../page-tests/page-tests.js';
 import '../../page-tests/page-test.js';
+import '../../page-tests/page-test-component.js';
 import '../../page-tests/page-add-test.js';
 
 const defaultTitle = 'API Components status';
@@ -59,6 +60,11 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'test',
         pattern: '/tests/:id',
         data: { title: 'Scheduled test' },
+      },
+      {
+        name: 'test-component',
+        pattern: '/tests/:id/:cmp',
+        data: { title: 'Test component detail' },
       },
       {
         name: 'not-found',
@@ -255,6 +261,16 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .apiToken="${this.apiToken}"
             .userStatus="${this.userStatus}"
           ></page-add-test>
+        `;
+      case 'test-component':
+        return html`
+          <page-test-component
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
+            .testId="${this.params.id}"
+            .componentId="${this.params.cmp}"
+          ></page-test-component>
         `;
       default:
         return html`

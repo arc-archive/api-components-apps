@@ -14,7 +14,7 @@ export const changelogTemplate = (item) => {
   return html`<div class="changelog-item card">
     <h4>${item.name} v${item.id}</h4>
     <div class="description-line">
-      <label>Published:</label
+      <label>Published</label
       ><relative-time class="value" datetime="${created}"></relative-time>
     </div>
     <div class="description-line">
@@ -25,12 +25,14 @@ export const changelogTemplate = (item) => {
       <label>Tags:</label>
       <span class="value">${item.tags.join(', ')}</span>
     </div>` : ''}
-    ${item.changelog ? html`<div class="description-line">
-      <label>Changelog:</label>
+    ${item.changelog ? html`
+    <details>
+      <summary>Change log</summary>
       <arc-marked .markdown="${item.changelog}">
         <div slot="markdown-html" class="markdown-html"></div>
       </arc-marked>
-    </div>` : ''}
+    </details>
+    ` : ''}
   </div>`;
 }
 
@@ -104,6 +106,10 @@ export class PageChangelog extends LitElement {
        * Current list of tag filters.
        */
       tags: { type: Array },
+      /**
+       * Last error messsage to render.
+       */
+      lastError: { type: String }
     };
   }
 
@@ -179,7 +185,13 @@ export class PageChangelog extends LitElement {
       credentials: 'include'
     };
     this.loading = true;
-    const response = await fetch(url, init);
+    let response;
+    try {
+      response = await fetch(url, init);
+    } catch (e) {
+      this.lastError = `${e.message}. Check your internet connection.`;
+      return;
+    }
     const success = response.ok;
     const data = await response.json();
     this.loading = false;
@@ -232,14 +244,14 @@ export class PageChangelog extends LitElement {
   }
 
   render() {
-    const { lastError, hasResult } = this;
+    const { lastError, hasResult, loading } = this;
     return html`
+    ${this._formTemplate()}
+    ${loading ? html`<progress></progress>` : ''}
     ${lastError ? html`<app-message
       type="error"
       @close="${this.closeError}"
     >${lastError}</app-message>` : ''}
-
-    ${this._formTemplate()}
 
     ${hasResult ? this._resultsTemplate() : ''}
     `;
@@ -274,6 +286,7 @@ export class PageChangelog extends LitElement {
           name="tags"
           .chipsValue="${tags}"
           @chips-changed="${this._tagsHandler}"
+          infoMessage="Use tags to limit number of results. Start typing to open suggestions."
         >
           <label slot="label">Tags</label>
         </anypoint-chip-input>

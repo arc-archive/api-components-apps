@@ -3,6 +3,7 @@ import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
 import '@github/time-elements/dist/time-elements.js';
+import '@polymer/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.js';
 import '../../apic-ci-status/app-message.js';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { baseStyles, headersStyles, progressCss } from '../../common-styles.js';
@@ -34,15 +35,15 @@ export class PageTests extends LitElement {
       }
 
       .test-result {
-        color: #2E7D32;
+        color: var(--success-color);
       }
 
       .failed .test-result {
-        color: #F44336;
+        color: var(--error-color);
       }
 
       .running .test-result {
-        color: #2196F3;
+        color: var(--info-color);
       }
 
       .status-line {
@@ -92,6 +93,11 @@ export class PageTests extends LitElement {
        * Last error mesage to render to the user.
        */
       lastError: { type: String },
+      /**
+       * The data returned from the API. It is passed to the indexeddb storage
+       * for processing
+       */
+      _liveItems: { type: Array },
     };
   }
 
@@ -186,10 +192,21 @@ export class PageTests extends LitElement {
     if (!data.items) {
       return;
     }
-    let items = this.items || [];
+    let items = this._liveItems || [];
     items = items.concat(data.items);
-    this.items = items;
+    this._liveItems = items;
     this.requestUpdate();
+  }
+
+  /**
+   * Handler for `app-indexeddb-mirror` data read event
+   * @param {CustomEvent} e
+   */
+  async _persistentItemsHandler(e) {
+    const { value } = e.detail;
+    await this.updateComplete;
+    this.loading = false;
+    this.items = value;
   }
 
   /**
@@ -208,6 +225,7 @@ export class PageTests extends LitElement {
   async refresh() {
     this.pageToken = null;
     this.items = null;
+    this._liveItems = null;
     await this.loadNextResults();
   }
 
@@ -219,7 +237,7 @@ export class PageTests extends LitElement {
   }
 
   render() {
-    const { lastError, hasResult, loggedIn, loading } = this;
+    const { lastError, hasResult, loggedIn, loading, _liveItems } = this;
     return html`
     ${lastError ? html`<app-message
       type="error"
@@ -245,6 +263,11 @@ export class PageTests extends LitElement {
     </div>
     ${loading ? html`<progress></progress>` : ''}
     ${hasResult ? this._resultsTemplate() : ''}
+    <app-indexeddb-mirror
+      key="tests"
+      .data="${_liveItems}"
+      @persisted-data-changed="${this._persistentItemsHandler}">
+    </app-indexeddb-mirror>
     `;
   }
 

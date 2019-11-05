@@ -4,7 +4,7 @@
   "description": "API components CI status web app",
   "main": "app.js",
   "scripts": {
-    "start": "node ${SCRIPT:-app.js}",
+    "start": "node ${SCRIPT:-app.js} --PORT=8086",
     "gke:build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version .",
     "gke:deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version",
     "gke:deploy-config": "kubectl apply -f deployment.yaml",
@@ -31,6 +31,7 @@
     "@google-cloud/logging-winston": "^2.1.0",
     "@google-cloud/trace-agent": "^4.2.2",
     "compression": "^1.7.4",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-winston": "^4.0.1",
     "nconf": "^0.10.0",
@@ -54,6 +55,7 @@
     "@open-wc/prettier-config": "^0.1.10",
     "@open-wc/testing": "^2.0.0",
     "@open-wc/testing-karma": "^3.1.52",
+    "@polymer/app-storage": "^3.0.2",
     "es-dev-server": "^1.23.0",
     "eslint": "^6.1.0",
     "eslint-config-google": "^0.14.0",
@@ -65,6 +67,8 @@
     "lit-html": "^1.0.0",
     "rimraf": "^2.7.1",
     "rollup": "^1.15.4",
+    "rollup-plugin-cpy": "^2.0.1",
+    "rollup-plugin-workbox": "^4.0.0",
     "webpack-merge": "^4.1.5"
   },
   "license": "Apache-2.0",

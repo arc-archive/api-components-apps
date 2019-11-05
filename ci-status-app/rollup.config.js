@@ -1,7 +1,42 @@
 import { createDefaultConfig } from '@open-wc/building-rollup';
+import { generateSW } from 'rollup-plugin-workbox';
+import cpy from 'rollup-plugin-cpy';
+import path from 'path';
 
-// if you need to support IE11 use "modern-and-legacy-config" instead.
-// import { createCompatibilityConfig } from '@open-wc/building-rollup';
-// export default createCompatibilityConfig({ input: './index.html' });
-
-export default createDefaultConfig({ input: './index.html' });
+const config = createDefaultConfig({ input: './index.html' });
+export default {
+  ...config,
+  output: {
+    ...config.output,
+    // sourcemap: false,
+  },
+  plugins: [
+    ...config.plugins,
+    cpy({
+      files: [
+        './images/**/*.*',
+        './manifest.json',
+        './index.css',
+        './node_modules/@polymer/app-storage/app-indexeddb-mirror/*.js',
+      ],
+      dest: 'dist',
+      options: {
+        parents: true,
+      },
+    }),
+    generateSW({
+      swDest: path.join(__dirname, 'dist', 'sw.js'),
+      globDirectory: path.join(__dirname, 'dist'),
+      offlineGoogleAnalytics: true,
+      runtimeCaching: [{
+        urlPattern: new RegExp('^https://api.advancedrestclient.com/'),
+        handler: 'NetworkFirst',
+        options: {
+          cacheableResponse: {
+            statuses: [0, 200]
+          }
+        }
+      }],
+    }),
+  ],
+};

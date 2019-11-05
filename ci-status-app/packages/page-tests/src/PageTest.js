@@ -3,6 +3,7 @@ import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item-body.js';
 import '@github/time-elements/dist/time-elements.js';
+import '@polymer/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.js';
 import '../../apic-ci-status/app-message.js';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { routerLinkMixin } from 'lit-element-router/router-mixin/router-mixin.js';
@@ -48,11 +49,15 @@ export class PageTest extends routerLinkMixin(LitElement) {
       }
 
       .result-value {
-        color: #F44336;
+        color: var(--error-color);
+      }
+
+      .status-value {
+        text-transform: capitalize;
       }
 
       .passed .result-value {
-        color: #2E7D32;
+        color: var(--success-color);
       }
 
       .result-list {
@@ -62,15 +67,15 @@ export class PageTest extends routerLinkMixin(LitElement) {
       .item-status {
         width: 80px;
         text-transform: capitalize;
-        color: #F44336;
+        color: var(--error-color);
       }
 
       .passed .item-status {
-        color: #2E7D32;
+        color: var(--success-color);
       }
 
       .running .item-status {
-        color: #2196F3;
+        color: var(--info-color);
       }
 
       .item-name {
@@ -80,6 +85,10 @@ export class PageTest extends routerLinkMixin(LitElement) {
       anypoint-button,
       a {
         text-decoration: none;
+      }
+
+      .reset-test-container {
+        margin-top: 12px;
       }
     `];
   }
@@ -127,7 +136,17 @@ export class PageTest extends routerLinkMixin(LitElement) {
       /**
        * A test details object.
        */
-      testDetail: { type: Object }
+      testDetail: { type: Object },
+      /**
+       * The items data returned from the API. It is passed to the indexeddb storage
+       * for processing
+       */
+      _liveItems: { type: Array },
+      /**
+       * The test data returned from the API. It is passed to the indexeddb storage
+       * for processing
+       */
+      _liveTestDetail: { type: Object },
     };
   }
 
@@ -157,6 +176,21 @@ export class PageTest extends routerLinkMixin(LitElement) {
   get isPassed() {
     const { testDetail } = this;
     return testDetail.status === 'finished' && !testDetail.failed;
+  }
+
+  get testKey() {
+    const { testId } = this;
+    return `tests/${testId}`;
+  }
+
+  get testComponentsKey() {
+    const { testId } = this;
+    return `tests/${testId}/components`;
+  }
+
+  get renderRestart() {
+    const { loggedIn, isFinished } = this;
+    return !!loggedIn && isFinished;
   }
 
   constructor() {
@@ -198,11 +232,14 @@ export class PageTest extends routerLinkMixin(LitElement) {
   }
 
   async loadTest() {
-    const { apiBase, testId } = this;
+    const { apiBase, testId, apiToken } = this;
     const url = `${apiBase}tests/${testId}`;
     const init = {
       credentials: 'include'
     };
+    if (apiToken) {
+      init.headers = [['authorization', `Bearer ${apiToken}`]];
+    }
     this.loading = true;
     const response = await fetch(url, init);
     const success = response.ok;
@@ -212,7 +249,17 @@ export class PageTest extends routerLinkMixin(LitElement) {
       this.lastError = data.message;
       return;
     }
-    this.testDetail = data;
+    this._liveTestDetail = data;
+  }
+
+  /**
+   * Handler for `app-indexeddb-mirror` data read event for test details
+   * @param {CustomEvent} e
+   */
+  async _persistentTestHandler(e) {
+    const { value } = e.detail;
+    await this.updateComplete;
+    this.testDetail = value;
   }
 
   /**
@@ -238,6 +285,10 @@ export class PageTest extends routerLinkMixin(LitElement) {
     const init = {
       credentials: 'include'
     };
+    const { apiToken } = this;
+    if (apiToken) {
+      init.headers = [['authorization', `Bearer ${apiToken}`]];
+    }
     this.loading = true;
     const response = await fetch(url, init);
     const success = response.ok;
@@ -261,10 +312,21 @@ export class PageTest extends routerLinkMixin(LitElement) {
     if (!data.items) {
       return;
     }
-    let items = this.items || [];
+    let items = this._liveItems || [];
     items = items.concat(data.items);
-    this.items = items;
+    this._liveItems = items;
     this.requestUpdate();
+  }
+
+  /**
+   * Handler for `app-indexeddb-mirror` data read event for items
+   * @param {CustomEvent} e
+   */
+  async _persistentItemsHandler(e) {
+    const { value } = e.detail;
+    await this.updateComplete;
+    this.loading = false;
+    this.items = value;
   }
 
   /**
@@ -284,6 +346,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
     this.pageToken = null;
     this.items = null;
     this.testDetail = null;
+    this._liveItems = null;
     await this.loadTest();
     await this.loadNextResults();
   }
@@ -297,17 +360,56 @@ export class PageTest extends routerLinkMixin(LitElement) {
   }
 
   async deleteTest() {
+    this.loading = true;
+    const { testId, apiBase, apiToken } = this;
     const init = {
       method: 'DELETE',
       credentials: 'include'
     };
-    this.loading = true;
-    const { testId, apiBase } = this;
+    if (apiToken) {
+      init.headers = [['authorization', `Bearer ${apiToken}`]];
+    }
     const url = `${apiBase}tests/${testId}`;
     const response = await fetch(url, init);
     if (response.status === 204) {
       const href = new URL('/tests', window.location.href);
       this.navigate(href.toString());
+      return;
+    }
+    try {
+      const data = await response.json();
+      this.lastError = data.message || 'Invalid request';
+    } catch (e) {
+      this.lastError = 'Invalid response from the API';
+    }
+  }
+
+  _restartHandler() {
+    this.restartTest();
+  }
+
+  /**
+   * Makes call to the API to restart the test.
+   * The test cannot be restarted by unknown user or when thhe test is running.
+   * @return {Promise}
+   */
+  async restartTest() {
+    const { loggedIn, isFinished, apiBase, testId, apiToken } = this;
+    if ((!loggedIn && !apiToken) || !isFinished) {
+      return;
+    }
+    const init = {
+      method: 'PUT',
+      credentials: 'include'
+    };
+    if (apiToken) {
+      init.headers = [['authorization', `Bearer ${apiToken}`]];
+    }
+    this.loading = true;
+    const url = `${apiBase}tests/${testId}/restart`;
+    const response = await fetch(url, init);
+    if (response.status === 204) {
+      this.refresh();
       return;
     }
     try {
@@ -326,7 +428,17 @@ export class PageTest extends routerLinkMixin(LitElement) {
   }
 
   render() {
-    const { lastError, hasResult, loading, testDetail, loggedIn } = this;
+    const {
+      lastError,
+      hasResult,
+      loading,
+      testDetail,
+      loggedIn,
+      _liveTestDetail,
+      _liveItems,
+      testKey,
+      testComponentsKey
+    } = this;
     return html`
     ${lastError ? html`<app-message
       type="error"
@@ -362,11 +474,23 @@ export class PageTest extends routerLinkMixin(LitElement) {
     ${loading ? html`<progress></progress>` : ''}
     ${testDetail ? this._testDetailTemplate() : ''}
     ${hasResult ? this._resultsTemplate() : ''}
+
+    <app-indexeddb-mirror
+      .key="${testKey}"
+      .data="${_liveTestDetail}"
+      @persisted-data-changed="${this._persistentTestHandler}">
+    </app-indexeddb-mirror>
+
+    <app-indexeddb-mirror
+      .key="${testComponentsKey}"
+      .data="${_liveItems}"
+      @persisted-data-changed="${this._persistentItemsHandler}">
+    </app-indexeddb-mirror>
     `;
   }
 
   _testDetailTemplate() {
-    const { testDetail, isFinished, isPassed } = this;
+    const { testDetail, isFinished, isPassed, renderRestart } = this;
     const classes = { passed: isPassed, details: true };
     return html`
     <section
@@ -388,6 +512,14 @@ export class PageTest extends routerLinkMixin(LitElement) {
       ${testTypeDetails(testDetail)}
       ${testDetail.endTime ? html`<div class="desc end-time">
         Test ended: <relative-time datetime="${computeIsoDate(testDetail.endTime)}"></relative-time>
+      </div>` : ''}
+
+      ${renderRestart ? html`
+      <div class="reset-test-container">
+        <anypoint-button
+          @click="${this._restartHandler}"
+          emphasis="medium"
+        >Restart test</anypoint-button>
       </div>` : ''}
     </section>
     `;

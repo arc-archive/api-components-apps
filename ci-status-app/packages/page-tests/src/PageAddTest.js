@@ -16,6 +16,9 @@ const sourceComponentInputTemplate = () => html`<anypoint-input name="component"
 const sourceInputTemplate = () => html`<anypoint-input name="branch" required autovalidate>
   <label slot="label">Source branch</label>
 </anypoint-input>`;
+const orgInputTemplate = () => html`<anypoint-input name="org" required autovalidate>
+  <label slot="label">GitHub organization</label>
+</anypoint-input>`;
 const commitInputTemplate = () => html`<anypoint-input name="commit">
   <label slot="label">Commit SHA (optional)</label>
 </anypoint-input>`;
@@ -31,6 +34,7 @@ const amfFormItems = () => {
 }
 const bottomUpFormItems = () => {
   return html`
+  ${orgInputTemplate()}
   ${sourceComponentInputTemplate()}
   ${sourceInputTemplate()}
   ${commitInputTemplate()}
