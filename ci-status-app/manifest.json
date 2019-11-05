@@ -1,0 +1,23 @@
+{
+  "name": "API Components CI",
+  "short_name": "APIC CI",
+  "description": "An application to interact with API Components CI pipeline.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation" : "any",
+	"lang" : "English",
+  "icons": [
+    {
+      "src": "images/manifest/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/manifest/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#eceef1",
+  "background_color": "#eceef1"
+}

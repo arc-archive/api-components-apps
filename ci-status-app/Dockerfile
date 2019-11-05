@@ -1,8 +1,8 @@
-FROM gcr.io/google_appengine/nodejs
-RUN /usr/local/bin/install_node '>=8.12.0'
+FROM launcher.gcr.io/google/nodejs
+RUN install_node v12.13.0
 
 COPY . /app/
 
 RUN npm install --unsafe-perm || false
 
-CMD npm start
+CMD ["npm","start"]

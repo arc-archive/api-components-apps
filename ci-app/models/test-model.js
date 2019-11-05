@@ -26,7 +26,9 @@ export class TestsModel extends BaseModel {
       'error',
       'message',
       'includeDev',
-      'org'
+      'org',
+      'creator.id',
+      'creator.displayName',
     ];
   }
 
@@ -71,6 +73,11 @@ export class TestsModel extends BaseModel {
       {
         name: 'status',
         value: 'queued',
+        excludeFromIndexes: true
+      },
+      {
+        name: 'creator',
+        value: info.creator,
         excludeFromIndexes: true
       }
     ];
