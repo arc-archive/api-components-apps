@@ -41,6 +41,14 @@ export class PageTests extends LitElement {
         color: #F44336;
       }
 
+      .running .test-result {
+        color: #2196F3;
+      }
+
+      .status-line {
+        text-transform: capitalize;
+      }
+
       anypoint-button,
       a {
         text-decoration: none;
@@ -262,11 +270,11 @@ export class PageTests extends LitElement {
         <div>
           Added <relative-time datetime="${computeIsoDate(created)}"></relative-time>
         </div>
-        <div secondary>
+        <div secondary class="status-line">
           Status: ${status}
         </div>
         <div secondary class="test-result">
-          Result: ${result}
+          Result: ${isRunning ? 'n/a' : result}
         </div>
       </anypoint-item-body>
       <a href="/tests/${item.id}">

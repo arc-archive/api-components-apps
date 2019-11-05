@@ -15,6 +15,7 @@ import '../../page-tokens/page-add-token.js';
 import '../../page-changelog/page-changelog.js';
 import '../../page-tests/page-tests.js';
 import '../../page-tests/page-test.js';
+import '../../page-tests/page-add-test.js';
 
 const defaultTitle = 'API Components status';
 const gaId = 'UA-71458341-7';
@@ -48,6 +49,11 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'tests',
         pattern: '/tests',
         data: { title: 'Scheduled tests' },
+      },
+      {
+        name: 'add-test',
+        pattern: '/tests/add',
+        data: { title: 'Schedule a test' },
       },
       {
         name: 'test',
@@ -242,6 +248,14 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .testId="${this.params.id}"
           ></page-test>
         `;
+      case 'add-test':
+        return html`
+          <page-add-test
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
+          ></page-add-test>
+        `;
       default:
         return html`
           <p>Page not found try going to <a href="/">Main</a></p>
@@ -303,7 +317,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
 
   _navTemplate() {
     const states = [
-      ['/intro', 'intro', 'Introduction', 'Activate for introduction page'],
+      // ['/intro', 'intro', 'Introduction', 'Activate for introduction page'],
       ['/tests', 'tests', 'Tests', 'Activate for list of tests'],
       ['/changelog', 'changelog', 'Change log', 'Activate for components change log'],
     ];
