@@ -10,7 +10,7 @@ function prepareAmfBuild(workingDir, branch, sha) {
     let lastError;
 
     amf.stdout.on('data', (data) => {
-      // console.info(`[AMF BUILD]: ${data}`);
+      console.info(`[AMF BUILD]: ${data}`);
     });
 
     amf.stderr.on('data', (data) => {
