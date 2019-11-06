@@ -57,11 +57,7 @@ class TestApiRoute extends BaseApi {
    */
   async createTest(req, res) {
     try {
-      const hasAccess = this.isValidAccess(req, 'create-test');
-      if (!hasAccess) {
-        this.sendError(res, 'Unauthorized', 401);
-        return;
-      }
+      await this.ensureAccess(req, 'create-test');
       const errors = this.validateCreateTest(req);
       if (errors) {
         this.sendError(res, errors, 400);
@@ -84,6 +80,9 @@ class TestApiRoute extends BaseApi {
       if (body.includeDev) {
         info.includeDev = body.includeDev;
       }
+      if (body.purpose) {
+        info.purpose = body.purpose;
+      }
       info.creator = {
         id: user.id,
         displayName: user.displayName || ''
@@ -97,177 +96,149 @@ class TestApiRoute extends BaseApi {
     }
   }
 
-  listTest(req, res) {
+  async listTest(req, res) {
     const errors = this.validatePagination(req);
     if (errors) {
       this.sendError(res, errors);
       return;
     }
-    let { limit, nextPageToken } = req.query;
-    this.testModel
-      .listTests(limit, nextPageToken)
-      .then((result) => this.sendListResult(result, res))
-      .catch((cause) => {
-        logging.error(cause);
-        if (cause.code === 3) {
-          this.sendError(res, 'Inavlid nextPageToken parameter');
-          return;
-        }
-        this.sendError(res, cause.message, 500);
-      });
+    const { limit, nextPageToken } = req.query;
+    try {
+      const result = await this.testModel.listTests(limit, nextPageToken);
+      this.sendListResult(result, res);
+    } catch (cause) {
+      logging.error(cause);
+      if (cause.code === 3) {
+        this.sendError(res, 'Inavlid nextPageToken parameter');
+        return;
+      }
+      this.sendError(res, cause.message, 500);
+    }
   }
 
-  getTest(req, res) {
+  async getTest(req, res) {
     const { testId } = req.params;
-    this.testModel
-      .getTest(testId)
-      .then((resource) => {
-        if (resource) {
-          res.send(resource);
-        } else {
-          this.sendError(res, 'Test not found', 404);
-        }
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        this.sendError(res, cause.message, 500);
-      });
+    try {
+      const resource = await this.testModel.getTest(testId);
+      if (resource) {
+        res.send(resource);
+      } else {
+        this.sendError(res, 'Test not found', 404);
+      }
+    } catch (cause) {
+      logging.error(cause);
+      this.sendError(res, cause.message, 500);
+    }
   }
 
-  deleteTest(req, res) {
+  async deleteTest(req, res) {
     const { testId } = req.params;
-    return this.isValidAccess(req, 'delete-test')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          const o = {
-            message: 'Unauthorized',
-            status: 401
-          };
-          throw o;
-        }
-        return this.testModel.getTest(testId);
-      })
-      .then((resource) => {
-        if (!resource) {
-          const o = {
-            message: 'Test not found',
-            status: 404
-          };
-          throw o;
-        }
-        return this.testModel.deleteTest(testId);
-      })
-      .then(() => {
-        res.sendStatus(204).end();
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        const status = cause.status || 500;
-        this.sendError(res, cause.message, status);
-      });
+    try {
+      await this.ensureAccess(req, 'delete-test');
+      const resource = await this.testModel.getTest(testId);
+      if (!resource) {
+        const o = {
+          message: 'Test not found',
+          status: 404
+        };
+        throw o;
+      }
+      await this.testModel.deleteTest(testId);
+      res.sendStatus(204).end();
+    } catch (cause) {
+      logging.error(cause);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
+    }
   }
   /**
    * An edpoint to reset test state and re-run the test.
    * @param {Object} req
    * @param {Object} res
    */
-  restartTest(req, res) {
+  async restartTest(req, res) {
     const { testId } = req.params;
-    this.isValidAccess(req, 'create-test')
-      .then((hasAccess) => {
-        if (!hasAccess) {
-          const o = {
-            message: 'Unauthorized',
-            status: 401
-          };
-          throw o;
-        }
-        return this.testModel.resetTest(testId);
-      })
-      .then(() => {
-        res.sendStatus(204).end();
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        const status = cause.status || 500;
-        this.sendError(res, cause.message, status);
-      });
+    try {
+      await this.ensureAccess(req, 'create-test');
+      await this.testModel.resetTest(testId);
+      res.sendStatus(204).end();
+    } catch (cause) {
+      logging.error(cause);
+      const status = cause.status || 500;
+      this.sendError(res, cause.message, status);
+    }
   }
 
-  listTestComponents(req, res) {
+  async listTestComponents(req, res) {
     const errors = this.validatePagination(req);
     if (errors) {
       this.sendError(res, errors);
       return;
     }
     const { testId } = req.params;
-    let { limit, nextPageToken } = req.query;
-    this.testsComponentModel
-      .list(testId, limit, nextPageToken)
-      .then((result) => this.sendListResult(result, res))
-      .catch((cause) => {
-        logging.error(cause);
-        if (cause.code === 3) {
-          this.sendError(res, 'Inavlid nextPageToken parameter');
-          return;
-        }
-        this.sendError(res, cause.message, 500);
-      });
+    const { limit, nextPageToken } = req.query;
+    try {
+      const result = await this.testsComponentModel.list(testId, limit, nextPageToken);
+      this.sendListResult(result, res);
+    } catch (cause) {
+      logging.error(cause);
+      if (cause.code === 3) {
+        this.sendError(res, 'Inavlid nextPageToken parameter');
+        return;
+      }
+      this.sendError(res, cause.message, 500);
+    }
   }
 
-  getTestComponent(req, res) {
+  async getTestComponent(req, res) {
     const { testId, componentName } = req.params;
-    this.testsComponentModel
-      .get(testId, componentName)
-      .then((resource) => {
-        if (resource) {
-          res.send(resource);
-        } else {
-          this.sendError(res, 'Test component not found', 404);
-        }
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        this.sendError(res, cause.message, 500);
-      });
+    try {
+      const resource = await this.testsComponentModel.get(testId, componentName);
+      if (resource) {
+        res.send(resource);
+      } else {
+        this.sendError(res, 'Test component not found', 404);
+      }
+    } catch (cause) {
+      logging.error(cause);
+      this.sendError(res, cause.message, 500);
+    }
   }
 
-  listLogs(req, res) {
+  async listLogs(req, res) {
     const errors = this.validatePagination(req);
     if (errors) {
       this.sendError(res, errors);
       return;
     }
     const { testId, componentName } = req.params;
-    let { limit, nextPageToken } = req.query;
-    this.testsLogsModel
-      .list(testId, componentName, limit, nextPageToken)
-      .then((result) => this.sendListResult(result, res))
-      .catch((cause) => {
-        logging.error(cause);
-        if (cause.code === 3) {
-          this.sendError(res, 'Inavlid nextPageToken parameter');
-          return;
-        }
-        this.sendError(res, cause.message, 500);
-      });
+    const { limit, nextPageToken } = req.query;
+    try {
+      const result = await this.testsLogsModel.list(testId, componentName, limit, nextPageToken);
+      this.sendListResult(result, res);
+    } catch (cause) {
+      logging.error(cause);
+      if (cause.code === 3) {
+        this.sendError(res, 'Inavlid nextPageToken parameter');
+        return;
+      }
+      this.sendError(res, cause.message, 500);
+    }
   }
 
-  getLog(req, res) {
+  async getLog(req, res) {
     const { testId, componentName, logId } = req.params;
-    this.testsLogsModel
-      .get(testId, componentName, logId)
-      .then((resource) => {
-        if (resource) {
-          res.send(resource);
-        } else {
-          this.sendError(res, 'Test log not found', 404);
-        }
-      })
-      .catch((cause) => {
-        logging.error(cause);
-        this.sendError(res, cause.message, 500);
-      });
+    try {
+      const resource = await this.testsLogsModel.get(testId, componentName, logId);
+      if (resource) {
+        res.send(resource);
+      } else {
+        this.sendError(res, 'Test log not found', 404);
+      }
+    } catch (cause) {
+      logging.error(cause);
+      this.sendError(res, cause.message, 500);
+    }
   }
 }
 

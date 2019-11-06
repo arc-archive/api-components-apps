@@ -104,6 +104,13 @@ export class TestsModel extends BaseModel {
         excludeFromIndexes: true
       });
     }
+    if (info.purpose) {
+      results.push({
+        name: 'purpose',
+        value: info.purpose,
+        excludeFromIndexes: true
+      });
+    }
     if (typeof info.includeDev === 'boolean') {
       results.push({
         name: 'includeDev',
@@ -127,53 +134,53 @@ export class TestsModel extends BaseModel {
     const transaction = this.store.transaction();
     const key = this.createTestKey(testId);
     return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [test] = data;
-        test.status = 'queued';
-        delete test.passed;
-        delete test.failed;
-        delete test.size;
-        delete test.startTime;
-        delete test.error;
-        delete test.message;
-        transaction.save({
-          key: key,
-          data: test,
-          excludeFromIndexes: this.excludedIndexes
+        .run()
+        .then(() => transaction.get(key))
+        .then((data) => {
+          const [test] = data;
+          test.status = 'queued';
+          delete test.passed;
+          delete test.failed;
+          delete test.size;
+          delete test.startTime;
+          delete test.error;
+          delete test.message;
+          transaction.save({
+            key: key,
+            data: test,
+            excludeFromIndexes: this.excludedIndexes
+          });
+        })
+        .then(() => {
+          const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
+          return query.run();
+        })
+        .then((result) => {
+          const keys = result[0].map((item) => item[this.store.KEY]);
+          if (keys.length) {
+            transaction.delete(keys);
+          }
+        })
+        .then(() => {
+          const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
+          return query.run();
+        })
+        .then((result) => {
+          const keys = result[0].map((item) => item[this.store.KEY]);
+          if (keys.length) {
+            transaction.delete(keys);
+          }
+        })
+        .then(() => {
+          return transaction.commit();
+        })
+        .then(() => {
+          background.queueTest(testId);
+        })
+        .catch((cause) => {
+          transaction.rollback();
+          return Promise.reject(cause);
         });
-      })
-      .then(() => {
-        const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
-        return query.run();
-      })
-      .then((result) => {
-        const keys = result[0].map((item) => item[this.store.KEY]);
-        if (keys.length) {
-          transaction.delete(keys);
-        }
-      })
-      .then(() => {
-        const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
-        return query.run();
-      })
-      .then((result) => {
-        const keys = result[0].map((item) => item[this.store.KEY]);
-        if (keys.length) {
-          transaction.delete(keys);
-        }
-      })
-      .then(() => {
-        return transaction.commit();
-      })
-      .then(() => {
-        background.queueTest(testId);
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
   }
 
   getTest(id) {
@@ -211,28 +218,28 @@ export class TestsModel extends BaseModel {
     const transaction = this.store.transaction();
     const key = this.createTestKey(id);
     return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [test] = data;
-        if (test.status === 'queued') {
-          test.status = 'running';
-        }
-        if (!test.failed) {
-          test.failed = 0;
-        }
-        test.failed++;
-        transaction.save({
-          key: key,
-          data: test,
-          excludeFromIndexes: this.excludedIndexes
+        .run()
+        .then(() => transaction.get(key))
+        .then((data) => {
+          const [test] = data;
+          if (test.status === 'queued') {
+            test.status = 'running';
+          }
+          if (!test.failed) {
+            test.failed = 0;
+          }
+          test.failed++;
+          transaction.save({
+            key: key,
+            data: test,
+            excludeFromIndexes: this.excludedIndexes
+          });
+          return transaction.commit();
+        })
+        .catch((cause) => {
+          transaction.rollback();
+          return Promise.reject(cause);
         });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
   }
 
   async updateComponentResult(id, report) {
@@ -283,24 +290,24 @@ export class TestsModel extends BaseModel {
     const transaction = this.store.transaction();
     const key = this.createTestKey(id);
     return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [test] = data;
-        Object.keys(props).forEach((key) => {
-          test[key] = props[key];
+        .run()
+        .then(() => transaction.get(key))
+        .then((data) => {
+          const [test] = data;
+          Object.keys(props).forEach((key) => {
+            test[key] = props[key];
+          });
+          transaction.save({
+            key: key,
+            data: test,
+            excludeFromIndexes: this.excludedIndexes
+          });
+          return transaction.commit();
+        })
+        .catch((cause) => {
+          transaction.rollback();
+          return Promise.reject(cause);
         });
-        transaction.save({
-          key: key,
-          data: test,
-          excludeFromIndexes: this.excludedIndexes
-        });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
   }
 
   deleteTest(id) {
@@ -308,34 +315,34 @@ export class TestsModel extends BaseModel {
     const transaction = this.store.transaction();
     const key = this.createTestKey(id);
     return transaction
-      .run()
-      .then(() => transaction.delete(key))
-      .then(() => {
-        const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
-        return query.run();
-      })
-      .then((result) => {
-        const keys = result[0].map((item) => item[this.store.KEY]);
-        if (keys.length) {
-          transaction.delete(keys);
-        }
-      })
-      .then(() => {
-        const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
-        return query.run();
-      })
-      .then((result) => {
-        const keys = result[0].map((item) => item[this.store.KEY]);
-        if (keys.length) {
-          transaction.delete(keys);
-        }
-      })
-      .then(() => {
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
+        .run()
+        .then(() => transaction.delete(key))
+        .then(() => {
+          const query = transaction.createQuery(this.namespace, this.testLogsKind).hasAncestor(key);
+          return query.run();
+        })
+        .then((result) => {
+          const keys = result[0].map((item) => item[this.store.KEY]);
+          if (keys.length) {
+            transaction.delete(keys);
+          }
+        })
+        .then(() => {
+          const query = transaction.createQuery(this.namespace, this.componentsKind).hasAncestor(key);
+          return query.run();
+        })
+        .then((result) => {
+          const keys = result[0].map((item) => item[this.store.KEY]);
+          if (keys.length) {
+            transaction.delete(keys);
+          }
+        })
+        .then(() => {
+          return transaction.commit();
+        })
+        .catch((cause) => {
+          transaction.rollback();
+          return Promise.reject(cause);
+        });
   }
 }

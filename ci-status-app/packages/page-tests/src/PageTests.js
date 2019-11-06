@@ -303,6 +303,7 @@ export class PageTests extends LitElement {
       <anypoint-item-body threeline>
         <div>
           Added <relative-time datetime="${computeIsoDate(created)}"></relative-time>
+          ${item.purpose ? html`, <span>${item.purpose}</span>` : ''}
         </div>
         <div secondary class="status-line">
           Status: ${status}

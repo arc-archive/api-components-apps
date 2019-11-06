@@ -23,6 +23,13 @@ const orgInputTemplate = () => html`<anypoint-input name="org" required autovali
 const commitInputTemplate = () => html`<anypoint-input name="commit">
   <label slot="label">Commit SHA (optional)</label>
 </anypoint-input>`;
+const purposeInputTemplate = () => html`<anypoint-input
+  name="purpose"
+  class="info"
+  infomessage="This is rendered in the tests list"
+>
+  <label slot="label">Purpose (optional)</label>
+</anypoint-input>`;
 const includeDevInputTemplate = () => html`<div class="dev-option">
   <anypoint-checkbox name="includeDev">Inlcude dev dependencies</anypoint-checkbox>
 </div>`;
@@ -30,6 +37,7 @@ const amfFormItems = () => {
   return html`
   ${sourceInputTemplate()}
   ${commitInputTemplate()}
+  ${purposeInputTemplate()}
   ${includeDevInputTemplate()}
   `;
 }
@@ -39,6 +47,7 @@ const bottomUpFormItems = () => {
   ${sourceComponentInputTemplate()}
   ${sourceInputTemplate()}
   ${commitInputTemplate()}
+  ${purposeInputTemplate()}
   ${includeDevInputTemplate()}
   `;
 }
@@ -75,6 +84,10 @@ export class PageAddTest extends LitElement {
 
       anypoint-input {
         width: auto;
+      }
+
+      anypoint-input.info {
+        margin-bottom: 32px;
       }
 
       .action-button {

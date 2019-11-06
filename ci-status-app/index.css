@@ -25,6 +25,7 @@ html {
   --inactive-background-color: #FAFAFA;
   --opened-background-color: #E3F2FD;
   --code-background-color: #f5f2f0;
+  --anypoint-button-emphasis-high-hover-background-color: #1565C0;
 }
 
 body {

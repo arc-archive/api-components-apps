@@ -1,6 +1,7 @@
 import * as jwt from '../lib/jwt';
 import { TokenModel } from '../models/token-model';
 import cors from 'cors';
+import { AccessError } from './errors.js';
 
 let tokenModel;
 export class BaseApi {
@@ -58,52 +59,67 @@ export class BaseApi {
    * @param {?String} scope
    * @return {Promise<Boolean>}
    */
-  isValidAccess(req, scope) {
-    const user = req.user;
+  async isValidAccess(req, scope) {
+    const { user } = req;
     if (user && (user.orgUser || user.superUser)) {
-      return Promise.resolve(true);
+      return true;
     }
     const auth = req.get('authorization');
     if (!auth) {
-      return Promise.resolve(false);
+      return false;
     }
-    if (
-      !String(auth)
-        .toLowerCase()
-        .startsWith('bearer ')
-    ) {
-      return Promise.resolve(false);
+    if (!String(auth).toLowerCase().startsWith('bearer ')) {
+      return false;
     }
     const token = auth.substr(7);
     let detail;
     try {
       detail = jwt.verifyTokenSync(token);
     } catch (_) {
-      return Promise.resolve(false);
+      return false;
     }
     if (jwt.isTokenExpired(detail)) {
-      return Promise.resolve(false);
+      return false;
     }
     if (scope) {
       if (!jwt.hasScope(detail, 'all')) {
         if (!jwt.hasScope(detail, scope)) {
-          return Promise.resolve(false);
+          return false;
         }
       }
     }
-    return this.tokenModel
-      .find(token)
-      .catch(() => {})
-      .then((token) => {
-        if (!token || token.revoked) {
-          return false;
-        }
-        req.user = {
-          id: token.issuer.id,
-          displayName: token.issuer.displayName
-        };
-        return true;
-      });
+    let queryResult;
+    try {
+      queryResult = await this.tokenModel.find(token);
+      if (!queryResult || queryResult.revoked) {
+        return false;
+      }
+      req.user = {
+        id: token.issuer.id,
+        displayName: token.issuer.displayName
+      };
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  /**
+   * Ensures that the current user has access to the resource or throws an error
+   * otherwise.
+   * @param {Object} req
+   * @param {?String} scope
+   * @return {Promise} Resolves when has access, rejects when do not have access.
+   */
+  async ensureAccess(req, scope) {
+    let has = false;
+    try {
+      has = await this.isValidAccess(req, scope);
+    } catch (_) {
+      // ..
+    }
+    if (!has) {
+      throw new AccessError();
+    }
   }
 
   _processCors(req, callback) {

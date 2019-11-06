@@ -513,6 +513,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
     <section
       class=${classMap(classes)}
     >
+      ${testDetail.purpose ? html`<p>${testDetail.purpose}</p>` : ''}
       <div class="desc status">
         Status: <span class="status-value">${testDetail.status}</span>
       </div>
