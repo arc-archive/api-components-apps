@@ -16,7 +16,7 @@ echo "Building AMF library in $AMF_DIR"
 mkdir ${AMF_DIR}
 cd $AMF_DIR
 
-git clone --depth=50 https://github.com/aml-org/amf.git src
+git clone https://github.com/aml-org/amf.git src
 cd src
 
 if [ -z ${BRANCH+x} ]; then
