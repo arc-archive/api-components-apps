@@ -400,12 +400,12 @@ export class ComponentModel extends BaseModel {
       promise = this.store.update(entity);
     }
     return promise
-      .then(() => this.store.get(key))
-      .then((entity) => {
-        if (entity && entity[0]) {
-          return this.fromDatastore(entity[0]);
-        }
-      });
+        .then(() => this.store.get(key))
+        .then((entity) => {
+          if (entity && entity[0]) {
+            return this.fromDatastore(entity[0]);
+          }
+        });
   }
   /**
    * Replaces/creates version in the datastrore
@@ -421,33 +421,33 @@ export class ComponentModel extends BaseModel {
   _ensureVersion(parent, version, componentName, groupName, data, changelog) {
     const key = this._createVersionKey(groupName, componentName, version);
     return this.store
-      .get(key)
-      .catch(() => {})
-      .then((model) => {
-        if (!model || !model[0]) {
-          return this._createVersion(parent, version, componentName, groupName, data, changelog);
-        } else {
-          model = model[0];
-          model.created = Date.now();
-          model.docs = JSON.stringify(data);
-          if (parent.tags) {
-            model.tags = parent.tags;
-          } else if (model.tags) {
-            delete model.tags;
+        .get(key)
+        .catch(() => {})
+        .then((model) => {
+          if (!model || !model[0]) {
+            return this._createVersion(parent, version, componentName, groupName, data, changelog);
+          } else {
+            model = model[0];
+            model.created = Date.now();
+            model.docs = JSON.stringify(data);
+            if (parent.tags) {
+              model.tags = parent.tags;
+            } else if (model.tags) {
+              delete model.tags;
+            }
+            if (changelog) {
+              model.changelog = changelog;
+            } else if (model.changelog) {
+              delete model.changelog;
+            }
+            const entity = {
+              key,
+              data: model,
+              excludeFromIndexes: this.versionExcludeIndexes
+            };
+            return this.store.update(entity);
           }
-          if (changelog) {
-            model.changelog = changelog;
-          } else if (model.changelog) {
-            delete model.changelog;
-          }
-          const entity = {
-            key,
-            data: model,
-            excludeFromIndexes: this.versionExcludeIndexes
-          };
-          return this.store.update(entity);
-        }
-      });
+        });
   }
   /**
    * Creates component version entity.

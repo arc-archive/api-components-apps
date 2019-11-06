@@ -17,7 +17,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateTagParameter(req) {
-    let { tags } = req.query;
+    const { tags } = req.query;
     if (!tags) {
       return;
     }
@@ -48,7 +48,7 @@ class ComponentsApiRoute extends BaseApi {
       this.sendError(res, tagError);
       return;
     }
-    let { limit, nextPageToken, tags, group } = req.query;
+    const { limit, nextPageToken, tags, group } = req.query;
     try {
       const result = await this.model.queryComponents(limit, nextPageToken, {
         tags,
@@ -66,7 +66,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateTimeRange(req) {
-    let { since, until } = req.query;
+    const { since, until } = req.query;
     if (!since && !until) {
       return;
     }
@@ -89,7 +89,7 @@ class ComponentsApiRoute extends BaseApi {
   }
 
   _validateParentParameters(req) {
-    let { group, component } = req.query;
+    const { group, component } = req.query;
     if (group && !component) {
       return 'The "component" parameter is required when "group" is used';
     }
@@ -119,7 +119,7 @@ class ComponentsApiRoute extends BaseApi {
       this.sendError(res, groupError);
       return;
     }
-    let { limit, nextPageToken, tags, group, component, since, until } = req.query;
+    const { limit, nextPageToken, tags, group, component, since, until } = req.query;
     try {
       const result = await this.model.queryVersions(limit, nextPageToken, {
         tags,
