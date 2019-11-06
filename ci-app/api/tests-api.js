@@ -73,17 +73,17 @@ class TestApiRoute extends BaseApi {
       }
       const { body, user } = req;
       const info = {
-        branch: validator.escape(body.branch),
-        type: validator.escape(body.type)
+        branch: body.branch,
+        type: body.type
       };
       if (body.commit) {
-        info.commit = validator.escape(body.commit);
+        info.commit = body.commit;
       }
       if (body.component) {
-        info.component = validator.escape(body.component);
+        info.component = body.component;
       }
       if (body.org) {
-        info.org = validator.escape(body.org);
+        info.org = body.org;
       }
       if (body.includeDev) {
         info.includeDev = body.includeDev;
