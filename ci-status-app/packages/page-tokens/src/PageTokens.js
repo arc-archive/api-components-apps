@@ -106,31 +106,31 @@ export class PageTokens extends LitElement {
 
       anypoint-item.details {
         border-bottom: none;
-        background-color: #E3F2FD;
+        background-color: var(--opened-background-color);
       }
 
       anypoint-item.revoked {
-        color: #9e9e9e;
-        background-color: #FAFAFA;
+        color: var(--inactive-color);
+        background-color: var(--inactive-background-color);
       }
 
       [secondary],
       .token-details {
         font-size: 13px;
-        color: #616161;
+        color: var(--secondary-text-color);
       }
 
       anypoint-item.revoked [secondary] {
-        color: #9e9e9e;
+        color: var(--inactive-color);
       }
 
       .token-details {
         padding: 0px 12px;
-        background-color: #E3F2FD;
+        background-color: var(--opened-background-color);
       }
 
       .token-details.revoked {
-        background-color: #FAFAFA;
+        background-color: var(--inactive-background-color);
       }
 
       .token-details pre {

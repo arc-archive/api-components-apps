@@ -465,11 +465,15 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
 
         header {
           padding: 12px 24px;
-          background-color: #eceef1;
+          background-color: var(--header-background-color);
           height: 72px;
-          color: #000;
+          color: var(--header-color);
           display: flex;
           align-items: center;
+        }
+
+        :host([narrow]) header {
+          padding: 12px 0;
         }
 
         header h1 {
@@ -504,7 +508,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
 
         main {
           max-width: 1440px;
-          background-color: #fff;
+          background-color: var(--page-background-color);
           padding: 0 40px;
           margin-bottom: 20px;
           flex: 1;
@@ -513,8 +517,8 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         :host([narrow]) main {
           flex: auto;
           max-width: auto;
-          padding: 0;
-          margin: 0 12px 20px 12px;
+          padding: 0 12px 20px 12px;
+          margin: 0;
         }
 
         .app-icon {
@@ -531,13 +535,13 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         }
 
         .user-menu {
-          background-color: #fff;
+          /* background-color: #fff; */
         }
 
         .nav-drawer {
           width: var(--app-drawer-width, 256px);
           display: block;
-          background-color: #fff;
+          background-color: var(--app-drawer-background-color);
         }
 
         :host([narrow]) .nav-drawer {

@@ -16,7 +16,7 @@ export class AppMessage extends LitElement {
     :host {
       display: flex;
       flex-direction: row;
-      background-color: #F5F7F9;
+      background-color: var(--app-message-background-color, #F5F7F9);
       border-radius: 3px;
       padding: 12px 24px 12px 12px;
       margin: 12px 0;

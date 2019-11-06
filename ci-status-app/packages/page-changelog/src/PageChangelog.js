@@ -73,7 +73,7 @@ export class PageChangelog extends LitElement {
       }
 
       arc-marked {
-        background-color: #FFF9C4;
+        background-color: var(--code-background-color);
         padding: 4px;
       }
     `];

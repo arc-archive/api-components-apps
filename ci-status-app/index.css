@@ -3,6 +3,7 @@ html {
   --primary-color: #01579B;
   --accent-color: #4CAF50;
   --error-color: #C62828;
+  --secondary-text-color: #616161;
   --anypoiont-dropdown-shaddow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   --anypoiont-autocomplete-dropdown-shaddow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   --anypoint-listbox-background-color: #fff;
@@ -15,6 +16,15 @@ html {
   --anypoint-icon-button-emphasis-low-color: var(--primary-color);
   --anypoint-button-emphasis-high-background-color: var(--primary-color);
   --anypoint-input-label-color: var(--text-color);
+  --header-background-color: #eceef1;
+  --header-color: #333;
+  --title-color: #202124;
+  --app-drawer-background-color: #fff;
+  --page-background-color: #fff;
+  --breadcrumb-chevron-color: #151515;
+  --inactive-background-color: #FAFAFA;
+  --opened-background-color: #E3F2FD;
+  --code-background-color: #f5f2f0;
 }
 
 body {
@@ -23,8 +33,16 @@ body {
 
 @media (prefers-color-scheme: dark) {
   html {
-    --secondary-text-color: #616161;
+    --primary-color: #FFCC80;
+    --text-color: #fff;
+    --secondary-text-color: #F5F5F5;
     --primary-background-color: #424242;
+    --link-color: #2196F3;
+    --success-color: #AED581;
+    --error-color: #FF8A65;
+    --inactive-color: #78909C;
+    --info-color: #64B5F6;
+    --inactive-background-color: #212121;
     --anypoint-checkbox-label-color:  #F5F5F5;
     --anypoint-input-background-color: #494949;
     --anypoint-input-label-color: #fff;
@@ -37,13 +55,26 @@ body {
     --anypoint-input-info-message-color: #fff;
     --anypoint-dropdown-menu-background-color: #494949;
     --anypoint-dropdown-menu-label-background-color: var(--primary-background-color);
-    --anypoint-listbox-background-color: #494949;
+    --anypoint-listbox-background-color: #212121;
     --anypoint-dropdown-menu-focus-background-color: #9E9E9E;
     --anypoint-dropdown-menu-label-color: #fff;
     --anypoint-dropdown-menu-info-message-color: #fff;
-    --anypoint-item-hover-background-color: #9E9E9E;
+    --anypoint-item-hover-background-color: #616161;
     --anypoiont-autocomplete-background-color: #494949;
     --anypoint-icon-button-emphasis-low-color: #fff;
+    --header-background-color: #212121;
+    --header-color: #fff;
+    --anypoint-button-color: #fff;
+    --app-drawer-background-color: #212121;
+    --anypoint-listbox-color: #fff;
+    --title-color: #F5F5F5;
+    --page-background-color: #212121;
+    --anypoint-chip-background-color: #212121;
+    --anypoint-chip-label-color: var(--text-color);
+    --breadcrumb-chevron-color: #fff;
+    --app-message-background-color: #37474F;
+    --opened-background-color: #424242;
+    --code-background-color: #263238;
   }
 
   body {

@@ -40,13 +40,13 @@ ul {
 export const headersStyles = css`
 h2 {
   font-size: 28px;
-  color: #202124;
+  color: var(--title-color);
   font-weight: 400;
   line-height: 1.2;
 }
 h3 {
   font-size: 24px;
-  color: #202124;
+  color: var(--title-color);
   font-weight: 400;
   line-height: 1.2;
 }
@@ -55,11 +55,7 @@ h4 {
   font-weight: 400;
   line-height: 1.2;
   margin: 0 0 8px;
-}
-body.styled.dark h2,
-body.styled.dark h3,
-body.styled.dark h4 {
-  color: #F5F5F5;
+  color: var(--title-color);
 }
 `;
 
@@ -101,7 +97,7 @@ a {
 .breadcrumbs li .breadcrumb-chevron:after {
   display: inline-block;
   content: '›';
-  color: #151515;
+  color: var(--breadcrumb-chevron-color);
   margin: 0 5px;
   font-size: 1rem;
   font-weight: 700;

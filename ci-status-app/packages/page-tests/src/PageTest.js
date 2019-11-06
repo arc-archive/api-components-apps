@@ -61,9 +61,6 @@ export class PageTest extends routerLinkMixin(LitElement) {
         color: var(--success-color);
       }
 
-      .result-list {
-      }
-
       .item-status {
         width: 80px;
         text-transform: capitalize;

@@ -40,7 +40,7 @@ export class PageTests extends LitElement {
 
       [secondary] {
         font-size: 0.88rem;
-        color: #616161;
+        color: var(--secondary-text-color);
       }
 
       .test-result {
