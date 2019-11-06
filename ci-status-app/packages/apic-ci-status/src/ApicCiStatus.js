@@ -523,8 +523,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         main {
           max-width: 1440px;
           background-color: var(--page-background-color);
-          padding: 0 40px;
-          margin-bottom: 20px;
+          padding: 0 40px 20px 40px;
           flex: 1;
         }
 
