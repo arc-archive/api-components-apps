@@ -2,6 +2,8 @@ import { BaseApi } from './base-api';
 import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
+import validator from 'validator';
+
 import { TestsModel } from '../models/test-model';
 import { TestsComponentModel } from '../models/test-component-model';
 import { TestsLogsModel } from '../models/test-logs-model';
@@ -39,11 +41,17 @@ class TestApiRoute extends BaseApi {
     if (body.type === 'bottom-up' && !body.org) {
       messages[messages.length] = 'The "org" property is required with "bottom-up" type.';
     }
+    if (body.includeDev !== undefined && typeof body.includeDev !== 'boolean') {
+      messages[messages.length] = `Invalid type "${typeof body.includeDev}" for "includeDev" property.`;
+    }
     if (body.component) {
       const cmp = String(body.component);
       if (cmp[0] !== '@') {
         messages[messages.length] = 'The "component" has no NPM scope.';
       }
+    }
+    if (body.commit && !validator.isHash(body.commit, 'sha1')) {
+      messages[messages.length] = 'The "commit" property is not valid SHA1 hash.';
     }
     return messages.length ? messages.join(' ') : undefined;
   }
@@ -65,23 +73,23 @@ class TestApiRoute extends BaseApi {
       }
       const { body, user } = req;
       const info = {
-        branch: body.branch,
-        type: body.type
+        branch: validator.escape(body.branch),
+        type: validator.escape(body.type)
       };
       if (body.commit) {
-        info.commit = body.commit;
+        info.commit = validator.escape(body.commit);
       }
       if (body.component) {
-        info.component = body.component;
+        info.component = validator.escape(body.component);
       }
       if (body.org) {
-        info.org = body.org;
+        info.org = validator.escape(body.org);
       }
       if (body.includeDev) {
         info.includeDev = body.includeDev;
       }
       if (body.purpose) {
-        info.purpose = body.purpose;
+        info.purpose = validator.escape(body.purpose);
       }
       info.creator = {
         id: user.id,

@@ -532,6 +532,10 @@ export class PageTest extends routerLinkMixin(LitElement) {
         Test ended: <relative-time datetime="${computeIsoDate(testDetail.endTime)}"></relative-time>
       </div>` : ''}
 
+      ${testDetail.creator && testDetail.creator.displayName ? html`<div class="desc">
+        Created by: ${testDetail.creator.displayName}
+      </div>` : ''}
+
       ${renderRestart ? html`
       <div class="reset-test-container">
         <anypoint-button
