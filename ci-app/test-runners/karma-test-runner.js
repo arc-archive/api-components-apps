@@ -1,141 +1,64 @@
-import { config, Server } from 'karma';
 import path from 'path';
 import { BaseTestRunner } from './base-test-runner';
 import logging from '../lib/logging';
-
-let runResult = {};
-
-const ensureBrowser = (browser) => {
-  const id = browser.id;
-  if (!runResult[id]) {
-    runResult[id] = {
-      browser: browser.name,
-      logs: [],
-      startTime: browser.lastResult ? browser.lastResult.startTime : Date.now()
-    };
-  }
-  return id;
-};
-
-const ArcCiReporter = function() {
-  this.onSpecComplete = (browser, result) => {
-    const id = ensureBrowser(browser);
-    runResult[id].logs.push({
-      suite: result.suite,
-      description: result.description,
-      success: result.success,
-      skipped: result.skipped,
-      errors: result.assertionErrors
-    });
-  };
-};
+import { fork } from 'child_process';
 
 export class KarmaTestRunner extends BaseTestRunner {
-  getReport() {
-    const keys = Object.keys(runResult);
-    const report = {
-      total: 0,
-      success: 0,
-      failed: 0,
-      skipped: 0,
-      error: false,
-      results: []
-    };
-    for (let i = 0, len = keys.length; i < len; i++) {
-      const key = keys[i];
-      const browser = runResult[key];
-      report.total += browser.total;
-      report.success += browser.success;
-      report.failed += browser.failed;
-      report.skipped += browser.skipped;
-      report.results.push(browser);
+  _procCleanUp() {
+    this._resolver = null;
+    this._rejecter = null;
+    this.proc.removeAllListeners('message');
+    this.proc.removeAllListeners('error');
+    try {
+      this.proc.kill();
+    } catch (_) {
+      // ..
     }
-    return report;
+    this.proc = null;
   }
 
-  clearResults() {
-    runResult = {};
+  _messageHandler(data) {
+    switch (data.type) {
+      case 'error':
+        this._rejecter(new Error(data.message));
+        break;
+      case 'result':
+        this._resolver(data.result);
+        break;
+      case 'log':
+        logging.verbose(data.message);
+        return;
+      default:
+        logging.error(`Unknown command from karma process ${data.type}`);
+        return;
+    }
+    this._procCleanUp();
+  }
+
+  _errorHandler(err) {
+    this._rejecter(err);
+    this._procCleanUp();
   }
 
   async _run() {
-    this.clearResults();
-    const orig = process.cwd();
-    logging.verbose(`Changing dir to ${this.componentDir}...`);
-    process.chdir(this.componentDir);
-    logging.verbose(`Running karma tests for ${this.component}`);
-    try {
-      const opts = await this.createConfig();
-      const port = 9876;
-      opts.port = port;
-      logging.verbose('Creating karma server...');
-      this.server = new Server(opts, (exitCode) => {
-        process.chdir(orig);
-        logging.verbose(`Karma has exited with ${exitCode}`);
-        this._resolve(this.getReport());
-        this.server = null;
-      });
-      this._addListeners(this.server);
-      const result = new Promise((resolve, reject) => {
-        this._resolve = resolve;
-        this._reject = reject;
-      });
-      logging.verbose('Starting karma server...');
-      this.server.start();
-      return result;
-    } catch (e) {
-      logging.verbose(`Error running karma tests: ${e.message}`);
-      throw e;
-    }
-  }
-
-  async createConfig() {
-    const cnfFile = path.resolve('./karma.conf.js');
-    logging.verbose(`Reading tests configuration from ${cnfFile}`);
-    const cnf = config.parseConfig(cnfFile, {
-      reporters: ['arcci']
+    this._messageHandler = this._messageHandler.bind(this);
+    this._errorHandler = this._errorHandler.bind(this);
+    // A placeholder for any ENV setup
+    const env = Object.assign({ }, process.env);
+    // execArgv are coppied from this process and this is not what we want.
+    const options = {
+      execArgv: [],
+      env
+    };
+    return new Promise((resolve, reject) => {
+      this._resolver = resolve;
+      this._rejecter = reject;
+      const file = path.join(__dirname, 'karma-proc.js');
+      const proc = fork(file, options);
+      this.proc = proc;
+      proc.on('message', this._messageHandler);
+      proc.on('error', this._errorHandler);
+      proc.send({ workingDir: this.componentDir });
     });
-    if (!cnf.plugins) {
-      cnf.plugins = [];
-    }
-    cnf.plugins.push({
-      'reporter:arcci': ['type', ArcCiReporter]
-    });
-    logging.verbose('Configuration is ready.');
-    return cnf;
   }
-
-  _addListeners(srv) {
-    srv.on('browser_complete', this._browserComplete.bind(this));
-    srv.on('browser_error', this._browserError.bind(this));
-    // srv.on('run_complete', this._runComplete.bind(this));
-  }
-
-  _browserComplete(browser, result) {
-    const id = ensureBrowser(browser);
-    const lastResult = browser.lastResult || {};
-    const b = runResult[id];
-    b.total = lastResult.total || 0;
-    b.success = lastResult.success || 0;
-    b.failed = lastResult.failed || 0;
-    b.skipped = lastResult.skipped || 0;
-    b.error = lastResult.error;
-    b.endTime = lastResult.endTime || Date.now();
-  }
-
-  _browserError(browser, error) {
-    const id = ensureBrowser(browser);
-    const b = runResult[id];
-    b.error = true;
-    b.message = String(error);
-    const lastResult = browser.lastResult || {};
-    b.total = lastResult.total || 0;
-    b.success = lastResult.success || 0;
-    b.failed = lastResult.failed || 0;
-    b.skipped = lastResult.skipped || 0;
-    b.endTime = lastResult.endTime || Date.now();
-  }
-
-  // _runComplete(browsers, results) {
-  //   console.log(runResult);
-  // }
 }
