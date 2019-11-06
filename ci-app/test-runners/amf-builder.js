@@ -15,7 +15,7 @@ function prepareAmfBuild(workingDir, branch, sha) {
 
     amf.stderr.on('data', (data) => {
       console.error(`[AMF BUILD] ERR: ${data}`);
-      const trimmed = data.trim();
+      const trimmed = data.trim ? data.trim() : data;
       if (trimmed) {
         lastError = trimmed;
       }
