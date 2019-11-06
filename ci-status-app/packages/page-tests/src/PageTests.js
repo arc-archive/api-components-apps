@@ -294,8 +294,8 @@ export class PageTests extends LitElement {
   }
 
   _testItemTemplate(item, index) {
-    const { status, failed, created } = item;
-    const isFailed = !!failed;
+    const { status, failed, created, error } = item;
+    const isFailed = error || !!failed;
     const isRunning = status === 'running';
     const classes = { failed: isFailed, running: isRunning };
     const result = isFailed ? 'Failed' : 'Passed';

@@ -173,7 +173,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
 
   get isPassed() {
     const { testDetail } = this;
-    return testDetail.status === 'finished' && !testDetail.failed;
+    return testDetail.status === 'finished' && !testDetail.failed && !testDetail.error;
   }
 
   get testKey() {
@@ -536,6 +536,11 @@ export class PageTest extends routerLinkMixin(LitElement) {
       ${testDetail.creator && testDetail.creator.displayName ? html`<div class="desc">
         Created by: ${testDetail.creator.displayName}
       </div>` : ''}
+
+      ${testDetail.error && testDetail.message ? html`<app-message
+        type="error"
+        persistant
+      >${testDetail.message}</app-message>` : ''}
 
       ${renderRestart ? html`
       <div class="reset-test-container">
