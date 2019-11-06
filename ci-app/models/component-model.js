@@ -174,14 +174,32 @@ export class ComponentModel extends BaseModel {
    * @return {Promise<Array>} Promise resolved to a list of names.
    */
   async listApiComponents() {
+    return await this.listTagComponents('apic');
+  }
+
+  /**
+   * Lists names of AMF consuming components (with `amf` tag)
+   * @return {Promise<Array>} Promise resolved to a list of names.
+   */
+  async listAmfComponents() {
+    return await this.listTagComponents('amf');
+  }
+
+  /**
+   * Lists names of components that has a tag.
+   * @param {String} tag The tag to search for.
+   * @return {Promise<Array>} Promise resolved to a list of names.
+   */
+  async listTagComponents(tag) {
     let query = this.store.createQuery(this.namespace, this.componentsKind);
-    query = query.filter('tags', '=', 'apic');
+    query = query.filter('tags', '=', tag);
     const [components] = await this.store.runQuery(query);
     if (!components) {
       return [];
     }
     return components.map((item) => this.fromDatastore(item));
   }
+
   /**
    * Lists version of a component.
    * @param {String} group Component group id

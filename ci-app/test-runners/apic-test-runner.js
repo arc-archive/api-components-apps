@@ -82,11 +82,16 @@ export class ApicTestRunner extends BaseBuild {
    * @return {Promise}
    */
   async _listComponents(type, component, includeDev) {
+    // return [{
+    //   name: 'api-type-document',
+    //   org: 'advanced-rest-client',
+    //   pkg: '@api-components/api-type-document'
+    // }];
     let data;
     let skip;
     if (type === 'amf-build') {
       skip = this.amfSkipComponents;
-      data = await this.catalogModel.listApiComponents();
+      data = await this.catalogModel.listAmfComponents();
     } else if (type === 'bottom-up') {
       skip = this.skipBottomUpComponents;
       data = await this.dependencyModel.listParentComponents(component, includeDev);
