@@ -76,6 +76,10 @@ export class PageChangelog extends LitElement {
         background-color: var(--code-background-color);
         padding: 4px;
       }
+
+      relative-time {
+        margin-left: 8px;
+      }
     `];
   }
 
