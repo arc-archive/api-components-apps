@@ -28,6 +28,7 @@ export class PageDependency extends LitElement {
       css`
       :host {
         display: block;
+        position: relative;
       }
 
       anypoint-item {
@@ -179,7 +180,7 @@ export class PageDependency extends LitElement {
   }
 
   render() {
-    const { lastError, hasItems } = this;
+    const { lastError, hasItems, loading } = this;
     return html`
     ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
@@ -188,6 +189,7 @@ export class PageDependency extends LitElement {
     >${lastError}</app-message>` : ''}
 
     ${this._formTemplate()}
+    ${loading ? html`<progress></progress>` : ''}
     ${hasItems ? this._listItems() : ''}
     `;
   }

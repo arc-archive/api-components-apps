@@ -60,6 +60,7 @@ export class PageChangelog extends LitElement {
       css`
       :host {
         display: block;
+        position: relative;
       }
 
       anypoint-input {

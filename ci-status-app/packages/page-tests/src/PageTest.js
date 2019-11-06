@@ -47,6 +47,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
       css`
       :host {
         display: block;
+        position: relative;
       }
 
       .result-value {

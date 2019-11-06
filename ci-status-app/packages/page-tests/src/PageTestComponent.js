@@ -55,6 +55,7 @@ export class PageTestComponent extends routerLinkMixin(LitElement) {
       css`
       :host {
         display: block;
+        position: relative;
       }
 
       .result-tiles {

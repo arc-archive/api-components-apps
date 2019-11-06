@@ -63,6 +63,7 @@ export const progressCss = css`
 progress {
   width: 100%;
   height: 3px;
+  position: absolute;
 }
 `;
 

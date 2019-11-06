@@ -6,7 +6,7 @@ import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.j
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-item.js';
 import '../../apic-ci-status/app-message.js';
-import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
+import { baseStyles, headersStyles, breadcrumbsStyles } from '../../common-styles.js';
 import { arrowBack } from '../../Icons.js';
 import unauthorizedView from '../../UnauthorizedToast.js';
 import { breadcrumbsGenerator } from '../../utils.js';
@@ -71,7 +71,6 @@ export class PageAddTest extends LitElement {
     return [
       baseStyles,
       headersStyles,
-      progressCss,
       breadcrumbsStyles,
       css`
       :host {

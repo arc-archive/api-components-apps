@@ -30,6 +30,7 @@ export class PageTests extends LitElement {
       css`
       :host {
         display: block;
+        position: relative;
       }
 
       anypoint-item {
