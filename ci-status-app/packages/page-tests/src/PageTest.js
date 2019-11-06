@@ -239,7 +239,11 @@ export class PageTest extends routerLinkMixin(LitElement) {
     }
     if (!userStatus.loggedIn) {
       this.loading = true;
-      await userStatus.getUser();
+      try {
+        await userStatus.getUser();
+      } catch (e) {
+        // ...
+      }
       this.loading = false;
     }
     if (!userStatus.loggedIn) {
@@ -258,7 +262,12 @@ export class PageTest extends routerLinkMixin(LitElement) {
       init.headers = [['authorization', `Bearer ${apiToken}`]];
     }
     this.loading = true;
-    const response = await fetch(url, init);
+    let response;
+    try {
+      response = await fetch(url, init);
+    } catch (e) {
+      return;
+    }
     const success = response.ok;
     const data = await response.json();
     this.loading = false;
@@ -491,7 +500,7 @@ export class PageTest extends routerLinkMixin(LitElement) {
     </div>
     ${loading ? html`<progress></progress>` : ''}
     ${testDetail ? this._testDetailTemplate() : ''}
-    ${hasResult ? this._resultsTemplate() : ''}
+    ${testDetail && hasResult ? this._resultsTemplate() : ''}
 
     <app-indexeddb-mirror
       .key="${testKey}"

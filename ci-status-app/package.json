@@ -21,8 +21,8 @@
     "test:compatibility": "karma start --compatibility all --coverage",
     "test:compatibility:watch": "karma start --compatibility all --auto-watch=true --single-run=false",
     "test:bs": "karma start karma.bs.config.js --compatibility all --coverage",
-    "start:build": "cd dist && es-dev-server --open",
-    "build": "rimraf dist && rollup -c rollup.config.js",
+    "start:build": "node app.js --PORT 8000",
+    "build": "rimraf dist && rollup -c rollup.config.js && node tasks/build-sw.js",
     "start:dev": "es-dev-server --app-index index.html --node-resolve --open --watch",
     "start:compatibility": "es-dev-server --app-index index.html --compatibility all --node-resolve --open --watch"
   },
@@ -69,7 +69,8 @@
     "rollup": "^1.15.4",
     "rollup-plugin-cpy": "^2.0.1",
     "rollup-plugin-workbox": "^4.0.0",
-    "webpack-merge": "^4.1.5"
+    "webpack-merge": "^4.1.5",
+    "workbox-build": "^4.3.1"
   },
   "license": "Apache-2.0",
   "repository": {

@@ -1,7 +1,7 @@
 import { createDefaultConfig } from '@open-wc/building-rollup';
-import { generateSW } from 'rollup-plugin-workbox';
+// import { generateSW } from 'rollup-plugin-workbox';
 import cpy from 'rollup-plugin-cpy';
-import path from 'path';
+// import path from 'path';
 
 const config = createDefaultConfig({ input: './index.html' });
 export default {
@@ -26,19 +26,19 @@ export default {
         parents: true,
       },
     }),
-    generateSW({
-      swDest: path.join(__dirname, 'dist', 'sw.js'),
-      globDirectory: path.join(__dirname, 'dist'),
-      offlineGoogleAnalytics: true,
-      runtimeCaching: [{
-        urlPattern: new RegExp('^https://api.advancedrestclient.com/'),
-        handler: 'NetworkFirst',
-        options: {
-          cacheableResponse: {
-            statuses: [0, 200]
-          }
-        }
-      }],
-    }),
+    // generateSW({
+    //   swDest: path.join(__dirname, 'dist', 'sw.js'),
+    //   globDirectory: path.join(__dirname, 'dist'),
+    //   // offlineGoogleAnalytics: true,
+    //   // runtimeCaching: [{
+    //   //   urlPattern: new RegExp('^https://api.advancedrestclient.com/'),
+    //   //   handler: 'NetworkFirst',
+    //   //   options: {
+    //   //     cacheableResponse: {
+    //   //       statuses: [0, 200]
+    //   //     }
+    //   //   }
+    //   // }],
+    // }),
   ],
 };
