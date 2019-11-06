@@ -157,7 +157,7 @@ export class ApicTestRunner extends BaseBuild {
       const result = await this.runTest(component);
       await this.reportComponentSuccess(pkg, result);
     } catch (e) {
-      this.reportComponentError(pkg, e);
+      await this.reportComponentError(pkg, e);
     }
     setImmediate(() => this._next());
   }
