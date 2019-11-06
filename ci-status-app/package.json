@@ -1,6 +1,6 @@
 {
   "name": "apic-ci-status",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "API components CI status web app",
   "main": "app.js",
   "scripts": {
