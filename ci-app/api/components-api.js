@@ -147,14 +147,19 @@ class ComponentsApiRoute extends BaseApi {
 
   async listParentComponents(req, res) {
     let { devDependencies } = req.query;
-    const { componentId } = req.params;
+    const { component } = req.params;
+    let { scope } = req.params;
+    if (scope[0] !== '@') {
+      scope = `@${scope}`;
+    }
     if (devDependencies === 'true') {
       devDependencies = true;
     } else {
       devDependencies = false;
     }
+    const componentId = `${scope}/${component}`;
     try {
-      const result = this.dependencyModel.listParentComponents(componentId, devDependencies);
+      const result = await this.dependencyModel.listParentComponents(componentId, devDependencies);
       this.sendListResult([result], res);
     } catch (cause) {
       logging.error(cause);
@@ -166,18 +171,49 @@ class ComponentsApiRoute extends BaseApi {
     }
   }
 
+  _processDependencies(type, items) {
+    if (!items) {
+      return [];
+    }
+    return items.map((item) => {
+      item.development = type === 'development';
+      item.production = type === 'production';
+      delete item.devDependencies;
+      delete item.dependencies;
+      return item;
+    });
+  }
+
   async listDependencies(req, res) {
-    const { componentId } = req.params;
+    const { component } = req.params;
+    let { scope } = req.params;
+    if (scope[0] !== '@') {
+      scope = `@${scope}`;
+    }
+    // TODO (pawel): depdnency keys are created in an invalid way
+    // const componentId = `${scope}/${component}`;
+    const componentId = `${component}`;
     try {
       const data = await this.dependencyModel.get(componentId);
       if (data) {
-        if (!data.dependencies) {
-          data.dependencies = [];
+        const result = [];
+        if (data.dependencies) {
+          data.dependencies.forEach((name) => {
+            result.push({
+              name,
+              production: true
+            });
+          });
         }
-        if (!data.devDependencies) {
-          data.devDependencies = [];
+        if (data.devDependencies) {
+          data.devDependencies.forEach((name) => {
+            result.push({
+              name,
+              development: true
+            });
+          });
         }
-        res.send(data);
+        this.sendListResult([result], res);
       } else {
         this.sendError(res, 'Component not found', 404);
       }
@@ -197,6 +233,6 @@ api.setCors(router);
 api.wrapApi(router, [
   ['/', 'listComponents'],
   ['/versions', 'listVersions'],
-  ['/:componentId/dependees', 'listParentComponents'],
-  ['/:componentId/dependencies', 'listDependencies']
+  ['/:scope/:component/dependees', 'listParentComponents'],
+  ['/:scope/:component/dependencies', 'listDependencies']
 ]);

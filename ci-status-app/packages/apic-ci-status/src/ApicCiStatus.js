@@ -11,7 +11,7 @@ import '@anypoint-web-components/anypoint-styles/colors.js';
 import { UserStatus } from './UserStatus.js';
 import { userImageTemplate, userIconTemplate } from './utils.js';
 import { baseStyles } from '../../common-styles.js';
-import { menu, assignmentTurnedIn, list } from '../../Icons.js';
+import { menu, assignmentTurnedIn, list, grain } from '../../Icons.js';
 import '../../page-main/page-main.js';
 import '../../page-tokens/page-tokens.js';
 import '../../page-tokens/page-add-token.js';
@@ -20,6 +20,7 @@ import '../../page-tests/page-tests.js';
 import '../../page-tests/page-test.js';
 import '../../page-tests/page-test-component.js';
 import '../../page-tests/page-add-test.js';
+import '../../page-dependency/page-dependency.js';
 
 const defaultTitle = 'API Components status';
 const gaId = 'UA-71458341-7';
@@ -74,6 +75,11 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'test-component',
         pattern: '/tests/:id/:cmp',
         data: { title: 'Test component detail' },
+      },
+      {
+        name: 'dependency',
+        pattern: '/dependency',
+        data: { title: 'Dependency graph' },
       },
       {
         name: 'not-found',
@@ -325,6 +331,13 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .narrow="${this.narrow}"
           ></page-test-component>
         `;
+      case 'dependency':
+        return html`
+          <page-dependency
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+          ></page-dependency>
+        `;
       default:
         return html`
           <p>Page not found try going to <a href="/">Main</a></p>
@@ -420,6 +433,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     const states = [
       ['/tests', 'tests', 'Tests', 'Activate for list of tests', assignmentTurnedIn],
       ['/changelog', 'changelog', 'Change log', 'Activate for components change log', list],
+      ['/dependency', 'dependency', 'Dependency graph', 'Activate for dependency graph', grain],
     ];
 
     return states.map(

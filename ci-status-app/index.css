@@ -11,6 +11,7 @@ html {
   --success-color: #2E7D32;
   --info-color: #2196F3;
   --inactive-color: #757575;
+  --warning-color: #FF9800;
   --link-color: var(--primary-color);
   --anypoint-button-color: var(--primary-color);
   --anypoint-icon-button-emphasis-low-color: var(--primary-color);

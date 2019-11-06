@@ -61,11 +61,10 @@ export class DependencyModel extends BaseModel {
     const [items] = await this.store.runQuery(query);
     if (items) {
       deps = items.map((item) => {
-        item = this.fromDatastore(item);
-        delete item.devDependencies;
-        delete item.dependencies;
-        item.production = true;
-        return item;
+        return {
+          production: true,
+          name: item.pkg
+        };
       });
     }
     if (includeDev) {
@@ -85,11 +84,10 @@ export class DependencyModel extends BaseModel {
       return;
     }
     return items.map((item) => {
-      item = this.fromDatastore(item);
-      item.development = true;
-      delete item.devDependencies;
-      delete item.dependencies;
-      return item;
+      return {
+        development: true,
+        name: item.pkg
+      };
     });
   }
 
