@@ -81,10 +81,6 @@ export class PageDependency extends LitElement {
        */
       pageToken: { type: String },
       /**
-       * When set to `false` it means that the API won't return more results.
-       */
-      hasMore: { type: Boolean },
-      /**
        * The list of dependencies for current element.
        */
       items: { type: Array },
@@ -122,7 +118,6 @@ export class PageDependency extends LitElement {
 
   constructor() {
     super();
-    this.hasMore = true;
     this.searchType = 0;
     this.scope = 'advanced-rest-client';
     this.component = 'arc-icons';

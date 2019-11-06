@@ -560,11 +560,19 @@ export class PageTest extends routerLinkMixin(LitElement) {
 
   _resultsTemplate() {
     const items = this.items || [];
+    const { hasMore } = this;
     return html`
     <h3>Components</h3>
     <section class="result-list" role="list">
       ${items.map((item) => this._componentListItem(item))}
     </section>
+    ${hasMore ? html`<div class="more-container">
+      <anypoint-button
+        @click="${this.loadNextResults}"
+        class="more-button"
+        emphasis="medium"
+      >Load more</anypoint-button>
+    </div>` : ''}
     `;
   }
 

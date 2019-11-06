@@ -86,7 +86,7 @@ export class PageTests extends LitElement {
        */
       apiBase: { type: String },
       /**
-       * Tokens pagination `pageToken`.
+       * Tests pagination `pageToken`.
        * This is returned by the API and used in subsequent requests
        * to get next page of results.
        */
@@ -287,10 +287,18 @@ export class PageTests extends LitElement {
   }
 
   _resultsTemplate() {
-    const { items } = this;
+    const { items, hasMore } = this;
     return html`<section class="results" role="list">
     ${items.map((item, index) => this._testItemTemplate(item, index))}
-    </section>`;
+    </section>
+
+    ${hasMore ? html`<div class="more-container">
+      <anypoint-button
+        @click="${this.loadNextResults}"
+        class="more-button"
+        emphasis="medium"
+      >Load more</anypoint-button>
+    </div>` : ''}`;
   }
 
   _testItemTemplate(item, index) {

@@ -385,7 +385,7 @@ export class PageTokens extends LitElement {
   }
 
   _tokensListTemplate() {
-    const { tokens } = this;
+    const { tokens, hasMore } = this;
     return html`
     <div class="page-header">
       <h2 class="title">Your tokens</h2>
@@ -404,6 +404,14 @@ export class PageTokens extends LitElement {
       </anypoint-icon-button></a>
     </div>
     ${tokens.map((item, index) => this._tokenItemTemplate(item, index))}
+
+    ${hasMore ? html`<div class="more-container">
+      <anypoint-button
+        @click="${this.loadNextResults}"
+        class="more-button"
+        emphasis="medium"
+      >Load more</anypoint-button>
+    </div>` : ''}
     `;
   }
 
