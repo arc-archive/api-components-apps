@@ -190,16 +190,6 @@ export class PageAddTest extends LitElement {
   }
 
   _scheduleHandler() {
-    const form = this.shadowRoot.querySelector('form');
-    const button = document.createElement('button');
-    button.type = 'submit';
-    form.appendChild(button);
-    button.click();
-    form.removeChild(button);
-  }
-
-  _formSubmitHandler(e) {
-    e.preventDefault();
     const valid = this.validate();
     if (!valid) {
       return;
@@ -305,7 +295,6 @@ export class PageAddTest extends LitElement {
       method="POST"
       action="${formAction}"
       enctype="application/json"
-      @submit="${this._formSubmitHandler}"
     >
       ${this._typeSelectorTemplate()}
       ${this._typeFormItems()}

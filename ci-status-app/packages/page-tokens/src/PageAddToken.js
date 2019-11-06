@@ -167,16 +167,6 @@ export class PageAddToken extends LitElement {
   }
 
   _addHandler() {
-    const form = this.shadowRoot.querySelector('form');
-    const button = document.createElement('button');
-    button.type = 'submit';
-    form.appendChild(button);
-    button.click();
-    form.removeChild(button);
-  }
-
-  _formSubmitHandler(e) {
-    e.preventDefault();
     const valid = this.validate();
     if (!valid) {
       return;
@@ -287,7 +277,6 @@ export class PageAddToken extends LitElement {
       method="POST"
       action="${formAction}"
       enctype="application/json"
-      @submit="${this._formSubmitHandler}"
     >
       <anypoint-input name="name">
         <label slot="label">Toke name (optional)</label>
