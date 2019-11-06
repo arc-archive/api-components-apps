@@ -12,7 +12,7 @@ export class ComponentModel extends BaseModel {
   }
 
   get componentExcludeIndexes() {
-    return ['name', 'version', 'versions[]', 'group', 'org', 'pkg', 'ref', 'scope'];
+    return ['version', 'versions[]', 'group', 'org', 'pkg', 'ref', 'scope'];
   }
 
   get versionExcludeIndexes() {
