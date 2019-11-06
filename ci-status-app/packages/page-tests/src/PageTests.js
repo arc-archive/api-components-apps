@@ -60,6 +60,10 @@ export class PageTests extends LitElement {
         text-transform: capitalize;
       }
 
+      relative-time {
+        margin-left: 8px;
+      }
+
       anypoint-button,
       a {
         text-decoration: none;
