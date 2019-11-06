@@ -13,16 +13,21 @@ export const createPassingMap = (item) => {
 };
 
 export const logTemplate = (item) => {
-  const { skipped, success, errors } = item;
+  const { skipped, success, errors, log } = item;
   const styles = createPassingMap(item);
   const symbol = success ? '✓' : '✖';
   const klas = { skipped, error: !success && !skipped, line: true, log: true };
   const hasErrors = !!(errors && errors.length);
+  const hasLogs = !hasErrors && !!(log && log.length);
+  // assertion error is cleaner that the log message, but not always available.
   return html`
   <div class=${classMap(klas)} style=${styleMap(styles)}>
     ${symbol}
     <div class="title">${item.description}</div>
   </div>
+  ${hasLogs ? html`<div class="errors" style=${styleMap(styles)}>
+  ${log.map((logItem) => html`<div class="log error-message">${logItem}</div>`)}
+  </div>` : ''}
   ${hasErrors ? html`<div class="errors" style=${styleMap(styles)}>
   ${errors.map((error) => html`<div class="log error-message">${error.name}: ${error.message}</div>`)}
   </div>` : ''}`;
@@ -69,6 +74,7 @@ export class BrowserExecutionLogs extends LitElement {
       color: #000000;
       background-color: #FFECB3;
       padding: 0 8px;
+      margin-bottom: 8px;
     }
     `;
   }

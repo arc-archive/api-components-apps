@@ -527,7 +527,12 @@ export class PageTest extends routerLinkMixin(LitElement) {
           class="passed-count"
           >${testDetail.passed || 0}</span
         >/<span class="failed-count">${testDetail.failed || 0}</span>)
-      </div>` : ''}
+      </div>` : html`<div class="desc end-time">
+        Started: <relative-time datetime="${computeIsoDate(testDetail.startTime)}"></relative-time>
+      </div>`}
+      <div class="desc end-time">
+        Scheduled: <relative-time datetime="${computeIsoDate(testDetail.created)}"></relative-time>
+      </div>
       ${testTypeDetails(testDetail)}
       ${testDetail.endTime ? html`<div class="desc end-time">
         Test ended: <relative-time datetime="${computeIsoDate(testDetail.endTime)}"></relative-time>
@@ -565,7 +570,8 @@ export class PageTest extends routerLinkMixin(LitElement) {
 
   _componentListItem(item) {
     const { testDetail } = this;
-    const classes = { passed: item.status === 'passed', running: item.status === 'running' };
+    const { error, message, status } = item;
+    const classes = { passed: status === 'passed', running: status === 'running' };
     return html`
     <anypoint-item class=${classMap(classes)} role="listitem">
       <div class="item-status">${item.status}</div>
@@ -573,6 +579,11 @@ export class PageTest extends routerLinkMixin(LitElement) {
       ${item.hasLogs ? html`<a href="/tests/${testDetail.id}/${item.id}">
         <anypoint-button>Details</anypoint-button>
       </a>` : ''}
-    </anypoint-item>`;
+    </anypoint-item>
+    ${error ? html`<app-message
+      type="error"
+      persistant
+    >${message || 'Unknown error'}</app-message>` : ''}
+    `;
   }
 }
