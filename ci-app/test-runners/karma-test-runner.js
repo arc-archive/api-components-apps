@@ -48,7 +48,9 @@ export class KarmaTestRunner extends BaseTestRunner {
     // execArgv are coppied from this process and this is not what we want.
     const options = {
       execArgv: [],
-      env
+      env,
+      detached: true,
+      stdio: ['ignore'],
     };
     return new Promise((resolve, reject) => {
       this._resolver = resolve;
