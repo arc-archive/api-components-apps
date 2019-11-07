@@ -50,7 +50,7 @@ export class KarmaTestRunner extends BaseTestRunner {
       execArgv: [],
       env,
       detached: true,
-      stdio: ['ignore'],
+      stdio: ['ignore', 'ignore', 'ignore', 'ipc'],
     };
     return new Promise((resolve, reject) => {
       this._resolver = resolve;
