@@ -80,7 +80,7 @@ export class GitSourceControl {
       fetchOpts: this._getFetchOptions()
     };
     const { dir, url } = cloneOpts;
-    logging.verbose(`Cloning ${url}...`);
+    logging.verbose(`Cloning ${url} into ${dir}...`);
     const repo = await Git.Clone(url, dir, opts);
     logging.verbose('Repository cloned.');
     return repo;

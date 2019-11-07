@@ -50,6 +50,7 @@
     "polymer-analyzer": "^3.2.4",
     "semver": "^6.3.0",
     "slug": "^1.1.0",
+    "tar-fs": "^2.0.0",
     "tmp": "0.1.0",
     "uuid": "^3.3.3",
     "validator": "^12.0.0",

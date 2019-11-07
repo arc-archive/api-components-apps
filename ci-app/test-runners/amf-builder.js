@@ -1,5 +1,8 @@
 import GitHub from 'github-api';
 import { Storage } from '@google-cloud/storage';
+import { spawn } from 'child_process';
+import path from 'path';
+import tar from 'tar-fs';
 import logging from '../lib/logging';
 import { GitSourceControl } from '../github/git-source-control.js';
 
@@ -43,10 +46,10 @@ export class AmfBuilder {
    * @return {Promise}
    */
   async run() {
+    if (!this.sha) {
+      await this.requestSha();
+    }
     try {
-      if (!this.sha) {
-        await this.requestSha();
-      }
       await this.restoreCached();
       return;
     } catch (e) {
@@ -54,6 +57,13 @@ export class AmfBuilder {
     }
     logging.info('Building AMF from sources.');
     await this.cloneAmf();
+    await this.buildAmf(this.branch || this.sha);
+    try {
+      await this.cacheAmf();
+    } catch (e) {
+      // It's not crucial to the build and test process.
+      logging.error(e);
+    }
   }
   /**
    * Clones AMF using HTTP scheme to a selected branch or SHA
@@ -61,7 +71,7 @@ export class AmfBuilder {
    */
   async cloneAmf() {
     const github = new GitSourceControl(this.workingDir, 'aml-org', 'amf');
-    await github.clone(false, this.branch || this.sha);
+    await github.clone(false, 'develop');
   }
   /**
    * It makes an API call to GitHub API to check for the sha value
@@ -73,7 +83,8 @@ export class AmfBuilder {
     const { branch } = this;
     const github = new GitHub();
     const repo = github.getRepo('aml-org', 'amf');
-    const info = await repo.getBranch(branch);
+    const data = await repo.getBranch(branch);
+    const info = data.data;
     if (!info) {
       throw new Error('Branch does not exists');
     }
@@ -93,8 +104,28 @@ export class AmfBuilder {
     if (!exists) {
       throw new Error('AMF cache file does not exist.');
     }
-    console.log('IMPLEMET ME!!!!!');
-    throw new Error('TEST.');
+    const dir = path.join(this.workingDir, 'lib');
+    await this._readFileStream(file, dir);
+  }
+
+  _readFileStream(file, dir) {
+    return new Promise((resolve, reject) => {
+      file.createReadStream()
+          .on('error', function(err) {
+            reject(err);
+          })
+          .on('end', () => {
+            logging.verbose('Cache file downloaded. Unpacking...');
+          })
+          .pipe(tar.extract(dir))
+          .on('error', function(err) {
+            reject(err);
+          })
+          .on('finish', () => {
+            logging.verbose('Cache restored...');
+            resolve();
+          });
+    });
   }
   /**
    * Creates a bucket with lifecycle rules when needed.
@@ -105,56 +136,84 @@ export class AmfBuilder {
     if (exists) {
       return;
     }
-    this.bucket = await this.bucket.create();
+    const [bucket] = await this.bucket.create();
+    this.bucket = bucket;
     // will keep files for 30 days
-    await this.bucket.addLifecycleRule({
+    await bucket.addLifecycleRule({
       action: 'delete',
       condition: {
         age: 30 // days
       }
     });
   }
-}
+  /**
+   * Runs AMF builder which runs stb build process
+   * in the repository folder and coppies the required libraries into
+   * `workingDir` + `lib` directory, and filanlly, installs the node depdnencies.
+   *
+   * @param {String} branchOrSha Branch name or SHA commit id.
+   * @return {Promise}
+   */
+  async buildAmf(branchOrSha) {
+    const file = path.join(__dirname, 'amf-compiler.sh');
+    return new Promise((resolve, reject) => {
+      const amf = spawn(file, [branchOrSha], {
+        cwd: this.workingDir
+      });
+      let lastError;
 
-// const { spawn } = require('child_process');
-// const path = require('path');
-// /* eslint-disable no-console */
-// function prepareAmfBuild(workingDir, branch, sha) {
-//   if (branch === 'master') {
-//     branch = 'HEAD';
-//   }
-//   return new Promise((resolve, reject) => {
-//     const amf = spawn(path.join(__dirname, 'amf-compiler.sh'), [workingDir, branch, sha]);
-//     let lastError;
-//
-//     amf.stdout.on('data', (data) => {
-//       console.info(`[AMF BUILD]: ${data}`);
-//     });
-//
-//     amf.stderr.on('data', (data) => {
-//       console.error(`[AMF BUILD] ERR: ${data}`);
-//       const trimmed = data.trim ? data.trim() : data;
-//       if (trimmed) {
-//         lastError = trimmed;
-//       }
-//     });
-//
-//     amf.on('close', (code) => {
-//       console.info(`[AMF BUILD] exit code is ${code}`);
-//       if (code !== 0) {
-//         if (lastError) {
-//           lastError = new Error(lastError);
-//         } else {
-//           lastError = new Error('AMF build exit with code ' + code);
-//         }
-//         reject(lastError);
-//       } else {
-//         resolve();
-//       }
-//     });
-//   });
-// }
-//
-// module.exports = {
-//   prepareAmfBuild
-// };
+      amf.stdout.on('data', (data) => {
+        logging.verbose(`[AMF BUILD]: ${data}`);
+      });
+
+      amf.stderr.on('data', (data) => {
+        logging.error(`[AMF BUILD] ERR: ${data}`);
+        const trimmed = data.trim ? data.trim() : data;
+        if (trimmed) {
+          lastError = trimmed;
+        }
+      });
+
+      amf.on('close', (code) => {
+        logging.info(`[AMF BUILD] exit code is ${code}`);
+        if (code !== 0) {
+          if (lastError) {
+            lastError = new Error(lastError);
+          } else {
+            lastError = new Error('AMF build exit with code ' + code);
+          }
+          reject(lastError);
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+  /**
+   * Caches created AMF library in bucket store.
+   * @return {Promise}
+   */
+  async cacheAmf() {
+    const { cacheFile } = this;
+    const file = this.bucket.file(cacheFile);
+    const dir = path.join(this.workingDir, 'lib');
+    await this._streamUploadCache(file, dir);
+  }
+
+  _streamUploadCache(file, dir) {
+    return new Promise((resolve, reject) => {
+      let finished = false;
+      tar.pack(dir)
+          .pipe(file.createWriteStream({ gzip: true }))
+          .on('error', (err) => {
+            reject(err);
+            finished = true;
+          })
+          .on('finish', () => {
+            if (!finished) {
+              resolve();
+            }
+          });
+    });
+  }
+}
