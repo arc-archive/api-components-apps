@@ -145,7 +145,6 @@ export class AmfModelGenerator {
       if (result.error) {
         this._resultError(result.error);
       } else {
-        this._storeModel(result.api, result.source);
         this._runParser();
       }
     });
@@ -153,14 +152,6 @@ export class AmfModelGenerator {
     this.amfProc.on('error', (error) => {
       this._resultError(error);
     });
-  }
-
-  _storeModel(model, file) {
-    let apiFile = path.basename(file);
-    apiFile = apiFile.substr(0, apiFile.lastIndexOf('.')) + '.json';
-    const dest = path.join(this.modelDestBase, apiFile);
-    logging.verbose('Storing API model to ' + dest);
-    fs.outputFileSync(dest, model);
   }
 
   _clearProcess() {
@@ -180,6 +171,12 @@ export class AmfModelGenerator {
     this._rejecter = undefined;
   }
 
+  _getApiStoreBaseName(file) {
+    let apiFile = path.basename(file);
+    apiFile = apiFile.substr(0, apiFile.lastIndexOf('.'));
+    return path.join(this.modelDestBase, apiFile);
+  }
+
   _runParser() {
     const api = this.models.shift();
     if (!api) {
@@ -190,8 +187,10 @@ export class AmfModelGenerator {
       return;
     }
     const source = path.join(this.modelSrcBase, api.file);
+    const destBase = this._getApiStoreBaseName(api.file);
     this.amfProc.send({
       source,
+      destBase,
       mediaType: api.mediaType,
       type: api.type
     });
