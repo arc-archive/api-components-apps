@@ -42,7 +42,7 @@ export class BaseTestRunner extends BaseBuild {
     const { component } = this;
     logging.verbose(`Preparing ${component} component to run in test`);
     const github = new GitSourceControl(this.workingDir, this.org, this.component);
-    await github.clone(false);
+    await github.clone(false, 'stage');
     if (this.testConfig.type === 'amf-build') {
       await this.updateModels(component);
     }
