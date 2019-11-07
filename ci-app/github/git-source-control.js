@@ -80,7 +80,7 @@ export class GitSourceControl {
       fetchOpts: this._getFetchOptions()
     };
     const { dir, url } = cloneOpts;
-    logging.verbose(`Cloning ${url}...`);
+    logging.verbose(`Cloning ${url} into ${dir}...`);
     const repo = await Git.Clone(url, dir, opts);
     logging.verbose('Repository cloned.');
     return repo;
@@ -96,7 +96,7 @@ export class GitSourceControl {
    * a reference to a branch.
    */
   async ensureBranch(repo, branch) {
-    let ref = await repo.getCurrentBranch();
+    const ref = await repo.getCurrentBranch();
     const current = ref.shorthand();
     if (current !== branch) {
       logging.verbose(`Checkout out ${branch} branch...`);
@@ -117,10 +117,10 @@ export class GitSourceControl {
       callbacks: {
         credentials: function(url, userName) {
           return Git.Cred.sshKeyNew(
-            userName,
-            config.get('GITHUB_SSH_KEY_PUB'),
-            config.get('GITHUB_SSH_KEY'),
-            config.get('GITHUB_SSH_KEY_PASS')
+              userName,
+              config.get('GITHUB_SSH_KEY_PUB'),
+              config.get('GITHUB_SSH_KEY'),
+              config.get('GITHUB_SSH_KEY_PASS')
           );
         }
       }
@@ -231,7 +231,7 @@ export class GitSourceControl {
     // return repo.createCommit(branch, author, committer, message, oid, parents);
     // https://github.com/nodegit/nodegit/issues/1018
     return await repo.createCommitWithSignature(branch, author, committer, message, oid,
-      parents, this._onSignature.bind(this));
+        parents, this._onSignature.bind(this));
   }
 
   async push(repo, branch) {

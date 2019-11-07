@@ -5,7 +5,7 @@ import { TestsModel } from '../models/test-model';
 import { TestsComponentModel } from '../models/test-component-model';
 import { DependencyModel } from '../models/dependency-model';
 import { TestsLogsModel } from '../models/test-logs-model';
-import { prepareAmfBuild } from './amf-builder.js';
+import { AmfBuilder } from './amf-builder.js';
 import logging from '../lib/logging';
 /**
  * A class responsible for running API comsponents tests.
@@ -64,7 +64,11 @@ export class ApicTestRunner extends BaseBuild {
       logging.verbose(`Found ${size} components to test.`);
       await this.testsModel.updateTestScope(this.entryId, size);
       if (type === 'amf-build') {
-        await prepareAmfBuild(this.workingDir, this.config.branch, this.config.sha);
+        const builder = new AmfBuilder(this.workingDir, {
+          branch: this.config.branch,
+          sha: this.config.sha,
+        });
+        await builder.run();
       }
       this.emit('status', this.config.type, 'running');
       // removes test executorion from current try / catch context

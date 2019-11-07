@@ -5,58 +5,29 @@ set -e
 # This script is mean to be executed in a container as root.
 # It will fail without running this as root.
 
-BUILD_DIR=$1
-BRANCH=$2
-COMMIT_SHA=$3
+BRANCH=$1
 
-AMF_DIR="${BUILD_DIR}/amf/"
+# git clone https://github.com/aml-org/amf.git
 
-echo "Building AMF library in $AMF_DIR"
+cd amf/
 
-mkdir ${AMF_DIR}
-cd $AMF_DIR
+git checkout ${BRANCH}
 
-git clone https://github.com/aml-org/amf.git src
-cd src
+echo "Building AMF client library."
+sbt clientJS/fullOptJS
+echo "Executing buildjs.sh from AMF project"
+./amf-client/js/build-scripts/buildjs.sh
 
-if [ -z ${BRANCH+x} ]; then
-  echo "Checking out commit $COMMIT_SHA"
-  git checkout ${COMMIT_SHA}
-else
-  echo "Checking out branch $BRANCH"
-  git checkout ${BRANCH}
-fi
+echo "Copying AMF library to the working location."
+cd ../
 
-SHA=`git rev-parse HEAD`
-CACHED_NAME="$SHA.tar.gz"
-CACHED="$HOME/amf-cache/${CACHED_NAME}"
+mkdir "lib"
+mkdir "lib/bin"
 
-if test -f "$CACHED"; then
-  cd ../
-  tar -xzf $CACHED
-else
-  echo "Building AMF client library."
-  sbt clientJS/fullOptJS
-  echo "Executing buildjs.sh from AMF project"
-  ./amf-client/js/build-scripts/buildjs.sh
+cp amf/amf-client/js/amf.js lib/
+cp amf/amf-client/js/package.json lib/
+cp amf/amf-client/js/bin/amf lib/bin/
 
-  echo "Copying AMF library to the working location."
-  cd ../
-
-  mkdir "${AMF_DIR}/lib/"
-  mkdir "${AMF_DIR}/lib/bin"
-
-  cp src/amf-client/js/amf.js lib/
-  cp src/amf-client/js/package.json lib/
-  cp src/amf-client/js/bin/amf lib/bin/
-
-  echo "Installing AMF project dependencies"
-  cd lib/
-  npm i
-  cd ../
-  echo "Caching commit to $CACHED"
-  tar -czf $CACHED_NAME lib
-  mkdir -p "$HOME/amf-cache/"
-  cp $CACHED_NAME $CACHED
-  rm $CACHED_NAME
-fi
+echo "Installing AMF project dependencies"
+cd lib/
+npm i
