@@ -10,3 +10,4 @@ echo "{\"name\":\"test-package\", \"version\":\"1.0.0\"}" > package.json
 
 git add -- package.json
 git commit -m "fix: adding package.json file"
+git tag -a -m "first tag" 0.1.0

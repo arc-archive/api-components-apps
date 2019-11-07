@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const path = require('path');
 const fs = require('fs-extra');
-const npm = require('npm');
+const { exec } = require('child_process');
 const { KarmaTestRunner } = require('../test-runners/karma-test-runner.js');
 
 describe('KarmaTestRunner', () => {
@@ -19,22 +19,12 @@ describe('KarmaTestRunner', () => {
 
   function installDependencies() {
     return new Promise((resolve, reject) => {
-      npm.load({
-        'loaded': false,
-        'progress': false,
-        'no-audit': true
-      }, (err) => {
+      exec('npm i', { cwd: esmComponent }, (err) => {
         if (err) {
           reject(err);
-          return;
+        } else {
+          resolve();
         }
-        npm.commands.install(esmComponent, [], (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
       });
     });
   }
@@ -104,7 +94,7 @@ describe('KarmaTestRunner', () => {
     });
   });
 
-  describe.only('run()', () => {
+  describe('run()', () => {
     let instance;
     let testConfig;
     const org = 'advanced-rest-client';
