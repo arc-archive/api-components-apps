@@ -14,7 +14,7 @@ export class ComponentBuildModel extends BaseModel {
   }
 
   get excludedIndexes() {
-    return ['type', 'commit', 'branch', 'status', 'component', 'error', 'message', 'sshUrl', 'org'];
+    return ['type', 'commit', 'branch', 'status', 'component', 'error', 'message', 'sshUrl', 'org', 'bumpVersion'];
   }
 
   list(limit, nextPageToken) {
