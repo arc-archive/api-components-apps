@@ -94,3 +94,8 @@ spec:
               secretKeyRef:
                 name: github-webhook-secret
                 key: github-webhook-secret
+          - name: NPM_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: npm-token
+                key: token
