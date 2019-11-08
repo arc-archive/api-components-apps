@@ -8,6 +8,7 @@ import groupsRoute from './groups-api.js';
 import componentsRoute from './components-api.js';
 import messagesRoute from './messages-api.js';
 import analyticsRoute from './analytics-api.js';
+import buildsRoute from './builds-api.js';
 
 const router = express.Router();
 export default router;
@@ -28,6 +29,8 @@ router.use('/components', componentsRoute);
 router.use('/messages', messagesRoute);
 // ARC analytics route
 router.use('/analytics', analyticsRoute);
+// Componetns build status
+router.use('/builds', buildsRoute);
 // Errors
 router.use((req, res) => {
   const message = `Route ${req.url} not found`;

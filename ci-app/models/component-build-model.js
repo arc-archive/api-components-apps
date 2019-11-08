@@ -17,23 +17,22 @@ export class ComponentBuildModel extends BaseModel {
     return ['type', 'commit', 'branch', 'status', 'component', 'error', 'message', 'sshUrl', 'org', 'bumpVersion'];
   }
 
-  list(limit, nextPageToken) {
+  async list(limit, nextPageToken) {
     if (!limit) {
-      limit = 25;
+      limit = this.listLimit;
     }
     let query = this.store.createQuery(this.namespace, this.buildKind);
-    query = query.limit(limit);
     query = query.order('created', {
       descending: true
     });
+    query = query.limit(limit);
     if (nextPageToken) {
       query = query.start(nextPageToken);
     }
-    return this.store.runQuery(query).then((result) => {
-      const entities = result[0].map(this.fromDatastore.bind(this));
-      const hasMore = result[1].moreResults !== this.NO_MORE_RESULTS ? result[1].endCursor : false;
-      return [entities, hasMore];
-    });
+    const [items, meta] = await this.store.runQuery(query);
+    const entities = items ? items.map(this.fromDatastore.bind(this)) : [];
+    const hasMore = meta.moreResults !== this.NO_MORE_RESULTS ? meta.endCursor : false;
+    return [entities, hasMore];
   }
 
   insertBuild(info) {
@@ -102,19 +101,26 @@ export class ComponentBuildModel extends BaseModel {
     });
   }
 
-  get(id) {
+  async get(id) {
     const key = this.createBuildKey(id);
-    return this.store.get(key).then((entity) => {
-      if (entity && entity[0]) {
-        return this.fromDatastore(entity[0]);
-      }
-    });
+    const [entry] = await this.store.get(key);
+    return this.fromDatastore(entry);
   }
 
   startBuild(id) {
     return this.updateBuildProperties(id, {
       status: 'running',
       startTime: Date.now()
+    });
+  }
+
+  async restartBuild(id) {
+    return this.updateBuildProperties(id, {
+      status: 'queued',
+      startTime: Date.now(),
+      endTime: 0,
+      message: '',
+      error: false
     });
   }
 
@@ -142,24 +148,24 @@ export class ComponentBuildModel extends BaseModel {
     const transaction = this.store.transaction();
     const key = this.createBuildKey(id);
     return transaction
-      .run()
-      .then(() => transaction.get(key))
-      .then((data) => {
-        const [test] = data;
-        Object.keys(props).forEach((key) => {
-          test[key] = props[key];
+        .run()
+        .then(() => transaction.get(key))
+        .then((data) => {
+          const [test] = data;
+          Object.keys(props).forEach((key) => {
+            test[key] = props[key];
+          });
+          transaction.save({
+            key: key,
+            data: test,
+            excludeFromIndexes: this.excludedIndexes
+          });
+          return transaction.commit();
+        })
+        .catch((cause) => {
+          transaction.rollback();
+          return Promise.reject(cause);
         });
-        transaction.save({
-          key: key,
-          data: test,
-          excludeFromIndexes: this.excludedIndexes
-        });
-        return transaction.commit();
-      })
-      .catch((cause) => {
-        transaction.rollback();
-        return Promise.reject(cause);
-      });
   }
 
   delete(id) {
