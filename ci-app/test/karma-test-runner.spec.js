@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const path = require('path');
 const fs = require('fs-extra');
-const npm = require('npm');
+const { exec } = require('child_process');
 const { KarmaTestRunner } = require('../test-runners/karma-test-runner.js');
 
 describe('KarmaTestRunner', () => {
@@ -19,22 +19,12 @@ describe('KarmaTestRunner', () => {
 
   function installDependencies() {
     return new Promise((resolve, reject) => {
-      npm.load({
-        'loaded': false,
-        'progress': false,
-        'no-audit': true
-      }, (err) => {
+      exec('npm i', { cwd: esmComponent }, (err) => {
         if (err) {
           reject(err);
-          return;
+        } else {
+          resolve();
         }
-        npm.commands.install(esmComponent, [], (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
       });
     });
   }
@@ -72,39 +62,39 @@ describe('KarmaTestRunner', () => {
     });
   });
 
-  describe('createConfig()', () => {
-    let instance;
-    let origPath;
-    before(() => {
-      instance = new KarmaTestRunner(org, component, pkgName);
-      origPath = process.cwd();
-      process.chdir(esmComponent);
-    });
+  // describe('createConfig()', () => {
+  //   let instance;
+  //   let origPath;
+  //   before(() => {
+  //     instance = new KarmaTestRunner(org, component, pkgName);
+  //     origPath = process.cwd();
+  //     process.chdir(esmComponent);
+  //   });
+  //
+  //   after(async () => {
+  //     process.chdir(origPath);
+  //     await setPackageFile();
+  //   });
+  //
+  //   it('adds the reporter', async () => {
+  //     const result = await instance.createConfig();
+  //     assert.include(result.reporters, 'arcci');
+  //   });
+  //
+  //   it('adds the plugin', async () => {
+  //     const result = await instance.createConfig();
+  //     const plugin = result.plugins.find((plugin) => {
+  //       if (typeof plugin !== 'object') {
+  //         return false;
+  //       }
+  //       const keys = Object.keys(plugin);
+  //       return keys.indexOf('reporter:arcci') !== -1;
+  //     });
+  //     assert.ok(plugin);
+  //   });
+  // });
 
-    after(async () => {
-      process.chdir(origPath);
-      await setPackageFile();
-    });
-
-    it('adds the reporter', async () => {
-      const result = await instance.createConfig();
-      assert.include(result.reporters, 'arcci');
-    });
-
-    it('adds the plugin', async () => {
-      const result = await instance.createConfig();
-      const plugin = result.plugins.find((plugin) => {
-        if (typeof plugin !== 'object') {
-          return false;
-        }
-        const keys = Object.keys(plugin);
-        return keys.indexOf('reporter:arcci') !== -1;
-      });
-      assert.ok(plugin);
-    });
-  });
-
-  describe.only('run()', () => {
+  describe('run()', () => {
     let instance;
     let testConfig;
     const org = 'advanced-rest-client';
