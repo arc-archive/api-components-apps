@@ -47,7 +47,7 @@ export class StageBuild extends BaseBuild {
     try {
       await this.initBuild();
       await this.cloneComponent();
-      const [commitPkg, commitLock] = await this.bumpVersion();
+      const [commitPkg, commitLock] = await this.bumpPackageVersion();
       await this.buildChangelog();
       await this.commitStage(commitPkg, commitLock);
       await this.pushStage();
@@ -66,7 +66,7 @@ export class StageBuild extends BaseBuild {
     await this.git.clone(false, 'stage');
   }
 
-  async bumpVersion() {
+  async bumpPackageVersion() {
     if (!this.bumpVersion) {
       return [false, false];
     }
