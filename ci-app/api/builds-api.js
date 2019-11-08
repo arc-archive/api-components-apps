@@ -67,5 +67,5 @@ api.setCors(router);
 api.wrapApi(router, [
   ['/', 'listBuilds'],
   ['/:id', 'getBuild'],
-  ['/:id/restart', 'restartBuild', 'post'],
+  ['/:id/restart', 'restartBuild', 'put'],
 ]);

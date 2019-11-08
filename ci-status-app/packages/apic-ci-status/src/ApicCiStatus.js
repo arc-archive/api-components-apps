@@ -11,7 +11,7 @@ import '@anypoint-web-components/anypoint-styles/colors.js';
 import { UserStatus } from './UserStatus.js';
 import { userImageTemplate, userIconTemplate } from './utils.js';
 import { baseStyles } from '../../common-styles.js';
-import { menu, assignmentTurnedIn, list, grain } from '../../Icons.js';
+import { menu, assignmentTurnedIn, list, grain, build } from '../../Icons.js';
 import '../../page-main/page-main.js';
 import '../../page-tokens/page-tokens.js';
 import '../../page-tokens/page-add-token.js';
@@ -21,6 +21,8 @@ import '../../page-tests/page-test.js';
 import '../../page-tests/page-test-component.js';
 import '../../page-tests/page-add-test.js';
 import '../../page-dependency/page-dependency.js';
+import '../../page-builds/page-builds.js';
+import '../../page-builds/page-build.js';
 
 const defaultTitle = 'API Components status';
 const gaId = 'UA-71458341-7';
@@ -80,6 +82,16 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'dependency',
         pattern: '/dependency',
         data: { title: 'Dependency graph' },
+      },
+      {
+        name: 'builds',
+        pattern: '/builds',
+        data: { title: 'Scheduled builds' },
+      },
+      {
+        name: 'build',
+        pattern: '/builds/:id',
+        data: { title: 'Component build' },
       },
       {
         name: 'not-found',
@@ -338,6 +350,22 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
             .apiToken="${this.apiToken}"
           ></page-dependency>
         `;
+      case 'builds':
+        return html`
+          <page-builds
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+          ></page-builds>
+        `;
+      case 'build':
+        return html`
+          <page-build
+            .apiBase="${this.apiBase}"
+            .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
+            .buildId="${this.params.id}"
+          ></page-build>
+        `;
       default:
         return html`
           <p>Page not found try going to <a href="/">Main</a></p>
@@ -432,6 +460,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
   _navTemplate() {
     const states = [
       ['/tests', 'tests', 'Tests', 'Activate for list of tests', assignmentTurnedIn],
+      ['/builds', 'builds', 'Builds', 'Activate for build status', build],
       ['/changelog', 'changelog', 'Change log', 'Activate for components change log', list],
       ['/dependency', 'dependency', 'Dependency graph', 'Activate for dependency graph', grain],
     ];
