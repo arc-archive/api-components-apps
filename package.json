@@ -7,7 +7,7 @@
     "build-api-docs": "api-console build -t 'RAML 1.0' -a api-model/apic-api.raml -o ci-app/api-docs",
     "create-index": "gcloud datastore indexes create index.yaml",
     "test": "npm run test-ci-app",
-    "test-ci-app": "mocha ci-app/test/*.spec.js",
+    "test-ci-app": "mocha ci-app/test/*.spec.js --require esm --timeout 90000",
     "lint:eslint": "eslint --ext .js,.html .",
     "format:eslint": "eslint --ext .js,.html . --fix",
     "lint:prettier": "prettier \"**/*.js\" --list-different || (echo '↑↑ these files are not prettier formatted ↑↑' && exit 1)",
