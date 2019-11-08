@@ -61,7 +61,7 @@ export class StageBuild extends BaseBuild {
   }
 
   async cloneComponent() {
-    await this.git.clone(false, 'stage');
+    await this.git.clone(true, 'stage');
   }
 
   async bumpPackageVersion() {
