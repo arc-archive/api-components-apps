@@ -6,7 +6,8 @@ install:
 - cd ../ci-app && npm ci
 - cd ../ci-status-app && npm ci
 - cd ../
-script: npm run test
+script:
+  - cd ci-app && npm test
 cache:
   directories:
   - "$HOME/.npm"
