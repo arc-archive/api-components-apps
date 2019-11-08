@@ -56,7 +56,7 @@ export class VersionBump {
     }
     const updated = semver.inc(current, type);
     pkg.version = updated;
-    await fs.writeJson(this.packageFile, pkg);
+    await fs.writeJson(this.packageFile, pkg, { spaces: 2 });
     const lockUpdated = await this.updateLockFile(updated);
     return [true, lockUpdated];
   }
@@ -83,7 +83,7 @@ export class VersionBump {
     try {
       const pkg = await fs.readJson(lockFile);
       pkg.version = version;
-      await fs.writeJson(lockFile, pkg);
+      await fs.writeJson(lockFile, pkg, { spaces: 2 });
       return true;
     } catch (e) {
       logging.error(`Unable to bump package-lock.json file ${e.message}`);
