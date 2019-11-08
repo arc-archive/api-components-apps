@@ -79,6 +79,11 @@ export class ComponentBuildModel extends BaseModel {
         name: 'org',
         value: info.org,
         excludeFromIndexes: true
+      },
+      {
+        name: 'bumpVersion',
+        value: info.bumpVersion,
+        excludeFromIndexes: true
       }
     ];
 

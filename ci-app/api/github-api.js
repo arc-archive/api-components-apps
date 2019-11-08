@@ -84,6 +84,26 @@ class GithubApiRoute extends BaseApi {
     }
     return true;
   }
+  /**
+   * Checks if the head commit contains `[bump-version]` phrase.
+   * @param {Object} body GH payload body
+   * @return {Boolean} True if the phrase exists in head commit message.
+   */
+  isAutoBump(body) {
+    const { commit } = body;
+    if (!commit) {
+      return false;
+    }
+    const c = commit.commit;
+    if (!c) {
+      return false;
+    }
+    const { message } = c;
+    if (typeof message !== 'string') {
+      return false;
+    }
+    return message.indexOf('[bump-version]') !== -1;
+  }
 
   scheduleStageBuild(body) {
     const branches = body.branches;
@@ -98,13 +118,15 @@ class GithubApiRoute extends BaseApi {
     const name = body.repository.full_name;
     const org = body.organization.login;
     const sha = branch.commit.sha;
+    const bumpVersion = this.isAutoBump(body);
     this.model.insertBuild({
       type: 'stage-build',
       branch: 'stage',
       component: name,
       org,
       commit: sha,
-      sshUrl: sshUrl
+      sshUrl,
+      bumpVersion
     });
   }
 
