@@ -79,13 +79,16 @@ export class ComponentBuildModel extends BaseModel {
         name: 'org',
         value: info.org,
         excludeFromIndexes: true
-      },
-      {
-        name: 'bumpVersion',
-        value: info.bumpVersion,
-        excludeFromIndexes: true
       }
     ];
+
+    if (typeof info.bumpVersion === 'boolean') {
+      results[results.length] = {
+        name: 'bumpVersion',
+        value: info.bumpVersion,
+        excludeFromIndexes: true,
+      };
+    }
 
     const entity = {
       key,
