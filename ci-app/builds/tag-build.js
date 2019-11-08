@@ -4,7 +4,7 @@ import { BaseBuild } from './base-build.js';
 import { CatalogDataGenerator } from './catalog-data-generator';
 import { DependencyGraph } from './dependency-graph';
 import { GitSourceControl } from '../github/git-source-control.js';
-import { getScopeAndName } from './utils.js';
+import { getScopeAndName, nonElements } from './utils.js';
 import { NpmPublish } from './npm-publish.js';
 /**
  * A class responsible for processing the component after tag is created.
@@ -32,24 +32,6 @@ export class TagBuild extends BaseBuild {
     ];
   }
   /**
-   * List of know not arc component projects.
-   *
-   * @deprecated
-   * @return {Array}
-   */
-  get nonElements() {
-    return [
-      'arc-datastore',
-      'arc-tools',
-      'polymd',
-      'cookie-parser',
-      'har',
-      'arc-element-catalog',
-      'ci-server',
-      'arc-electron'
-    ];
-  }
-  /**
    * After cloning the component that actual working dir is the component
    * directory which is current working dir + component name
    * @return {String}
@@ -59,7 +41,7 @@ export class TagBuild extends BaseBuild {
   }
 
   async build() {
-    if (this.nonElements.indexOf(this.name) !== -1) {
+    if (nonElements.indexOf(this.name) !== -1) {
       return;
     }
     try {

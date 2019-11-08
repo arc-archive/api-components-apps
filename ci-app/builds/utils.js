@@ -17,3 +17,20 @@ export const getScopeAndName = (fullName) => {
   }
   return [scope, name];
 };
+
+
+/**
+ * List of know not ARC/API component projects.
+ *
+ * @return {Array}
+ */
+export const nonElements = [
+  'arc-datastore',
+  'arc-tools',
+  'polymd',
+  'cookie-parser',
+  'har',
+  'arc-element-catalog',
+  'ci-server',
+  'arc-electron'
+];

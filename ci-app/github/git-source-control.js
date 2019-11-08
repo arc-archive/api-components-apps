@@ -132,7 +132,7 @@ export class GitSourceControl {
    * @param {Object} repo A reference to a repository object. It can be `this.repo`
    * created when `clone()` is called.
    * @param {String} branch Branch to checkout
-   * @return {Promise} [description]
+   * @return {Promise} Promise resolved when the branch is ready
    */
   async checkoutBranch(repo, branch) {
     logging.verbose(`Changing branch to ${branch}...`);
@@ -149,6 +149,25 @@ export class GitSourceControl {
     if (ref) {
       await repo.checkoutBranch(ref, {});
     }
+  }
+  /**
+   * Checkouts branch and if the branch does not exist it is created.
+   *
+   * @param {Object} repo A reference to a repository object. It can be `this.repo`
+   * created when `clone()` is called.
+   * @param {String} branch Branch to checkout
+   * @return {Promise} Promise resolved when the branch is ready
+   */
+  async checkoutOrCreate(repo, branch) {
+    let ref;
+    try {
+      ref = await repo.getBranch(branch);
+    } catch (_) {
+      logging.verbose(`Creating ${branch} branch...`);
+      const targetCommit = await repo.getHeadCommit();
+      ref = await repo.createBranch(branch, targetCommit, false);
+    }
+    return await repo.checkoutBranch(ref, {});
   }
 
   /**
@@ -233,11 +252,46 @@ export class GitSourceControl {
     return await repo.createCommitWithSignature(branch, author, committer, message, oid,
         parents, this._onSignature.bind(this));
   }
-
+  /**
+   * Pushes commits to the origin.
+   * @param {Object} repo A reference to a repository object. It can be `this.repo`
+   * created when `clone()` is called.
+   * @param {String} branch The branch name
+   * @return {Promise}
+   */
   async push(repo, branch) {
-    logging.verbose('Pushing to the remote: ' + branch);
+    logging.verbose(`Pushing to the remote: ${branch}`);
     const remote = await repo.getRemote('origin');
     const refs = [`refs/heads/${branch}:refs/heads/${branch}`];
     return await remote.push(refs, this._getFetchOptions());
+  }
+  /**
+   * Commits `files` to current branch.
+   * It adds the files, write to index, and write to the repo tree.
+   *
+   * @param {Object} repo The repository object.
+   * @param {Array<String>} files A list of file to be added to current working tree.
+   * @return {Promise<String>} Promise resolved to nodegit's `oid`
+   */
+  async commitFiles(repo, files) {
+    const index = await repo.index();
+    for (let i = 0, len = files.length; i < len; i++) {
+      const file = files[i];
+      await index.addByPath(file);
+    }
+    await index.write();
+    return await index.writeTree();
+  }
+  /**
+   * Merge current branch with remote branch favouring our branch.
+   * @param {Object} repo The repository object.
+   * @param {String} remote Remote branch name
+   * @return {Promise}
+   */
+  async mergeRemote(repo, remote) {
+    const origin = `origin/${remote}`;
+    await repo.fetch('origin', this._getFetchOptions());
+    const sig = this._createSignature();
+    return await repo.mergeBranches(remote, origin, sig, {}, { fileFavor: Git.Merge.FILE_FAVOR.OURS });
   }
 }
