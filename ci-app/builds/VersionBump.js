@@ -39,6 +39,12 @@ export class VersionBump {
    */
   async bump(type) {
     logging.info(`Bumping ${type} version`);
+    const { packageFile } = this;
+    const exists = await fs.pathExists(packageFile);
+    if (!exists) {
+      logging.error(`Unable to bump version as package.json does not exist`);
+      return [false, false];
+    }
     const pkg = await this.getPackage();
     const current = pkg.version;
     if (!current) {

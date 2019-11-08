@@ -2,7 +2,7 @@ import path from 'path';
 import Git from 'nodegit';
 import logging from '../lib/logging';
 import config from '../config';
-import openpgp from 'openpgp';
+import * as openpgp from 'openpgp';
 import fs from 'fs-extra';
 /**
  * A class that allows to manipulate a git repository.
@@ -247,10 +247,10 @@ export class GitSourceControl {
   async createCommit(repo, branch, message, oid, parents) {
     const author = this._createSignature();
     const committer = this._createSignature();
-    // return repo.createCommit(branch, author, committer, message, oid, parents);
+    return repo.createCommit(branch, author, committer, message, oid, parents);
     // https://github.com/nodegit/nodegit/issues/1018
-    return await repo.createCommitWithSignature(branch, author, committer, message, oid,
-        parents, this._onSignature.bind(this));
+    // return await repo.createCommitWithSignature(branch, author, committer, message, oid,
+    //     parents, this._onSignature.bind(this));
   }
   /**
    * Pushes commits to the origin.
@@ -292,6 +292,6 @@ export class GitSourceControl {
     const origin = `origin/${remote}`;
     await repo.fetch('origin', this._getFetchOptions());
     const sig = this._createSignature();
-    return await repo.mergeBranches(remote, origin, sig, {}, { fileFavor: Git.Merge.FILE_FAVOR.OURS });
+    return await repo.mergeBranches(remote, origin, sig, 1, { fileFavor: Git.Merge.FILE_FAVOR.OURS });
   }
 }

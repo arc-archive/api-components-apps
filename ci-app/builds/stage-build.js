@@ -12,11 +12,9 @@ import { VersionBump } from './VersionBump.js';
 export class StageBuild extends BaseBuild {
   constructor(info) {
     super();
-    this.info = info;
     const { org, component, bumpVersion } = info;
-    const [scope, name] = getScopeAndName(component);
-    this.name = name;
-    this.scope = scope;
+    const names = getScopeAndName(component);
+    this.name = names[1];
     this.organization = org;
     this.bumpVersion = bumpVersion === true;
   }
@@ -71,7 +69,7 @@ export class StageBuild extends BaseBuild {
       return [false, false];
     }
     const bumper = new VersionBump(this.elementWorkingDir);
-    return await bumper.bump('minor');
+    return await bumper.bump('patch');
   }
 
   async buildChangelog() {
@@ -97,13 +95,13 @@ export class StageBuild extends BaseBuild {
     if (commitLock) {
       files[files.length] = 'package-lock.json';
     }
-    const oid = this.git.commitFiles(files);
+    const oid = await this.git.commitFiles(repo, files);
     const head = await Git.Reference.nameToId(repo, 'HEAD');
     const parent = await repo.getCommit(head);
     const msg = '[ci skip] Automated commit after stage build.';
     /* this.stageOid = */
     await this.git.createCommit(repo, 'HEAD', msg, oid, [parent]);
-    // this.stageHead = await repo.head();
+    // // this.stageHead = await repo.head();
     logging.verbose('Stage branch is ready.');
   }
   /**
@@ -124,7 +122,7 @@ export class StageBuild extends BaseBuild {
     await this.git.checkoutOrCreate(repo, 'master');
     const ourCommit = await repo.getBranchCommit('master');
     const theirsCommit = await repo.getBranchCommit('stage');
-    const index = Git.Merge.commits(repo, ourCommit, theirsCommit, { fileFavor: Git.Merge.FILE_FAVOR.THEIRS });
+    const index = await Git.Merge.commits(repo, ourCommit, theirsCommit, { fileFavor: Git.Merge.FILE_FAVOR.THEIRS });
     if (index.hasConflicts()) {
       index.conflictCleanup();
     }
