@@ -1,3 +1,4 @@
+import path from 'path';
 import logging from '../lib/logging';
 import { BaseBuild } from './base-build.js';
 import { CatalogDataGenerator } from './catalog-data-generator';
@@ -48,6 +49,14 @@ export class TagBuild extends BaseBuild {
       'arc-electron'
     ];
   }
+  /**
+   * After cloning the component that actual working dir is the component
+   * directory which is current working dir + component name
+   * @return {String}
+   */
+  get elementWorkingDir() {
+    return path.join(this.workingDir, this.name);
+  }
 
   async build() {
     if (this.nonElements.indexOf(this.name) !== -1) {
@@ -73,7 +82,7 @@ export class TagBuild extends BaseBuild {
 
   async _generateCatalogModel() {
     const generator = new CatalogDataGenerator(
-        this.workingDir,
+        this.elementWorkingDir,
         this.organization,
         this.name,
         this.info.branch);
@@ -82,7 +91,7 @@ export class TagBuild extends BaseBuild {
 
   async _generateGrpah() {
     const generator = new DependencyGraph(
-        this.workingDir,
+        this.elementWorkingDir,
         this.organization,
         this.name
     );
@@ -97,7 +106,7 @@ export class TagBuild extends BaseBuild {
     if (this.allowedScopes.indexOf(this.scope) === -1) {
       return;
     }
-    const publisher = new NpmPublish(this.workingDir, this.tag);
+    const publisher = new NpmPublish(this.elementWorkingDir, this.tag);
     await publisher.publish();
   }
 }

@@ -93,7 +93,7 @@ export class CatalogDataGenerator {
   _getGroupName(tags) {
     let result;
     if (tags) {
-      let tag = tags.find((item) => item.title === 'memberof' || item.title === 'group');
+      const tag = tags.find((item) => item.title === 'memberof' || item.title === 'group');
       if (tag) {
         result = tag.description;
       }
@@ -171,7 +171,7 @@ export class CatalogDataGenerator {
       return arr;
     }
     arr = arr.filter((item) => {
-      let inh = item.inheritedFrom;
+      const inh = item.inheritedFrom;
       if (inh && inh.indexOf('Polymer') !== -1) {
         return false;
       }
