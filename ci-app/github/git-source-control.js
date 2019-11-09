@@ -204,7 +204,11 @@ export class GitSourceControl {
       detached: true
     };
     const signed = await openpgp.sign(options);
-    return signed.signature;
+    return {
+      code: Git.Error.CODE.OK,
+      field: 'gpgsig',
+      signedData: signed.signature
+    };
   }
   /**
    * Decrypts GPG key to be used to sign commits.
@@ -247,10 +251,10 @@ export class GitSourceControl {
   async createCommit(repo, branch, message, oid, parents) {
     const author = this._createSignature();
     const committer = this._createSignature();
-    return repo.createCommit(branch, author, committer, message, oid, parents);
+    // return repo.createCommit(branch, author, committer, message, oid, parents);
     // https://github.com/nodegit/nodegit/issues/1018
-    // return await repo.createCommitWithSignature(branch, author, committer, message, oid,
-    //     parents, this._onSignature.bind(this));
+    return await repo.createCommitWithSignature(branch, author, committer, message, oid,
+        parents, this._onSignature.bind(this));
   }
   /**
    * Pushes commits to the origin.

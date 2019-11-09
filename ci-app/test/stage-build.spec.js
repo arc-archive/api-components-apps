@@ -188,7 +188,9 @@ describe('StageBuild', () => {
       await fs.writeFile(changelogFile, 'chg content', 'utf8');
       await instance.commitStage(false, false);
       const commit = await instance.git.repo.getHeadCommit();
-      assert.equal(commit.message(), '[ci skip] Automated commit after stage build.', 'message is set');
+      const commitMessage = commit.message().trim();
+      const expected = '[ci skip] Automated commit after stage build.';
+      assert.equal(commitMessage, expected, 'message is set');
       const tree = await commit.getTree();
       assert.equal(tree.entries()[0].name(), 'CHANGELOG.md', 'has chanelog');
     });
