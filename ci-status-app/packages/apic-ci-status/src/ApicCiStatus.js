@@ -204,7 +204,7 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
     if (!href) {
       return;
     }
-    if (anhor.href.indexOf(window.location.host) === -1) {
+    if (anhor.href.indexOf(window.location.host) !== 0) {
       return;
     }
     e.preventDefault();
