@@ -181,7 +181,8 @@ export class CatalogDataGenerator {
   }
 
   async getChangelogData() {
-    const changelog = new Changelog(this.workingDir);
+    const { component, organization } = this;
+    const changelog = new Changelog(this.workingDir, organization, component);
     return await changelog.get();
   }
 

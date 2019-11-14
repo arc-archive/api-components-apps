@@ -17,182 +17,141 @@ describe('Changelog class', () => {
       assert.equal(instance.changelogFile, 'CHANGELOG.md');
     });
 
-    it('Sets startDir', () => {
-      const instance = new Changelog();
-      assert.equal(instance.startDir, process.cwd());
+    it('Sets organization', () => {
+      const instance = new Changelog('a', 'b', 'c');
+      assert.equal(instance.organization, 'b');
+    });
+
+    it('Sets component', () => {
+      const instance = new Changelog('a', 'b', 'c');
+      assert.equal(instance.component, 'c');
     });
   });
 
-  describe('_getChangelogStreem()', () => {
-    let instance;
-
-    beforeEach(() => {
-      instance = new Changelog(path.join(__dirname, '..'));
-    });
-
-    it('Returns a stream', () => {
-      const result = instance._getChangelogStreem();
-      assert.typeOf(result, 'object');
-      assert.isTrue(result.readable);
-    });
-  });
-
-  describe('_changelogString()', () => {
-    let instance;
-    let startDir;
-
-    before((done) => {
-      const file = path.join(__dirname, 'create-test-repo.sh');
+  async function createRepo() {
+    const file = path.join(__dirname, 'create-test-repo.sh');
+    return new Promise((resolve, reject) => {
       exec(file, (error) => {
         if (error) {
-          done(error);
+          reject(error);
         } else {
-          done();
+          resolve();
         }
       });
     });
+  }
 
-    after(async () => {
-      await fs.remove(path.join(__dirname, 'test-repo'));
-    });
-
-    beforeEach(() => {
-      startDir = process.cwd();
-      instance = new Changelog(path.join(__dirname, 'test-repo'));
-      process.chdir(instance.workingDir);
-    });
-
-    afterEach(() => {
-      process.chdir(startDir);
-    });
-
-    it('Returns a promise', () => {
-      const result = instance._changelogString();
-      assert.typeOf(result, 'promise');
-      return result.then(() => {});
-    });
-
-    it('Resolves to a string', () => {
-      return instance._changelogString().then((result) => {
-        assert.typeOf(result, 'string');
+  async function runUpdateGit() {
+    const file = path.join(__dirname, 'update-test-repo.sh');
+    return new Promise((resolve, reject) => {
+      exec(file, (error, log) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve();
+        }
       });
     });
-  });
+  }
 
   describe('get()', () => {
     let instance;
-    let startDir;
+    const org = 'advanced-rest-client';
+    const name = 'test-repo';
+    const repoDir = path.join(__dirname, 'test-repo');
 
-    beforeEach(() => {
-      startDir = process.cwd();
-      instance = new Changelog(path.join(__dirname, '..'));
-    });
-
-    afterEach(() => {
-      process.chdir(startDir);
-      return fs.remove(path.join(__dirname, '..', instance.changelogFile));
-    });
-
-    it('Returns a promise', () => {
-      const result = instance.get();
-      assert.typeOf(result, 'promise');
-      return result.then(() => {});
-    });
-
-    it('Resolves to a string', () => {
-      return instance.get().then((result) => {
-        assert.typeOf(result, 'string');
-      });
-    });
-
-    it('Creates CHANGELOG.md file', () => {
-      return instance
-        .get()
-        .then(() => fs.exists(path.join(__dirname, '..', instance.changelogFile)))
-        .then((result) => {
-          assert.isTrue(result);
-        });
-    });
-  });
-
-  describe('Generating changelog', () => {
-    before((done) => {
-      const file = path.join(__dirname, 'create-test-repo.sh');
-      exec(file, (error) => {
-        if (error) {
-          done(error);
-        } else {
-          done();
-        }
-      });
-    });
-
-    after(async () => {
-      await fs.remove(path.join(__dirname, 'test-repo'));
-    });
-
-    let instance;
-    let startDir;
-
-    beforeEach(() => {
-      startDir = process.cwd();
-      instance = new Changelog(path.join(__dirname, 'test-repo'));
-      process.chdir(instance.workingDir);
+    beforeEach(async () => {
+      await createRepo();
+      instance = new Changelog(repoDir, org, name);
     });
 
     afterEach(async () => {
-      process.chdir(startDir);
-      await fs.remove(path.join(__dirname, 'test-repo', 'CHANGELOG.md'));
+      await fs.remove(repoDir);
     });
 
-    it('Generates the changelog string', async () => {
-      const result = await instance._changelogString();
+    it('Gets latrest commit message', async () => {
+      const result = await instance.get();
       const parts = result.split('\n').filter((item) => !!item.trim());
-      assert.notEqual(parts[0].indexOf('# 1.0.0'), -1);
-      assert.notEqual(parts[1].indexOf('### Bug Fixes'), -1);
-      assert.notEqual(parts[2].indexOf('* adding package.json file'), -1);
-      assert.notEqual(parts[3].indexOf('### Features'), -1);
-      assert.notEqual(parts[4].indexOf('* adding test message'), -1);
+      assert.include(parts[0], '<a name="1.0.0"></a>', 'includes anchor');
+      assert.include(parts[1], '# 1.0.0 (', 'includes header');
+      assert.include(parts[2], '## Features', 'includes "features" title');
+      assert.include(parts[3], '* create 1 (feat)', 'includes commit message');
+      assert.include(parts[3], 'https://github.com/advanced-rest-client/test-repo/commit/', 'includes commit url');
+      assert.include(parts[4], '## Bug Fixes', 'includes "Big Fixes" title');
+      assert.include(parts[5], '* create 2 (fix)', 'includes bug fixes commit message');
+    });
+  });
+
+  describe('build()', () => {
+    const org = 'advanced-rest-client';
+    const name = 'test-repo';
+    const repoDir = path.join(__dirname, 'test-repo');
+
+    before(async () => {
+      await createRepo();
     });
 
-    it('Creates changelog', async () => {
+    after(async () => {
+      await fs.remove(repoDir);
+    });
+
+    let instance;
+    beforeEach(() => {
+      instance = new Changelog(repoDir, org, name);
+    });
+
+    afterEach(async () => {
+      await fs.remove(path.join(repoDir, instance.changelogFile));
+    });
+
+    it('creates a new changelog file', async () => {
       await instance.build();
       const file = path.join(__dirname, 'test-repo', 'CHANGELOG.md');
       const result = await fs.readFile(file, 'utf8');
       const parts = result.split('\n').filter((item) => !!item.trim());
-      assert.notEqual(parts[0].indexOf('# 1.0.0'), -1);
-      assert.notEqual(parts[1].indexOf('### Bug Fixes'), -1);
-      assert.notEqual(parts[2].indexOf('* adding package.json file'), -1);
-      assert.notEqual(parts[3].indexOf('### Features'), -1);
-      assert.notEqual(parts[4].indexOf('* adding test message'), -1);
+      assert.include(parts[0], '<a name="1.0.0"></a>', 'includes anchor');
+      assert.include(parts[1], '# 1.0.0 (', 'includes header');
+      assert.include(parts[2], '## Features', 'includes "features" title');
+      assert.include(parts[3], '* create 1 (feat)', 'includes commit message');
+      assert.include(parts[3], 'https://github.com/advanced-rest-client/test-repo/commit/', 'includes commit url');
+      assert.include(parts[4], '## Bug Fixes', 'includes "Big Fixes" title');
+      assert.include(parts[5], '* create 2 (fix)', 'includes bug fixes commit message');
     });
 
-    async function runUpdateGit() {
-      const file = path.join(__dirname, 'update-test-repo.sh');
-      return new Promise((resolve, reject) => {
-        exec(file, (error) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve();
-          }
-        });
-      });
-    }
-
-    it('Updates changelog', async () => {
-      await instance.build();
+    it('updates existing changelog file', async () => {
       const file = path.join(__dirname, 'test-repo', 'CHANGELOG.md');
+      await instance.build();
       await runUpdateGit();
       await instance.build();
       const result = await fs.readFile(file, 'utf8');
       const parts = result.split('\n').filter((item) => !!item.trim());
-      assert.notEqual(parts[0].indexOf('# 1.0.0'), -1);
-      assert.notEqual(parts[5].indexOf('# 1.0.1'), -1);
-      assert.notEqual(parts[6].indexOf('### Bug Fixes'), -1);
-      assert.notEqual(parts[7].indexOf('* adding package.json file'), -1);
-      assert.notEqual(parts[8].indexOf('### Features'), -1);
-      assert.notEqual(parts[9].indexOf('* adding test message'), -1);
+      assert.include(parts[0], '<a name="1.0.0"></a>', 'includes 1.0.0 anchor');
+      assert.include(parts[6], '<a name="1.0.1"></a>', 'includes 1.0.1 anchor');
+      assert.include(parts[7],
+          '## [1.0.1](https://github.com/advanced-rest-client/test-repo/compare/1.0.0...1.0.1) ',
+          'includes release title with compare link'
+      );
+      assert.include(parts[8], '### Features', 'includes "Features" title');
+      assert.include(parts[9], '* update 2 (feat)', 'includes commit message for features');
+      assert.include(parts[10], '### Testing', 'includes "Testing" title');
+      assert.include(parts[11], '* update 1 (test)', 'includes commit message for testing');
+    });
+
+    it('regenerates changelog file', async () => {
+      const file = path.join(__dirname, 'test-repo', 'CHANGELOG.md');
+      await instance.build();
+      const result = await fs.readFile(file, 'utf8');
+      const parts = result.split('\n').filter((item) => !!item.trim());
+      assert.include(parts[0], '<a name="1.0.0"></a>', 'includes 1.0.0 anchor');
+      assert.include(parts[6], '<a name="1.0.1"></a>', 'includes 1.0.1 anchor');
+      assert.include(parts[7],
+          '## [1.0.1](https://github.com/advanced-rest-client/test-repo/compare/1.0.0...1.0.1) ',
+          'includes release title with compare link'
+      );
+      assert.include(parts[8], '### Features', 'includes "Features" title');
+      assert.include(parts[9], '* update 2', 'includes commit message for features');
+      assert.include(parts[10], '### Testing', 'includes "Testing" title');
+      assert.include(parts[11], '* update 1', 'includes commit message for testing');
     });
   });
 });

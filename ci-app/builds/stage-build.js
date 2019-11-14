@@ -73,8 +73,9 @@ export class StageBuild extends BaseBuild {
   }
 
   async buildChangelog() {
+    const { organization, name } = this;
     logging.debug('Generaing changelog file...');
-    const changelog = new Changelog(this.elementWorkingDir);
+    const changelog = new Changelog(this.elementWorkingDir, organization, name);
     return await changelog.build();
   }
 
