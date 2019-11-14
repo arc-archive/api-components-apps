@@ -265,7 +265,7 @@ export class Changelog {
     const repo = await this.open();
     const lastTagName = await this.getLastTagName(repo);
     const lastTagSha = await this.getTagSha(repo, lastTagName);
-    const commit = await repo.getMasterCommit();
+    const commit = await repo.getHeadCommit();
     const commits = await this.listHistory(commit, lastTagSha);
     const pkg = await this.readPackage();
     const message = this.buildMessage(commits, pkg.version, commit, lastTagName);
@@ -311,7 +311,7 @@ export class Changelog {
     if (!tags.length) {
       return '';
     }
-    const commit = await repo.getMasterCommit();
+    const commit = await repo.getHeadCommit();
     const allCommits = await this.listHistory(commit);
     allCommits.reverse();
     let logs = '';
