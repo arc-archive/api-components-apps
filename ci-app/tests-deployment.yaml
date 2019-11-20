@@ -15,7 +15,7 @@
 # This file configures the API components autotest CI application frontend.
 # The frontend serves public web traffic.
 
-apiVersion: extensions/v1beta1
+apiVersion: eapps/v1
 kind: Deployment
 metadata:
   name: apic-ci-worker
