@@ -12,7 +12,7 @@ import { refresh } from '../../Icons.js';
 
 const typeLabel = (type) => {
   switch (type) {
-    case 'master-build': return 'Mater branch build';
+    case 'master-build': return 'Master branch build';
     case 'stage-build': return 'Stage branch build';
     case 'tag-build': return 'Tag build';
     default: return type;
