@@ -86,6 +86,7 @@ export class TagBuild extends BaseBuild {
 
   async _npmPublish() {
     if (this.allowedScopes.indexOf(this.scope) === -1) {
+      logging.info(`${this.scope} is not allowed to publish to NPM [${this.organization}/${this.name}]`);
       return;
     }
     const publisher = new NpmPublish(this.elementWorkingDir, this.tag);
