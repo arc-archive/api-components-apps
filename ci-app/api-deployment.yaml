@@ -24,7 +24,11 @@ metadata:
 # For more info about Pods see:
 #   https://cloud.google.com/container-engine/docs/pods/
 spec:
-  replicas: 1
+  replicas: 2
+  selector:
+    matchLabels:
+      app: arc-api
+      tier: api
   template:
     metadata:
       labels:
@@ -37,7 +41,7 @@ spec:
           secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/apic-ci-api:latest
+        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.40
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google

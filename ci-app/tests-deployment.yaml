@@ -15,7 +15,7 @@
 # This file configures the API components autotest CI application frontend.
 # The frontend serves public web traffic.
 
-apiVersion: eapps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apic-ci-worker
@@ -25,6 +25,10 @@ metadata:
 #   https://cloud.google.com/container-engine/docs/pods/
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: apic-ci
+      tier: worker
   template:
     metadata:
       labels:
@@ -44,7 +48,7 @@ spec:
           secretName: github-ssh-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/apic-ci-api:latest
+        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.40
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google

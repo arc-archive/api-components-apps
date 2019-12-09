@@ -39,10 +39,15 @@ class GithubBuild {
    *
    * @return {Promise}
    */
-  subscribe() {
+  async subscribe() {
     background.on('message', this._onMessage);
     background.on('error', this._onError);
-    return background.subscribeGithubBuild();
+    try {
+      await background.subscribeGithubBuild();
+    } catch (e) {
+      logging.error(e);
+      process.exit(100);
+    }
   }
 
   _onMessage(topic, data) {
@@ -126,7 +131,6 @@ app.get('/_ah/health', (req, res) => {
 });
 
 const worker = new GithubBuild();
-// app.get('/', worker.routeMain.bind(worker));
 app.get('/:id', worker.routeRun.bind(worker));
 app.use(logging.errorLogger);
 

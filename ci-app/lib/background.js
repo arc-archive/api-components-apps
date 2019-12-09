@@ -67,32 +67,36 @@ class Background extends EventEmitter {
   }
 
   async subscribe() {
+    logging.info('PubSub: Subscribing to Tests topic.');
     const topic = await this.getTopic(this.topicTestProcess);
     const subscription = await this.getSubscription(topic, this.subBuildWorker);
     subscription.on('message', this.handleMessage.bind(this, this.topicTestProcess));
     subscription.on('error', this.handleError.bind(this, this.topicTestProcess));
     logging.verbose(
-      'Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker
+        'Subscribed to a topic: ' + this.topicTestProcess + ' with subscription ' + this.subBuildWorker
     );
     this.subscriptions.push(subscription);
   }
 
   async subscribeGithubBuild() {
-    const topic = await this.getTopic(this.topicGhWebhook);
+    logging.info('PubSub: Subscribing to GitHub topic...');
+      const topic = await this.getTopic(this.topicGhWebhook);
     const subscription = await this.getSubscription(topic, this.subGhCi);
     subscription.on('message', this.handleMessage.bind(this, this.topicGhWebhook));
     subscription.on('error', this.handleError.bind(this, this.topicGhWebhook));
     logging.verbose('Subscribed to a topic: ' + this.topicGhWebhook + ' with subscription ' + this.subGhCi);
     this.subscriptions.push(subscription);
+    logging.info('PubSub: GitHub topic subscription ready.');
   }
 
   async subscribeTestsResults() {
+    logging.info('PubSub: Subscribing to Test resultws topic.');
     const topic = await this.getTopic(this.topicTestResult);
     const subscription = await this.getSubscription(topic, this.subWorkerTestResult);
     subscription.on('message', this.handleMessage.bind(this, this.topicTestResult));
     subscription.on('error', this.handleError.bind(this, this.topicTestResult));
     logging.verbose(
-      'Subscribed to a topic: ' + this.topicTestResult + ' with subscription ' + this.subWorkerTestResult
+        'Subscribed to a topic: ' + this.topicTestResult + ' with subscription ' + this.subWorkerTestResult
     );
     this.subscriptions.push(subscription);
   }
