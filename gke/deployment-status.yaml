@@ -16,7 +16,7 @@
 # Deployment configuration for Status App UI (front end)
 #
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apic-ci-status
@@ -24,6 +24,10 @@ metadata:
     app: apic-ci
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: apic-ci
+      tier: frontend
   template:
     metadata:
       labels:

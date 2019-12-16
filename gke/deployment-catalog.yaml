@@ -16,7 +16,7 @@
 # Deployment configuration for ARC components catalog
 #
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: apic-catalog
@@ -24,6 +24,10 @@ metadata:
     app: apic-catalog
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: apic-catalog-frontend
+      tier: frontend
   template:
     metadata:
       labels:
@@ -35,7 +39,7 @@ spec:
         secret:
           secretName: apic-ci-key
       containers:
-      - name: apic-ci
+      - name: apic-catalog
         image: gcr.io/advancedrestclient-1155/apic-catalog
         volumeMounts:
         - name: google-cloud-key
