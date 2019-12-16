@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-# This file configures the API/ARC components CI pipeline where components are
-# build for production. This includes updating changelog, tagging and merging
-# stage with master branch.
 #
-# In ARC organization master branch is only updated by this process, never by
-# maitainer. It is only done when the component passes the tests.
+# Deployment configuration for GitHub hooks
+#
 
 apiVersion: apps/v1
 kind: Deployment

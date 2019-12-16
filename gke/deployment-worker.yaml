@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-# This file configures the API components autotest CI application frontend.
-# The frontend serves public web traffic.
+#
+# Deployment configuration for API Components tests runner
+#
 
 apiVersion: apps/v1
 kind: Deployment
@@ -21,8 +22,6 @@ metadata:
   name: apic-ci-worker
   labels:
     app: apic-ci
-# For more info about Pods see:
-#   https://cloud.google.com/container-engine/docs/pods/
 spec:
   replicas: 2
   selector:

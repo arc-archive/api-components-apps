@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-# This file configures the API components autotest CI application frontend.
-# The frontend serves public web traffic.
+#
+# Deployment configuration for ARC components catalog
+#
 
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -21,9 +22,6 @@ metadata:
   name: apic-catalog
   labels:
     app: apic-catalog
-
-# For more info about Pods see:
-#   https://cloud.google.com/container-engine/docs/pods/
 spec:
   replicas: 1
   template:
@@ -42,11 +40,7 @@ spec:
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
-        # This setting makes nodes pull the docker image every time before
-        # starting the pod. This is useful when debugging, but should be turned
-        # off in production.
         imagePullPolicy: Always
-        # The app process listens on port 8080 for web traffic by default.
         ports:
         - name: http-server
           containerPort: 8080

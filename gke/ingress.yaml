@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: apic-ci-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: apic-ci-global
+    networking.gke.io/managed-certificates: api-certificate,ci-certificate,catalog-certificate
+spec:
+  rules:
+  - host: api.advancedrestclient.com
+    http:
+      paths:
+      - backend:
+          serviceName: arc-api
+          servicePort: 8080
+  - host: ci.advancedrestclient.com
+    http:
+      paths:
+      - backend:
+          serviceName: apic-ci-status
+          servicePort: 8080
+  - host: catalog.advancedrestclient.com
+    http:
+      paths:
+      - backend:
+          serviceName: apic-catalog
+          servicePort: 8080

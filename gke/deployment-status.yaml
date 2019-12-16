@@ -12,28 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-# This file configures the API components autotest CI application frontend.
-# The frontend serves public web traffic.
+#
+# Deployment configuration for Status App UI (front end)
+#
 
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: arc-api
+  name: apic-ci-status
   labels:
-    app: apic-ci-api
-# For more info about Pods see:
-#   https://cloud.google.com/container-engine/docs/pods/
+    app: apic-ci
 spec:
   replicas: 2
-  selector:
-    matchLabels:
-      app: arc-api
-      tier: api
   template:
     metadata:
       labels:
-        app: arc-api
-        tier: api
+        app: apic-ci
+        tier: frontend
     spec:
       volumes:
       - name: google-cloud-key
@@ -41,7 +36,7 @@ spec:
           secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.40
+        image: gcr.io/advancedrestclient-1155/apic-ci-status:0.2.10
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
@@ -58,9 +53,3 @@ spec:
             value: /var/secrets/google/key.json
           - name: PROJECT_ID
             value: advancedrestclient-1155
-          - name: OAUTH2_CALLBACK
-            value: https://api.advancedrestclient.com/auth/callback
-          - name: OAUTH2_CLIENT_ID
-            value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
-          - name: MEMCACHE_URL
-            value: 35.233.153.23:11211

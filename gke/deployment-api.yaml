@@ -12,24 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License
 
-# This file configures the API components autotest CI application frontend.
-# The frontend serves public web traffic.
+#
+# Deployment configuration for application API
+#
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: apic-ci-status
+  name: arc-api
   labels:
-    app: apic-ci
-# For more info about Pods see:
-#   https://cloud.google.com/container-engine/docs/pods/
+    app: apic-ci-api
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: arc-api
+      tier: api
   template:
     metadata:
       labels:
-        app: apic-ci
-        tier: frontend
+        app: arc-api
+        tier: api
     spec:
       volumes:
       - name: google-cloud-key
@@ -37,15 +40,11 @@ spec:
           secretName: apic-ci-key
       containers:
       - name: apic-ci
-        image: gcr.io/advancedrestclient-1155/apic-ci-status:latest
+        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.1.40
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
-        # This setting makes nodes pull the docker image every time before
-        # starting the pod. This is useful when debugging, but should be turned
-        # off in production.
         imagePullPolicy: Always
-        # The app process listens on port 8080 for web traffic by default.
         ports:
         - name: http-server
           containerPort: 8080
@@ -54,3 +53,9 @@ spec:
             value: /var/secrets/google/key.json
           - name: PROJECT_ID
             value: advancedrestclient-1155
+          - name: OAUTH2_CALLBACK
+            value: https://api.advancedrestclient.com/auth/callback
+          - name: OAUTH2_CLIENT_ID
+            value: 1076318174169-ffof9prlf8nhehb8k2frhqa2890o50ao.apps.googleusercontent.com
+          - name: MEMCACHE_URL
+            value: 35.233.153.23:11211
