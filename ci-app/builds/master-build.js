@@ -8,6 +8,9 @@ import { getScopeAndName, nonElements } from './utils.js';
  * A class responsible for processing "master" branch after push.
  */
 export class MasterBuild extends GitBuild {
+  /**
+   * @param {Object} info Data store entry for the build
+   */
   constructor(info) {
     super();
     this.info = info;
@@ -16,67 +19,78 @@ export class MasterBuild extends GitBuild {
     this.name = names[1];
   }
 
-  build() {
+  /**
+   * Performs a build on a master branch:
+   * - tag version on GitHub
+   * @return {Promise}
+   */
+  async build() {
     if (nonElements.indexOf(this.name) !== -1) {
       logging.info(`Ignoring master build for ${this.name}`);
       return;
     }
 
-    return this.createWorkingDir()
-      .then(() => this._clone())
-      .then(() => this._tag())
-      .then(() => this.cleanup())
-      .then(() => {
-        logging.info('Master build completed.');
-      })
-      .catch((cause) => {
-        logging.error('Master build error: ' + cause.message);
-        throw cause;
-      });
+    try {
+      await this.createWorkingDir();
+      await this._clone();
+      await this._tag();
+      await this.cleanup();
+      logging.info('Master build completed.');
+    } catch (e) {
+      logging.error(`Master build error: ${e.message}`);
+      throw e;
+    }
+  }
+  /**
+   * Creates a new tag for current version, if not exists.
+   * @return {Promise}
+   * @throws {Error} When a tag already exists
+   */
+  async _tag() {
+    const ver = await this._getVersion();
+    const tags = await Git.Tag.list(this.repo);
+    if (tags.indexOf(ver) !== -1) {
+      throw new Error(`Tag ${ver} already exist.`);
+    }
+    const oid = await this._addTag(ver);
+    const tag = await this.repo.getTag(oid);
+    logging.verbose('Created tag: ' + tag.name());
+    await this._push(tag);
   }
 
-  _tag() {
-    let ver;
-    return this._getVersion()
-      .then((version) => {
-        ver = version;
-        return Git.Tag.list(this.repo);
-      })
-      .then((tags) => {
-        if (tags.indexOf(ver) !== -1) {
-          throw new Error(`Tag ${ver} already exist.`);
-        }
-        return this._addTag(ver);
-      })
-      .then((oid) => this.repo.getTag(oid))
-      .then((tag) => {
-        logging.verbose('Created tag: ' + tag.name());
-      })
-      .then(() => this._push(ver));
-  }
-
-  _addTag(ver) {
+  /**
+   * Creates a new tag.
+   * @param {String} ver
+   * @return {Promise}
+   */
+  async _addTag(ver) {
     const tagger = this._createSignature();
     const message = 'Publishing release v' + ver;
-    return Git.Commit.lookup(this.repo, this.info.commit).then((commit) =>
-      Git.Tag.create(this.repo, ver, commit, tagger, message, 0)
-    );
+    const commit = await Git.Commit.lookup(this.repo, this.info.commit);
+    return await Git.Tag.create(this.repo, ver, commit, tagger, message, 0);
   }
 
-  _getVersion() {
-    return fs.readJson(path.join(this.workingDir, 'package.json'), { throws: false }).then((pkg) => {
-      if (!pkg || !pkg.version) {
-        throw new Error('package.json file not found.');
-      }
-      return pkg.version;
-    });
+  /**
+   * Reads version from package.json file.
+   * @return {Promise<String>} Wersion of currently processed element.
+   */
+  async _getVersion() {
+    const pkg = await fs.readJson(path.join(this.workingDir, 'package.json'), { throws: false });
+    if (!pkg || !pkg.version) {
+      throw new Error('package.json file not found.');
+    }
+    return pkg.version;
   }
 
-  _push(tag) {
-    logging.verbose('Pushing to the remote: ' + tag);
-    return this.repo.getRemote('origin').then((remote) => {
-      const refs = [`refs/tags/${tag}:refs/tags/${tag}`];
-      return remote.push(refs, this._getFetchOptions());
-    });
+  /**
+   * Pushes tag to the remote.
+   * @param {String} tag Tag name
+   * @return {Promise}
+   */
+  async _push(tag) {
+    logging.verbose(`Pushing to the remote: ${tag}`);
+    const remote = await this.repo.getRemote('origin');
+    const refs = [`refs/tags/${tag}:refs/tags/${tag}`];
+    return await remote.push(refs, this._getFetchOptions());
   }
 }
