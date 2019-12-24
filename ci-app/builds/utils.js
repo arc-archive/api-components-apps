@@ -28,7 +28,7 @@ export const nonElements = [
   'arc-datastore',
   'arc-tools',
   'polymd',
-  'cookie-parser',
+  'api-components-apps',
   'har',
   'arc-element-catalog',
   'ci-server',
