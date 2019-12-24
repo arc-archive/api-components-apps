@@ -48,8 +48,13 @@ export class StageBuild extends BaseBuild {
       const [commitPkg, commitLock] = await this.bumpPackageVersion();
       await this.buildChangelog();
       await this.commitStage(commitPkg, commitLock);
-      await this.pushStage();
       await this.commitMaster();
+      try {
+        await this.syncStage();
+      } catch (e) {
+        // ...
+      }
+      await this.pushStage();
       await this.pushMaster();
       await this.cleanup();
       logging.info('Stage build complete.');
@@ -138,6 +143,34 @@ export class StageBuild extends BaseBuild {
     await this.git.mergeRemote(repo, 'master');
     logging.verbose('Master branch is merged and ready.');
   }
+  /**
+   * Merges master branch with stage.
+   * Sometimes master branch is out of sync with the stage branch. This should
+   * make them in sync.
+   * @return {Promise}
+   */
+  async syncStage() {
+    logging.verbose('Syncying stage with master...');
+    const repo = this.git.repo;
+    await this.git.checkoutOrCreate(repo, 'stage');
+    const ourCommit = await repo.getBranchCommit('stage');
+    const theirsCommit = await repo.getBranchCommit('master');
+    const index = await Git.Merge.commits(repo, ourCommit, theirsCommit, { fileFavor: Git.Merge.FILE_FAVOR.THEIRS });
+    if (index.hasConflicts()) {
+      index.conflictCleanup();
+    }
+    const repoIndex = await repo.refreshIndex();
+    await repoIndex.addAll();
+    await repoIndex.write();
+    const oid = await repoIndex.writeTree();
+    const msg = 'chore: [ci skip] automated merge master->stage. syncing main branches';
+    const parents = [ourCommit, theirsCommit];
+    logging.verbose('Creating commit message...');
+    await this.git.createCommit(repo, 'refs/heads/stage', msg, oid, parents);
+    await this.git.mergeRemote(repo, 'stage');
+    logging.verbose('Stage branch is merged with master.');
+  }
+
   /**
    * Pushes changes to the stage to origin
    * @return {Promise}
