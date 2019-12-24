@@ -3,6 +3,7 @@ import Git from 'nodegit';
 import { GitBuild } from './git-build';
 import fs from 'fs-extra';
 import path from 'path';
+import { getScopeAndName, nonElements } from './utils.js';
 /**
  * A class responsible for processing "master" branch after push.
  */
@@ -10,9 +11,17 @@ export class MasterBuild extends GitBuild {
   constructor(info) {
     super();
     this.info = info;
+    const { component } = info;
+    const names = getScopeAndName(component);
+    this.name = names[1];
   }
 
   build() {
+    if (nonElements.indexOf(this.name) !== -1) {
+      logging.info(`Ignoring master build for ${this.name}`);
+      return;
+    }
+
     return this.createWorkingDir()
       .then(() => this._clone())
       .then(() => this._tag())
