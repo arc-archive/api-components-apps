@@ -54,8 +54,9 @@ export class MasterBuild extends GitBuild {
     }
     const oid = await this._addTag(ver);
     const tag = await this.repo.getTag(oid);
-    logging.verbose('Created tag: ' + tag.name());
-    await this._push(tag);
+    const tagName = tag.name();
+    logging.verbose(`Created tag: ${tagName}`);
+    await this._push(tagName);
   }
 
   /**
