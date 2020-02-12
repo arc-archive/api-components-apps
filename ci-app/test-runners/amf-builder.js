@@ -12,8 +12,8 @@ export class AmfBuilder {
   /**
    * @param {String} workingDir A working directory where to create AMF library
    * @param {Object} opts
-   * - branch The branch name to checkout
-   * - sha Commit SHA to checkout
+   * @param {String?} opts.branch A branch to checkout
+   * @param {String?} opts.sha An sha of a commit to use to build the library
    * Either sha or branch is allowed as an option.
    * If branch is passed it is translated to sha.
    */
