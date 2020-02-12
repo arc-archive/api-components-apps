@@ -29,7 +29,7 @@
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "devDependencies": {
-    "@api-components/api-console-builder": "^2.0.2",
+    "@api-components/api-console-builder": "^2.0.6",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
     "chai": "^4.2.0",
@@ -38,11 +38,11 @@
     "eslint-config-node": "^4.0.0",
     "esm": "^3.2.25",
     "fs-extra": "^8.1.0",
-    "husky": "^4.0.10",
+    "husky": "^4.2.2",
     "lint-staged": "^9.5.0",
-    "mocha": "^7.0.0",
+    "mocha": "^7.0.1",
     "prettier": "^1.19.1",
-    "sinon": "^8.0.4"
+    "sinon": "^8.1.1"
   },
   "lint-staged": {
     "*.js": [
