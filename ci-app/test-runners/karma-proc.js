@@ -25,8 +25,11 @@ const ArcCiReporter = function() {
       suite: result.suite,
       description: result.description,
       success: result.success,
+      failed: result.failed,
+      total: result.total,
       skipped: result.skipped,
       errors: result.assertionErrors,
+      error: result.error,
       log: result.log,
     });
   };
@@ -81,11 +84,14 @@ class Runner {
     for (let i = 0, len = keys.length; i < len; i++) {
       const key = keys[i];
       const browser = runResult[key];
-      report.total += browser.total;
-      report.success += browser.success;
-      report.failed += browser.failed;
-      report.skipped += browser.skipped;
+      report.total += browser.total || 0;
+      report.success += browser.success || 0;
+      report.failed += browser.failed || 0;
+      report.skipped += browser.skipped || 0;
       report.results.push(browser);
+      if (!report.error && (browser.error || browser.failed)) {
+        report.error = true;
+      }
     }
     return report;
   }
