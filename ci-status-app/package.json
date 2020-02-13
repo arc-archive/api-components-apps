@@ -18,13 +18,13 @@
     "test:watch": "karma start --auto-watch=true --single-run=false",
     "test:update-snapshots": "karma start --update-snapshots",
     "test:prune-snapshots": "karma start --prune-snapshots",
-    "test:compatibility": "karma start --compatibility all --coverage",
-    "test:compatibility:watch": "karma start --compatibility all --auto-watch=true --single-run=false",
-    "test:bs": "karma start karma.bs.config.js --compatibility all --coverage",
+    "test:compatibility": "karma start --compatibility auto --coverage",
+    "test:compatibility:watch": "karma start --compatibility auto --auto-watch=true --single-run=false",
+    "test:bs": "karma start karma.bs.config.js --compatibility auto --coverage",
     "start:build": "node app.js --PORT 8000",
     "build": "rimraf dist && rollup -c rollup.config.js && node tasks/build-sw.js",
     "start:dev": "es-dev-server --app-index index.html --node-resolve --open --watch",
-    "start:compatibility": "es-dev-server --app-index index.html --compatibility all --node-resolve --open --watch"
+    "start:compatibility": "es-dev-server --app-index index.html --compatibility auto --node-resolve --open --watch"
   },
   "dependencies": {
     "@google-cloud/debug-agent": "^4.2.2",
