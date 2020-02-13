@@ -4,6 +4,7 @@ import cpy from 'rollup-plugin-cpy';
 // import path from 'path';
 
 const config = createDefaultConfig({ input: './index.html' });
+config.context = 'window';
 export default {
   ...config,
   output: {
