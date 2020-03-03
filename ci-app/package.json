@@ -1,6 +1,6 @@
 {
   "name": "api-components-ci",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
