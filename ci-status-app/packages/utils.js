@@ -24,7 +24,6 @@ export const scopeToLabel = (scope) => {
     case 'create-message': return 'Create ARC message';
     case 'delete-message': return 'Delete ARC message';
     case 'schedule-component-build': return 'Schedule component build process';
-    case 'restart-build': return 'Restaring component build process';
     default: return scope;
   }
 };
@@ -34,7 +33,7 @@ export const scopeToLabel = (scope) => {
  */
 export const scopes = [
   'all', 'create-test', 'delete-test', 'create-message', 'delete-message',
-  'schedule-component-build', 'restart-build'
+  'schedule-component-build',
 ];
 
 export const breadcrumbsGenerator = (items) => {
