@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node ${SCRIPT:-app.js}",
     "gke:build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version .",
-    "gke:deploy": "gcloud docker -- push gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version",
+    "gke:deploy": "docker -- push gcr.io/advancedrestclient-1155/apic-ci-status:$npm_package_version",
     "gke:deploy-config": "kubectl apply -f ../gke/deployment-status.yaml",
     "lint:eslint": "eslint --ext .js,.html . --ignore-path ../.gitignore",
     "format:eslint": "eslint --ext .js,.html . --fix --ignore-path ../.gitignore",
