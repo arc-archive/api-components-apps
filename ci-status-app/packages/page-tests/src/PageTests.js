@@ -150,9 +150,7 @@ export class PageTests extends LitElement {
       return;
     }
     if (!userStatus.loggedIn) {
-      this.loading = true;
       await userStatus.getUser();
-      this.loading = false;
     }
     if (!userStatus.loggedIn) {
       return;

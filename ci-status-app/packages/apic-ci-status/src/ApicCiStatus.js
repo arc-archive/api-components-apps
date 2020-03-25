@@ -22,6 +22,7 @@ import '../../page-tests/page-test-component.js';
 import '../../page-tests/page-add-test.js';
 import '../../page-dependency/page-dependency.js';
 import '../../page-builds/page-builds.js';
+import '../../page-builds/page-add-build.js';
 import '../../page-builds/page-build.js';
 
 const defaultTitle = 'API Components status';
@@ -87,6 +88,11 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
         name: 'builds',
         pattern: '/builds',
         data: { title: 'Scheduled builds' },
+      },
+      {
+        name: 'add-build',
+        pattern: '/builds/add',
+        data: { title: 'Add a build' },
       },
       {
         name: 'build',
@@ -355,8 +361,15 @@ export class ApicCiStatus extends routerLinkMixin(routerMixin(LitElement)) {
           <page-builds
             .apiBase="${this.apiBase}"
             .apiToken="${this.apiToken}"
+            .userStatus="${this.userStatus}"
           ></page-builds>
         `;
+      case 'add-build':
+        return html`<page-add-build
+          .apiBase="${this.apiBase}"
+          .apiToken="${this.apiToken}"
+          .userStatus="${this.userStatus}"
+        ></page-add-build>`;
       case 'build':
         return html`
           <page-build

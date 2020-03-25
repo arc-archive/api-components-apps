@@ -8,7 +8,7 @@ import '../../apic-ci-status/app-message.js';
 import { classMap } from 'lit-html/directives/class-map.js';
 import { baseStyles, headersStyles, progressCss, breadcrumbsStyles } from '../../common-styles.js';
 import { computeIsoDate, breadcrumbsGenerator } from '../../utils.js';
-import { refresh } from '../../Icons.js';
+import { refresh, add } from '../../Icons.js';
 
 const typeLabel = (type) => {
   switch (type) {
@@ -113,6 +113,10 @@ export class PageBuilds extends LitElement {
   static get properties() {
     return {
       /**
+       * An instance of `UserStatus` class.
+       */
+      userStatus: { type: Object },
+      /**
        * Current loading state.
        */
       loading: { type: Boolean },
@@ -134,6 +138,10 @@ export class PageBuilds extends LitElement {
        * List of items to render.
        */
       items: { type: Array },
+      /**
+       * True when the user is logged in
+       */
+      loggedIn: { type: Boolean },
       /**
        * Last error mesage to render to the user.
        */
@@ -157,6 +165,7 @@ export class PageBuilds extends LitElement {
   constructor() {
     super();
     this.hasMore = true;
+    this.loggedIn = false;
   }
 
   connectedCallback() {
@@ -171,6 +180,21 @@ export class PageBuilds extends LitElement {
    */
   async _initialize() {
     await this.loadNextResults();
+    await this._initUser();
+  }
+
+  async _initUser() {
+    const { userStatus } = this;
+    if (!userStatus) {
+      return;
+    }
+    if (!userStatus.loggedIn) {
+      await userStatus.getUser();
+    }
+    if (!userStatus.loggedIn) {
+      return;
+    }
+    this.loggedIn = true;
   }
 
   /**
@@ -264,7 +288,7 @@ export class PageBuilds extends LitElement {
   }
 
   render() {
-    const { lastError, hasResult, loading, _liveItems } = this;
+    const { lastError, hasResult, loading, _liveItems, loggedIn } = this;
     return html`
     ${breadcrumbsGenerator(breadcrumbs)}
     ${lastError ? html`<app-message
@@ -281,6 +305,13 @@ export class PageBuilds extends LitElement {
       >
         <span class="icon">${refresh}</span>
       </anypoint-icon-button>
+
+      ${loggedIn ? html`<a href="/builds/add"><anypoint-icon-button
+        title="Force new build"
+        aria-label="Activate to add a new build process"
+      >
+        <span class="icon">${add}</span>
+      </anypoint-icon-button></a>` : ''}
     </div>
     ${loading ? html`<progress></progress>` : ''}
     ${hasResult ? this._resultsTemplate() : ''}

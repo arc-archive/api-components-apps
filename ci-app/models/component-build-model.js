@@ -1,7 +1,7 @@
 import background from '../lib/background';
 import logging from '../lib/logging';
 import { BaseModel } from './base-model';
-import uuidv4 from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 /**
  * A model for catalog items.
  */

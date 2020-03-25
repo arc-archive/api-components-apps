@@ -213,18 +213,21 @@ class GithubApiRoute extends BaseApi {
         };
         throw o;
       }
-      this.ack(res);
       const { body } = req;
-      const { commit, sshUrl, component } = body;
-      this.model.insertBuild({
+      const { commit='', sshUrl, component, org } = body;
+      await this.model.insertBuild({
         type: 'stage-build',
         branch: 'stage',
         component,
+        org,
         commit,
-        sshUrl
+        sshUrl,
       });
+      this.ack(res);
     } catch (e) {
       logging.error(e);
+      // eslint-disable-next-line no-console
+      console.error(e);
       const status = e.status || 500;
       this.sendError(res, e.message, status);
     }
@@ -255,12 +258,12 @@ class GithubApiRoute extends BaseApi {
       }
       this.ack(res);
       const { body } = req;
-      const { commit, sshUrl, component, org } = body;
+      const { commit='', sshUrl, component, org } = body;
       this.model.insertBuild({
         type: 'master-build',
         branch: 'master',
         component,
-        org: org || 'advanced-rest-client',
+        org,
         commit,
         sshUrl
       });
@@ -302,7 +305,7 @@ class GithubApiRoute extends BaseApi {
         type: 'tag-build',
         branch: branch || 'master',
         component,
-        org: org || 'advanced-rest-client',
+        org,
         commit,
         sshUrl
       });
