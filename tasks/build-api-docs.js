@@ -10,7 +10,7 @@ const api = path.join(__dirname, '..', 'api-model', 'apic-api.raml');
     api,
     apiType: 'RAML 1.0',
     apiMediaType: 'application/raml',
-    tagName: '6.0.0-preview.36',
+    // tagName: '6.0.0-preview.36',
     verbose: true,
   });
   try {
