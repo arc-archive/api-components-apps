@@ -55,6 +55,7 @@ Note that authenticated user of the web UI application has `all` scope by defaul
 | `delete-test` | Allows to remove test from the queue |
 | `create-message` | Allows to create ARC info message |
 | `delete-message` | Allows to delete ARC info message |
+| `schedule-component-build` | Allows to create new build process |
 
 ## Revoking a token
 
