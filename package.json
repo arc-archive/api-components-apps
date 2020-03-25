@@ -4,7 +4,6 @@
   "description": "A CI server, API server and documentation apps repository",
   "main": "",
   "scripts": {
-    "build:api-docs": "node tasks/build-api-docs.js",
     "create-index": "gcloud datastore indexes create index.yaml",
     "test": "npm run test-ci-app",
     "test-ci-app": "cd ci-app && npm test && cd ..",

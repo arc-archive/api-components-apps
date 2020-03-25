@@ -10,6 +10,8 @@
     "start:github": "node --inspect=9224 github.js --PORT=8084",
     "test": "mocha test/*.spec.js --require esm --timeout 90000",
     "test:watch": "mocha test/*.spec.js --require esm --timeout 90000 --watch",
+    "build:api-docs": "node tasks/build-api-docs.js",
+    "prepare": "node tasks/build-api-docs.js",
     "gke:build": "docker build -t gcr.io/advancedrestclient-1155/apic-ci-api:$npm_package_version .",
     "gke:deploy": "docker -- push gcr.io/advancedrestclient-1155/apic-ci-api:$npm_package_version",
     "gke:deploy-config": "npm run gke:deploy-tests && npm run gke:deploy-github && npm run gke:deploy-api",
