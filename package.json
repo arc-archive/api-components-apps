@@ -28,6 +28,8 @@
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "devDependencies": {
+    "@advanced-rest-client/eslint-config": "^1.1.5",
+    "@advanced-rest-client/prettier-config": "^0.1.0",
     "@api-components/api-console-builder": "^2.0.6",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
