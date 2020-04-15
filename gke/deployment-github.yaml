@@ -46,7 +46,7 @@ spec:
           secretName: github-ssh-key
       containers:
       - name: github-ci
-        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.2.6
+        image: gcr.io/advancedrestclient-1155/apic-ci-api:0.2.7
         volumeMounts:
         - name: google-cloud-key
           mountPath: /var/secrets/google
