@@ -44,10 +44,11 @@ async function storeModels(model, compact, destBase) {
  * Generates regular and compact model for the API.
  * @param {Object} doc Parsed API document
  * @param {String} type API type.
+ * @param {String} [resolution='editing'] API Console's resolution pipeline
  * @return {Promise<Array>} A promise resolved to an array containing (in order)
  * regular and compact nodel as tring.
  */
-async function generateModels(doc, type) {
+async function generateModels(doc, type, resolution='editing') {
   const result = [];
   const generator = amf.Core.generator('AMF Graph', 'application/ld+json');
   let resolver;
@@ -58,7 +59,7 @@ async function generateModels(doc, type) {
     case 'OAS 3.0': resolver = amf.Core.resolver('OAS 3.0'); break;
   }
   if (resolver) {
-    doc = resolver.resolve(doc, 'editing');
+    doc = resolver.resolve(doc, resolution);
   }
   const optsRegular = amf.render.RenderOptions().withSourceMaps;
   result[result.length] = await generator.generateString(doc, optsRegular);
@@ -68,40 +69,63 @@ async function generateModels(doc, type) {
 }
 
 /**
+ * Normalizes input options to a common structure.
+ * @param {String|Array|Object} input User input
+ * @return {Object} A resulting configuration options with:
+ * - required `type`
+ * - optional `mime`
+ * - optional `resolution`
+ */
+function normalizeOptions(input) {
+  if (Array.isArray(input)) {
+    const [type, mime, resolution] = input;
+    return { type, mime, resolution };
+  }
+  if (typeof input === 'object') {
+    return input;
+  }
+  return {
+    type: input,
+  };
+}
+
+/**
  * Parses file and sends it to process.
  *
  * @param {String} file File name in `demo` folder
  * @param {String} type Source API type.
- * @param {Object} mediaType API spec media type.
+ * @param {String} mime API spec media type.
  * @return {String}
  */
-async function parseFile(file, type, mediaType) {
+async function parseFile(file, type, mime='application/raml') {
   console.log(
-      `Parsing ${file} with type ${type} and media type ${mediaType}`
+      `Parsing ${file} with type ${type} and media type ${mime}`
   );
-  const parser = amf.Core.parser(type, mediaType);
+  const parser = amf.Core.parser(type, mime);
   return await parser.parseFileAsync(`file://${file}`);
 }
 
 async function runFile(data) {
-  const { source, destBase, mediaType, type } = data;
+  const { source, destBase } = data;
+  const { type, mime='application/yaml', resolution='editing' } = normalizeOptions(data);
   await amf.Core.init();
-  const doc = await parseFile(source, type, mediaType);
+  const doc = await parseFile(source, type, mime);
   console.log('API parsed. Generating model...');
-  const [model, compact] = await generateModels(doc, type);
+  const [model, compact] = await generateModels(doc, type, resolution);
   await storeModels(model, compact, destBase);
 }
 
-process.on('message', (data) => {
-  runFile(data).then(() => {
+process.on('message', async (data) => {
+  try {
+    await runFile(data);
     console.log('API models ready.');
     process.send({
       error: false
     });
-  }).catch((cause) => {
+  } catch (e) {
     let m = `AMF parser: Unable to parse the API.\n`;
-    m += cause.message || cause.toString();
+    m += e.message || e.toString();
     console.error(m);
     process.send({ error: m });
-  });
+  }
 });
