@@ -6,7 +6,7 @@ FROM launcher.gcr.io/google/nodejs
 # '>=8.12.0', if not then do an npm install of the latest available
 # version that satisfies it.
 # RUN /usr/local/bin/install_node '>=12.13.0'
-RUN install_node v13.9.0
+RUN install_node v13.13.0 --ignore-verification-failure
 
 RUN apt-get update
 
