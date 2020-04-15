@@ -1,3 +1,4 @@
+rm -rf test/test-repo
 mkdir test/test-repo
 cd test/test-repo
 echo "test file" > test.txt
