@@ -1,6 +1,6 @@
-import logging from '../lib/logging';
+import logging from '../lib/logging.js';
 import Git from 'nodegit';
-import { GitBuild } from './git-build';
+import { GitBuild } from './git-build.js';
 import fs from 'fs-extra';
 import path from 'path';
 import { getScopeAndName, nonElements } from './utils.js';
@@ -41,6 +41,7 @@ export class MasterBuild extends GitBuild {
       throw e;
     }
   }
+
   /**
    * Creates a new tag for current version, if not exists.
    * @return {Promise}
@@ -66,9 +67,9 @@ export class MasterBuild extends GitBuild {
    */
   async _addTag(ver) {
     const tagger = this._createSignature();
-    const message = 'Publishing release v' + ver;
+    const message = `Publishing release v${ver}`;
     const commit = await Git.Commit.lookup(this.repo, this.info.commit);
-    return await Git.Tag.create(this.repo, ver, commit, tagger, message, 0);
+    return Git.Tag.create(this.repo, ver, commit, tagger, message, 0);
   }
 
   /**
@@ -92,6 +93,6 @@ export class MasterBuild extends GitBuild {
     logging.verbose(`Pushing to the remote: ${tag}`);
     const remote = await this.repo.getRemote('origin');
     const refs = [`refs/tags/${tag}:refs/tags/${tag}`];
-    return await remote.push(refs, this._getFetchOptions());
+    return remote.push(refs, this._getFetchOptions());
   }
 }

@@ -27,16 +27,26 @@
     "Pawel Psztyc",
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
+  "engines": {
+    "node": ">=13"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.6",
+    "@types/node": ">=13"
+  },
   "devDependencies": {
-    "@advanced-rest-client/eslint-config": "^1.1.5",
     "@advanced-rest-client/prettier-config": "^0.1.0",
     "@api-components/api-console-builder": "^2.0.6",
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",
+    "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "eslint-config-esnext": "^4.0.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-node": "^4.0.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-no-only-tests": "^2.4.0",
     "esm": "^3.2.25",
     "fs-extra": "^9.0.0",
     "husky": "^4.2.5",
@@ -49,45 +59,5 @@
     "*.js": [
       "eslint --fix"
     ]
-  },
-  "eslintConfig": {
-    "extends": [
-      "eslint-config-google"
-    ],
-    "parserOptions": {
-      "sourceType": "module",
-      "ecmaVersion": 8
-    },
-    "env": {
-      "browser": true,
-      "mocha": true,
-      "node": true,
-      "es6": true
-    },
-    "rules": {
-      "no-undef": "error",
-      "require-jsdoc": 0,
-      "comma-dangle": 0,
-      "new-cap": [
-        "error",
-        {
-          "properties": false,
-          "capIsNew": false
-        }
-      ],
-      "max-len": [
-        "error",
-        {
-          "code": 120
-        }
-      ],
-      "object-curly-spacing": [
-        "error",
-        "always"
-      ],
-      "no-console": [
-        "error"
-      ]
-    }
   }
 }
