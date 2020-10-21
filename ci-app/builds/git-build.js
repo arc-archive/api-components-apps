@@ -4,34 +4,59 @@ import openpgp from 'openpgp';
 import { BaseBuild } from './base-build.js';
 import logging from '../lib/logging.js';
 import config from '../config.js';
+
+/**
+ * @typedef {object} CloneOptions
+ * @property {string=} componentDir
+ * @property {string=} sshUrl
+ * @property {string=} branch
+ */
+
 /**
  * Base class for git builders.
  */
 export class GitBuild extends BaseBuild {
   /**
+   * @constructor
+   */
+  constructor() {
+    super();
+    /**
+     * @type {Git.Repository}
+     */
+    this.repo = null;
+    /**
+     * Component info object
+     * @type {object|null}
+     */
+    this.info = null;
+  }
+
+  /**
    * Clones the repository.
    * This sets `repo` property with the reference to `Repository` object.
    *
-   * @param {Object=} cloneOpts An object to override values from `this.info`
+   * @param {CloneOptions=} cloneOpts An object to override values from `this.info`
    * property. Additional property is `componentDir` which overrides `this.workingDir`.
    * @return {Promise}
    */
-  async _clone(cloneOpts) {
+  async _clone(cloneOpts={}) {
     const opts = {
       fetchOpts: this._getFetchOptions(),
     };
+    const { info = {} } = this;
+    const config = { ...info, ...cloneOpts };
+
+    const componentDir = config.componentDir || this.workingDir;
+    logging.verbose(`Cloning ${config.sshUrl}...`);
     // @ts-ignore
-    const info = Object.assign({}, this.info || {}, cloneOpts || {});
-    const componentDir = info.componentDir || this.workingDir;
-    logging.verbose(`Cloning ${info.sshUrl}...`);
-    // @ts-ignore
-    const repo = await Git.Clone(info.sshUrl, componentDir, opts);
+    const repo = await Git.Clone(config.sshUrl, componentDir, opts);
     this.repo = repo;
     let ref = await repo.getCurrentBranch();
     logging.verbose('Repository cloned.');
     const current = ref.shorthand();
-    if (current !== info.branch) {
-      await this._checkoutBranch(info.branch);
+    if (current !== config.branch) {
+      await this._checkoutBranch(config.branch);
     }
     ref = await this.repo.getCurrentBranch();
     logging.verbose(`On branch ${ref.shorthand()}`);
@@ -39,7 +64,7 @@ export class GitBuild extends BaseBuild {
 
   /**
    * Checks out a branch
-   * @param {String} name Branch name to checkout.
+   * @param {string} name Branch name to checkout.
    * @return {Promise<void>}
    */
   async _checkoutBranch(name) {
@@ -60,8 +85,8 @@ export class GitBuild extends BaseBuild {
 
   /**
    * Creates a branch for given name.
-   * @param {String} name Name of the branch to create
-   * @return {Promise} Resolved promise returns a {Git.Reference} object.
+   * @param {string} name Name of the branch to create
+   * @return {Promise<Git.Reference>} Resolved promise returns a {Git.Reference} object.
    */
   async _createBranch(name) {
     logging.verbose(`Creating branch ${name}...`);
@@ -86,10 +111,10 @@ export class GitBuild extends BaseBuild {
         return;
       }
       return Git.Cred.sshKeyNew(
-        userName,
-        config.get('GITHUB_SSH_KEY_PUB'),
-        config.get('GITHUB_SSH_KEY'),
-        config.get('GITHUB_SSH_KEY_PASS')
+          userName,
+          config.get('GITHUB_SSH_KEY_PUB'),
+          config.get('GITHUB_SSH_KEY'),
+          config.get('GITHUB_SSH_KEY_PASS'),
       );
     };
     return {
@@ -101,8 +126,8 @@ export class GitBuild extends BaseBuild {
 
   /**
    * Callback for GPG signature when signing the commit.
-   * @param {String} tosign A string to sign.
-   * @return {Promise}
+   * @param {string} tosign A string to sign.
+   * @return {Promise<any>}
    */
   async _onSignature(tosign) {
     const privateKeyResult = await this._decryptGpg();
@@ -124,14 +149,14 @@ export class GitBuild extends BaseBuild {
 
   /**
    * Decrypts GPG key to be used to sign commits.
-   * @return {Promise}
+   * @return {Promise<openpgp.key.Key>}
    */
   async _decryptGpg() {
     const key = config.get('GPG_KEY');
     const pass = config.get('GPG_KEY_PASS');
     const buff = await fs.readFile(key);
     const armored = await openpgp.key.readArmored(buff);
-    const keyObj = armored.keys[0];
+    const [keyObj] = armored.keys;
     const decrypted = keyObj.decrypt(pass);
     if (decrypted) {
       return keyObj;
@@ -153,11 +178,11 @@ export class GitBuild extends BaseBuild {
    * @TODO: when nodegit is ready to use GPG keys this should use configured
    * GPG key to sing the commit. Currently GPG support is merged with master but
    * not yet released.
-   * @param {String} branch Current branch
-   * @param {String} message Commit message
-   * @param {String} oid Commit ID.
-   * @param {Array} parents Commit parents.
-   * @return {Promise}
+   * @param {string} branch Current branch
+   * @param {string} message Commit message
+   * @param {string} oid Commit ID.
+   * @param {Git.Commit[]} parents Commit parents.
+   * @return {Promise<Git.Oid>}
    */
   _createCommit(branch, message, oid, parents) {
     const author = this._createSignature();
@@ -171,7 +196,7 @@ export class GitBuild extends BaseBuild {
   /**
    * Pushes current tip to the remote
    * @param {string} branch
-   * @return {Promise}
+   * @return {Promise<number>}
    */
   async _push(branch) {
     logging.verbose(`Pushing to the remote: ${branch}`);

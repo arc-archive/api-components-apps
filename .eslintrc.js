@@ -50,7 +50,7 @@ module.exports = {
       }
     ],
     "class-methods-use-this": [
-      // this is unescesary for node apps.
+      // this is unnecessary for node apps.
       "off",
       {
         "exceptMethods": []

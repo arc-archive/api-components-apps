@@ -9,7 +9,7 @@ import { getScopeAndName, nonElements } from './utils.js';
  */
 export class MasterBuild extends GitBuild {
   /**
-   * @param {Object} info Data store entry for the build
+   * @param {object} info Data store entry for the build
    */
   constructor(info) {
     super();
@@ -22,7 +22,7 @@ export class MasterBuild extends GitBuild {
   /**
    * Performs a build on a master branch:
    * - tag version on GitHub
-   * @return {Promise}
+   * @return {Promise<void>}
    */
   async build() {
     if (nonElements.indexOf(this.name) !== -1) {
@@ -44,7 +44,7 @@ export class MasterBuild extends GitBuild {
 
   /**
    * Creates a new tag for current version, if not exists.
-   * @return {Promise}
+   * @return {Promise<void>}
    * @throws {Error} When a tag already exists
    */
   async _tag() {
@@ -62,8 +62,8 @@ export class MasterBuild extends GitBuild {
 
   /**
    * Creates a new tag.
-   * @param {String} ver
-   * @return {Promise}
+   * @param {string} ver
+   * @return {Promise<Git.Oid>}
    */
   async _addTag(ver) {
     const tagger = this._createSignature();
@@ -74,7 +74,7 @@ export class MasterBuild extends GitBuild {
 
   /**
    * Reads version from package.json file.
-   * @return {Promise<String>} Wersion of currently processed element.
+   * @return {Promise<string>} Wersion of currently processed element.
    */
   async _getVersion() {
     const pkg = await fs.readJson(path.join(this.workingDir, 'package.json'), { throws: false });
@@ -86,8 +86,8 @@ export class MasterBuild extends GitBuild {
 
   /**
    * Pushes tag to the remote.
-   * @param {String} tag Tag name
-   * @return {Promise}
+   * @param {string} tag Tag name
+   * @return {Promise<number>}
    */
   async _push(tag) {
     logging.verbose(`Pushing to the remote: ${tag}`);
