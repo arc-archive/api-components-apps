@@ -39,7 +39,12 @@ class Runner {
   async run(workingDir) {
     this.workingDir = workingDir;
     process.chdir(workingDir);
-    const opts = await this.createConfig();
+    let opts;
+    try {
+      opts = await this.createConfig();
+    } catch (e) {
+      throw new Error('No karma config found.');
+    }
     log('Creating karma server...');
     this.server = new Server(opts, (exitCode) => {
       log(`Karma has exited with ${exitCode}`);
