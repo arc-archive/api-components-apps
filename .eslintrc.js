@@ -74,12 +74,7 @@ module.exports = {
         capIsNew: false
       }
     ],
-    'max-len': [
-      "error",
-      {
-        code: 120
-      }
-    ],
+    'max-len': 'off',
     'object-curly-spacing': [
       'error',
       'always'

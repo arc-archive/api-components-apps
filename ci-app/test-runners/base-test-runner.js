@@ -76,7 +76,7 @@ export class BaseTestRunner extends BaseBuild {
   }
 
   /**
-   * Installs dependnecies of a component.
+   * Installs dependencies of a component.
    * @param {String} component Component name
    * @return {Promise}
    */

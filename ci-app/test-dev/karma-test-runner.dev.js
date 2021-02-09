@@ -1,3 +1,4 @@
+/* eslint-disable no-sync */
 /* eslint-disable no-console */
 
 // import { KarmaTestRunner } from '../test-runners/karma-test-runner.js';
@@ -25,8 +26,8 @@ import tmp from 'tmp';
 import fs from 'fs-extra';
 
 (async () => {
-  const tmpobj = tmp.dirSync();
-  const workingDir = tmpobj.name;
+  const tmpObj = tmp.dirSync({ keep: true });
+  const workingDir = tmpObj.name;
   const config = {
     branch: 'release/4.7.0',
   };
@@ -36,10 +37,11 @@ import fs from 'fs-extra';
     console.log('Build complete');
     const list = await fs.readdir(`${workingDir}/lib`);
     console.log(list);
-    
+
     const runner = new KarmaTestRunner('advanced-rest-client', 'amf-helper-mixin', '@advanced-rest-client/amf-helper-mixin', config);
     runner.workingDir = workingDir;
     const result = await runner.run();
+    console.log('test result');
     console.log(result);
   } catch (e) {
     console.error(e);

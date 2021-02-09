@@ -1,6 +1,6 @@
 {
   "name": "api-components-ci",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "A CI server to run API components tests using latest version of AMF and report results",
   "main": "app.js",
   "scripts": {
@@ -65,6 +65,7 @@
   },
   "devDependencies": {
     "@api-components/api-console-builder": "3.0.0",
+    "@types/tmp": "^0.2.0",
     "express-http-proxy": "^1.6.2",
     "sinon": "^9.2.4"
   },
